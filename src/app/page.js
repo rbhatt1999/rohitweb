@@ -5,7 +5,7 @@ export const metadata = {
   description: `Certified Full Stack Web Developer with 2+ years of experience. Expert in Ruby on Rails, React, and JavaScript. Demonstrated proficiency in dynamic web applications. Ready to master new technologies for your projects.`,
   images: [
     {
-      url: '/logo.png',
+      url: '/assets/rohit-bhatt.jpg',
       width: 800,
       height: 500,
       alt: 'Rohit Bhatt',
@@ -19,7 +19,7 @@ export const metadata = {
     description: `Certified Full Stack Web Developer with 2+ years of experience. Expert in Ruby on Rails, React, and JavaScript. Demonstrated proficiency in dynamic web applications. Ready to master new technologies for your projects.`,
     images: [
       {
-        url: '/assets/rohit-bhatt.png',
+        url: '/assets/rohit-bhatt.jpg',
         width: 500,
         height: 800,
         alt: 'Rohit Bhatt',
@@ -32,7 +32,7 @@ export const metadata = {
     card: 'summary_large_image',
     title: `Empower Your Business with Custom Web Solutions`,
     description: `Certified Full Stack Web Developer with 2+ years of experience. Expert in Ruby on Rails, React, and JavaScript. Demonstrated proficiency in dynamic web applications. Ready to master new technologies for your projects.`,
-    images: ['/assets/rohit-bhatt.png'],
+    images: ['/assets/rohit-bhatt.jpg'],
     creator: '@Rohit__Bhatt_',
     url: `https://rohitweb.me`,
     type: 'website',
