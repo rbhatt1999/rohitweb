@@ -1,6 +1,7 @@
 import About from "@/components/home/About"
 import HomeComponent from "@/components/home/HomeComponent"
 import Projects from "@/components/home/Projects"
+import Skills from "@/components/home/Skills"
 
 export const metadata = {
   title: `Empower Your Business with Custom Web Solutions`,
@@ -47,6 +48,7 @@ export default function Home() {
       <HomeComponent />
       <About />
       <Projects />
+      <Skills />
     </main>
   )
 }

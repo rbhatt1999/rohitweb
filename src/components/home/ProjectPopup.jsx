@@ -14,7 +14,7 @@ export default function ProjectPopup({ selectedProject, setSelectedProject }) {
                 transition={{ type: 'spring', stiffness: 30, duration: 0.5 }}
                 className="flex flex-col w-full md:w-8/12 bg-white/10 rounded-lg p-5 gap-5 max-h-screen">
                 <div className="flex flex-row justify-between items-center px-2 h-20">
-                    <h1 className="text-2xl md:text-4xl font-semibold">{selectedProject.h1}</h1>
+                    <h1 className="text-2xl md:text-4xl font-bold animate-text bg-clip-text text-transparent bg-gradient-to-r from-blue-400/90 via-neutral-200 to-blue-500">{selectedProject.h1}</h1>
                     <AiOutlineClose className="w-8 h-8 cursor-pointer hover:text-red-500" onClick={() => setSelectedProject(false)} />
                 </div>
                 <div className="flex flex-col md:flex-row gap-5 overflow-x-auto flex-1">

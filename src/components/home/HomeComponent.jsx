@@ -23,7 +23,7 @@ export default function HomeComponent() {
   const state = ['Frontend Developer', 'Backend Developer', 'Full Stack Developer', 'Software Developer'];
   const { ref, inView } = useInView();
   return (
-    <div ref={ref} id="home" className="min-h-screen flex flex-col lg:flex-row items-center text-white justify-between px-5 md:px-10 lg:px-14 py-10 md:py-16 gap-10 w-full h-full overflow-hidden flex-1">
+    <div ref={ref} id="home" className="flex flex-col lg:flex-row items-center text-white justify-between px-5 md:px-10 lg:px-14 py-10 md:py-16 gap-10 w-full h-full overflow-hidden flex-1">
       <motion.div
         initial={{ x: '-100%', opacity: 0 }}
         animate={inView ? { x: 0, opacity: 1 } : { x: '-100%', opacity: 0 }}

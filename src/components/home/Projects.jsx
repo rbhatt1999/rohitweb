@@ -74,7 +74,7 @@ export default function Projects() {
         btn2: 'https://github.com/rbhatt1999/math-magician',
     },]
     return (
-        <div id="projects" ref={ref} className="min-h-screen flex flex-col items-center text-white justify-between px-5 md:px-10 lg:px-14 py-10 md:py-24 gap-10 w-full h-full overflow-hidden flex-1">
+        <div id="projects" ref={ref} className="flex flex-col items-center text-white justify-between px-5 md:px-10 lg:px-14 py-10 md:py-24 gap-10 w-full h-full overflow-hidden flex-1">
             <div
                 className={`flex flex-col flex-1 gap-3 md:gap-5`}>
                 <motion.h1
