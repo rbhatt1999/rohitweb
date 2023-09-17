@@ -5,3 +5,7 @@
 .active_underline {
     border-bottom: 3px solid rgb(59 130 246);
 }
+
+.blueShadow {
+    box-shadow: 0 0 30px 2px rgb(59 130 246);
+}

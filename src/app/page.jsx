@@ -1,4 +1,6 @@
+import About from "@/components/home/About"
 import HomeComponent from "@/components/home/HomeComponent"
+import Projects from "@/components/home/Projects"
 
 export const metadata = {
   title: `Empower Your Business with Custom Web Solutions`,
@@ -43,6 +45,8 @@ export default function Home() {
   return (
     <main className="flex min-h-screen w-full flex-col pt-20 box-border">
       <HomeComponent />
+      <About />
+      <Projects />
     </main>
   )
 }
