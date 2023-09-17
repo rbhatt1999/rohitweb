@@ -9,3 +9,7 @@
 .blueShadow {
     box-shadow: 0 0 30px 2px rgb(59 130 246);
 }
+
+.hoverblueShadow:hover {
+    box-shadow: 0 0 30px 2px rgb(59 130 246);
+}
