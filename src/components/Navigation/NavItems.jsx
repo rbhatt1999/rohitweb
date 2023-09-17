@@ -12,10 +12,10 @@ export default function NavItems({setIsOpen = false}) {
         pathname === '/' ?
         <>
           <Link2 to="home" activeClass="active_underline" spy={true} smooth={true} offset={-80} duration={500} className={`text-white text-xl cursor-pointer`} onClick={() => setIsOpen ? setIsOpen(false) : null}>Home</Link2>
-          <Link2 to="about" activeClass="active_underline" spy={true} smooth={true} offset={0} duration={500} className={`text-white text-xl cursor-pointer`} onClick={() => setIsOpen ? setIsOpen(false) : null}>About</Link2>
-          <Link2 to="projects" activeClass="active_underline" spy={true} smooth={true} offset={0} duration={500} className={`text-white text-xl cursor-pointer`} onClick={() => setIsOpen ? setIsOpen(false) : null}>Projects</Link2>
-          <Link2 to="skills" activeClass="active_underline" spy={true} smooth={true} offset={0} duration={500} className={`text-white text-xl cursor-pointer`} onClick={() => setIsOpen ? setIsOpen(false) : null}>Skills</Link2>
-          <Link2 to="contact" activeClass="active_underline" spy={true} smooth={true} offset={0} duration={500} className={`text-white text-xl cursor-pointer`} onClick={() => setIsOpen ? setIsOpen(false) : null}>Contact</Link2>
+          <Link2 to="about" activeClass="active_underline" spy={true} smooth={true} offset={-80} duration={500} className={`text-white text-xl cursor-pointer`} onClick={() => setIsOpen ? setIsOpen(false) : null}>About</Link2>
+          <Link2 to="projects" activeClass="active_underline" spy={true} smooth={true} offset={-80} duration={500} className={`text-white text-xl cursor-pointer`} onClick={() => setIsOpen ? setIsOpen(false) : null}>Projects</Link2>
+          <Link2 to="skills" activeClass="active_underline" spy={true} smooth={true} offset={-80} duration={500} className={`text-white text-xl cursor-pointer`} onClick={() => setIsOpen ? setIsOpen(false) : null}>Skills</Link2>
+          <Link2 to="contact" activeClass="active_underline" spy={true} smooth={true} offset={-80} duration={500} className={`text-white text-xl cursor-pointer`} onClick={() => setIsOpen ? setIsOpen(false) : null}>Contact</Link2>
         </>
           :
           <>
