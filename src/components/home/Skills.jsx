@@ -37,7 +37,7 @@ export default function Skills() {
                     initial={{ x: -200, opacity: 0 }}
                     animate={inView ? { x: 0, opacity: 1 } : { x: -200, opacity: 0 }}
                     transition={{ type: 'spring', stiffness: 30, duration: 1 }}                    
-                className={`max-w-sm flex flex-col border-2 border-blue-500 rounded-lg cursor-pointer flex-1 p-5 gap-5 hoverblueShadow hover:scale-105`}>
+                className={`max-w-sm flex flex-col border-2 border-blue-500 rounded-3xl cursor-pointer flex-1 p-5 gap-5 hoverblueShadow hover:scale-105`}>
                     <h2 className='text-lg text-center md:text-2xl font-semibold'>FRONT-END</h2>
                     <ul className='flex flex-col gap-4'>
                         <li className='flex flex-row justify-between border-b-2 pb-2 border-white text-2xl'><AiFillHtml5 /> HTML</li>
@@ -54,7 +54,7 @@ export default function Skills() {
                     initial={{ y: 200, opacity: 0 }}
                     animate={inView ? { y: 0, opacity: 1 } : { y: 200, opacity: 0 }}
                     transition={{ type: 'spring', stiffness: 30, duration: 1 }}
-                className={`max-w-sm flex flex-col border-2 border-blue-500 rounded-lg cursor-pointer flex-1 p-5 gap-5 hoverblueShadow hover:scale-105`}>
+                className={`max-w-sm flex flex-col border-2 border-blue-500 rounded-3xl cursor-pointer flex-1 p-5 gap-5 hoverblueShadow hover:scale-105`}>
                     <h2 className='text-lg text-center md:text-2xl font-semibold'>BACK-END</h2>
                     <ul className='flex flex-col gap-4'>
                         <li className='flex flex-row justify-between border-b-2 pb-2 border-white text-2xl'><SiPostgresql /> PostgreSQL</li>
@@ -71,7 +71,7 @@ export default function Skills() {
                     initial={{ x: 200, opacity: 0 }}
                     animate={inView ? { x: 0, opacity: 1 } : { x: 200, opacity: 0 }}
                     transition={{ type: 'spring', stiffness: 30, duration: 1 }}
-                className={`max-w-sm flex flex-col border-2 border-blue-500 rounded-lg cursor-pointer flex-1 p-5 gap-5 hoverblueShadow hover:scale-105`}>
+                className={`max-w-sm flex flex-col border-2 border-blue-500 rounded-3xl cursor-pointer flex-1 p-5 gap-5 hoverblueShadow hover:scale-105`}>
                     <h2 className='text-lg text-center md:text-2xl font-semibold'>OTHER SKILLS</h2>
                     <ul className='flex flex-col gap-4'>
                         <li className='flex flex-row justify-between border-b-2 pb-2 border-white text-2xl'><BsGit /> Git</li>

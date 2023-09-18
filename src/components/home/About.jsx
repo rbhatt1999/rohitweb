@@ -2,6 +2,7 @@
 import { useState } from 'react'
 import pic2 from '@/assets/images/rohit-bhatt.png'
 import Link from 'next/link'
+import { Link as Link2 } from 'react-scroll'
 import { motion } from 'framer-motion'
 import Image from 'next/image'
 import { Sora, Crete_Round } from 'next/font/google'
@@ -43,8 +44,8 @@ export default function About() {
                     (<>
                         <p className='text-base md:text-xl font-normal'>Immersed in remote development, I specialize in building stunning landing pages to full-stack websites. Early delivery is my secret to success. Working across time zones, I excel in remote collaboration. As a seasoned web developer, I combine technical expertise with creative flair. From captivating designs to seamless user experiences, I conquer complex challenges with innovative solutions. Let&apos;s shape your exceptional online presence together. Explore my skills and resume below to get started on our digital journey.</p>
                         <div className={`flex flex-row gap-10`}>
-                            <Link href="/tech" className={`text-base md:text-lg bg-white/30 rounded-lg border-2 border-blue-500/30 p-2 px-5 hover:bg-blue-500/30 hover:scale-105 hover:border-blue-500 transition-all duration-150`}>Skills</Link>
-                            <a href="./Resume.pdf" target="_blank" rel="noreferrer" className={`text-base md:text-lg bg-white/30 rounded-lg border-2 border-blue-500/30 p-2 px-5 hover:bg-blue-500/30 hover:scale-105 hover:border-blue-500 transition-all duration-150`}>Resume</a>
+                            <Link2 to="skills" smooth={true} duration={1000} className={`text-base md:text-lg bg-white/30 rounded-lg border-2 border-blue-500/30 p-2 px-5 hover:bg-blue-500/30 hover:scale-105 hover:border-blue-500 transition-all duration-150`}>Skills</Link2>
+                            <Link href="./assets/resume.pdf" target="_blank" rel="noreferrer" className={`text-base md:text-lg bg-white/30 rounded-lg border-2 border-blue-500/30 p-2 px-5 hover:bg-blue-500/30 hover:scale-105 hover:border-blue-500 transition-all duration-150`}>Resume</Link>
                         </div>
                     </>)
                     :

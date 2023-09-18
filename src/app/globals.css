@@ -13,3 +13,23 @@
 .hoverblueShadow:hover {
     box-shadow: 0 0 30px 2px rgb(59 130 246);
 }
+
+/* width */
+::-webkit-scrollbar {
+    width: 8px;
+  }
+  
+  /* Track */
+  ::-webkit-scrollbar-track {
+    background: #3c3c3c;
+  }
+  
+  /* Handle */
+  ::-webkit-scrollbar-thumb {
+    background: rgb(79, 79, 79)
+  }
+  
+  /* Handle on hover */
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgb(112, 112, 112);
+  }

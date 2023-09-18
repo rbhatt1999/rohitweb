@@ -1,4 +1,6 @@
+import Footer from "@/components/Footer"
 import About from "@/components/home/About"
+import Contact from "@/components/home/Contact"
 import HomeComponent from "@/components/home/HomeComponent"
 import Projects from "@/components/home/Projects"
 import Skills from "@/components/home/Skills"
@@ -40,6 +42,9 @@ export const metadata = {
     url: `https://rohitweb.me`,
     type: 'website',
   },
+  alternates: {
+    canonical: `https://rohitweb.me`,
+  },
 }
 
 export default function Home() {
@@ -49,6 +54,8 @@ export default function Home() {
       <About />
       <Projects />
       <Skills />
+      <Contact />
+      <Footer />
     </main>
   )
 }

@@ -1,6 +1,7 @@
 'use client'
 import { Typewriter } from 'react-simple-typewriter'
 import Link from 'next/link'
+import { Link as Link2 } from 'react-scroll'
 import pic from '@/assets/images/homepageimage.png'
 import { motion } from 'framer-motion'
 import { AiFillGithub, AiFillLinkedin, AiOutlineTwitter, AiFillMediumSquare } from 'react-icons/ai'
@@ -33,8 +34,8 @@ export default function HomeComponent() {
         <h2 className="text-xl md:text-4xl text-white">I&apos;m a <span className='text-blue-500'><Typewriter words={state} loop={false} cursor typeSpeed={90} /></span></h2>
         <p className='text-base md:text-xl font-normal'>Ready to turn your digital dreams into reality? With a proven track record in building impressive products, features, and websites, I&apos;ll bring your vision to life. Don&apos;t wait &ndash; contact me today and let&apos;s create something extraordinary together!</p>
         <div className="flex flex-row gap-4 md:gap-8">
-          <Link href="/about" className="text-base md:text-lg bg-white/30 rounded-lg border-2 border-blue-500/30 p-2 px-5 hover:bg-blue-500/30 hover:scale-105 hover:border-blue-500 transition-all duration-150">Know More</Link>
-          <Link href="/contact" className="text-base md:text-lg bg-white/30 rounded-lg border-2 border-blue-500/30 p-2 px-5 hover:bg-blue-500/30 hover:scale-105 hover:border-blue-500 transition-all duration-150">Contact Me</Link>
+          <Link2 to="about" smooth={true} duration={1000} className="text-base md:text-lg bg-white/30 rounded-lg border-2 border-blue-500/30 p-2 px-5 hover:bg-blue-500/30 hover:scale-105 hover:border-blue-500 transition-all cursor-pointer duration-150">Know More</Link2> 
+          <Link2 to="contact" smooth={true} duration={1000} className="text-base md:text-lg bg-white/30 rounded-lg border-2 border-blue-500/30 p-2 px-5 hover:bg-blue-500/30 hover:scale-105 hover:border-blue-500 transition-all cursor-pointer duration-150">Contact Me</Link2>
         </div>
         <div className="flex flex-row gap-4 justify-center md:justify-start">
           <Link href='https://github.com/rbhatt1999' target='_blank' rel="noreferrer"><AiFillGithub className="hover:scale-105 cursor-pointer w-8 h-8" /></Link>
