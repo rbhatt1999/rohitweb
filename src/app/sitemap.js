@@ -11,12 +11,13 @@ export default async function sitemap() {
       lastModified: new Date(blog.date),
     }
   })
-  const categoryUrls = categoryData.map(category => {
-    return {
-      url: `${url}/categories/${category.slug}`,
-      lastModified: new Date(),
-    }
-  })
+  const categoryUrls = [
+    {
+      url: `${url}`,
+      lastModified: date,
+      priority: 1,
+    },
+  ]
 
   const date = new Date();
   return [
