@@ -11,7 +11,7 @@ export default function NavigationBar() {
       <Link href="/">
         <Image src={logo} width={90} height={10} className='w-12 h-12 md:w-16 md:h-16' />
       </Link>
-      <div className="hidden lg:flex flex-row gap-10 justify-between">
+      <div className="hidden lg:flex flex-row gap-10 justify-between items-center">
         <NavItems />
       </div>
       <div className="flex lg:hidden">

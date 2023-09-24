@@ -1,0 +1,40 @@
+const categoryData = [
+  {
+    name: "JavaScript",
+    slug: "javascript",
+    id: 1,
+    title: "JavaScript Tips, Tricks, and Tutorials",
+    description: "Get the latest news, tips, and insights on JavaScript, the world's most popular programming language.",
+    image: {
+      src: `https://i.ibb.co/4RFydQR/javascript.webp`,
+      alt: `JavaScript Tips, Tricks, and Tutorials`,
+    },
+    tags: ['javascript', 'webdev', 'frontend'],
+  },
+  {
+    name: "Ruby on Rails",
+    slug: "ruby-on-rails",
+    id: 2,
+    title: "Ruby on Rails Tips, Tricks, and Tutorials",
+    description: "Get the latest news, tips, and insights on Ruby on Rails, a server-side web application framework written in Ruby.",
+    image: {
+      src: `https://i.ibb.co/YtrCKVR/ror.webp`,
+      alt: `Ruby on Rails Tips, Tricks, and Tutorials`,
+    },
+    tags: ['ruby', 'rails', 'backend'],
+  },
+  {
+    name: "Personal Life",
+    slug: "personal-life",
+    id: 3,
+    title: "About Rohit Bhatt Professional Journey",
+    description: "Know more about who Rohit Bhatt is, what he does, and how he can help you.",
+    image: {
+      src: `https://i.ibb.co/f8VY5x1/personal-life.webp`,
+      alt: `About Rohit Bhatt Professional Journey`,
+    },
+    tags: ['personal', 'life', 'journey'],
+  }
+]
+
+export default categoryData;

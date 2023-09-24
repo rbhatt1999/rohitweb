@@ -3,33 +3,49 @@
 @tailwind utilities;
 
 .active_underline {
-    border-bottom: 3px solid rgb(59 130 246);
+  border-bottom: 3px solid rgb(59 130 246);
 }
 
 .blueShadow {
-    box-shadow: 0 0 30px 2px rgb(59 130 246);
+  box-shadow: 0 0 30px 2px rgb(59 130 246);
 }
 
 .hoverblueShadow:hover {
-    box-shadow: 0 0 30px 2px rgb(59 130 246);
+  box-shadow: 0 0 30px 2px rgb(59 130 246);
 }
 
 /* width */
 ::-webkit-scrollbar {
-    width: 8px;
-  }
-  
-  /* Track */
-  ::-webkit-scrollbar-track {
-    background: #3c3c3c;
-  }
-  
-  /* Handle */
-  ::-webkit-scrollbar-thumb {
-    background: rgb(79, 79, 79)
-  }
-  
-  /* Handle on hover */
-  ::-webkit-scrollbar-thumb:hover {
-    background: rgb(112, 112, 112);
-  }
+  width: 8px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: #3c3c3c;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: rgb(79, 79, 79)
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: rgb(112, 112, 112);
+}
+
+.blog-section br {
+  display: block;
+  content: "";
+  margin: 5px 0;
+}
+
+.anchor-tag a {
+  color: #1e00b5;
+  text-decoration: none;
+}
+
+.social-anchor-tag a:hover {
+  color: #1e00b5;
+  text-decoration: underline;
+}
