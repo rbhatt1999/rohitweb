@@ -92,7 +92,7 @@ export default async function page({ params }) {
     <>
       <main className={`relative flex min-h-screen blog-section flex-col items-center mt-16 ${sora.className}`}>
         <div className='flex flex-col md:flex-row w-full gap-8 px-2 py-12 md:px-40'>
-          <section className="flex flex-col w-full gap-5 justify-center md:w-8/12 break-words">
+          <section className="flex flex-col w-full gap-5 justify-center md:w-8/12 break-words overflow-x-hidden">
             <div className="flex flex-col justify-center w-full border-y-2 border-stone-200/5  py-2 flex-1 gap-2 md:gap-5">
               <span className='text-left text-base text-white'>
                 <Link href={`/blogs`}>Blogs</Link> / <Link href={`/categories/${data.category.slug}`}>{data.category.name}</Link> / <Link href={`/blogs/${data.blog.slug}`}>{data.blog.title}</Link>
