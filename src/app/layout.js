@@ -2,6 +2,7 @@ import NavigationBar from '@/components/Navigation/NavigationBar'
 import './globals.css'
 import { Roboto, Lato } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/react';
+import Footer from '@/components/Footer';
 
 
 const lato = Lato({
@@ -22,7 +23,7 @@ export const metadata = {
   ],
   url: `https://www.rohitweb.me`,
   type: 'website',
-  keywords: ['Rohit Bhatt', 'Custom Web Solutions', 'Full Stack Web Developer', 'Ruby on Rails', 'React', 'JavaScript', 'Dynamic Web Applications', 'Web Development', 'Web Developer', 'Web Solutions', 'Web Solutions Provider', 'Web Solutions Provider in India', 'Web Solutions Provider in Utarakhand', 'Web Solutions Provider in Ahmedabad', 'Web Solutions Provider in Gujarat', 'Web Solutions Provider in India', 'Web Solutions Provider in USA', 'Web Solutions Provider in Canada', 'Web Solutions Provider in Australia', 'Web Solutions Provider in UK', 'Web Solutions Provider in UAE', 'Web Solutions Provider in Dubai', 'Web Solutions Provider in Singapore', 'Web Solutions Provider in Malaysia', 'Web Solutions Provider in New Zealand', 'Web Solutions Provider in South Africa', 'Web Solutions Provider in Europe', 'Web Solutions Provider in Asia', 'Web Solutions Provider in North America', 'Web Solutions Provider in South America', 'Web Solutions Provider in Central America', 'Web Solutions Provider in Africa', 'Web Solutions Provider in Delhi'], 
+  keywords: ['Rohit Bhatt', 'Custom Web Solutions', 'Full Stack Web Developer', 'Ruby on Rails', 'React', 'JavaScript', 'Dynamic Web Applications', 'Web Development', 'Web Developer', 'Web Solutions', 'Web Solutions Provider', 'Web Solutions Provider in India', 'Web Solutions Provider in Utarakhand', 'Web Solutions Provider in Ahmedabad', 'Web Solutions Provider in Gujarat', 'Web Solutions Provider in India', 'Web Solutions Provider in USA', 'Web Solutions Provider in Canada', 'Web Solutions Provider in Australia', 'Web Solutions Provider in UK', 'Web Solutions Provider in UAE', 'Web Solutions Provider in Dubai', 'Web Solutions Provider in Singapore', 'Web Solutions Provider in Malaysia', 'Web Solutions Provider in New Zealand', 'Web Solutions Provider in South Africa', 'Web Solutions Provider in Europe', 'Web Solutions Provider in Asia', 'Web Solutions Provider in North America', 'Web Solutions Provider in South America', 'Web Solutions Provider in Central America', 'Web Solutions Provider in Africa', 'Web Solutions Provider in Delhi'],
   openGraph: {
     title: `Empower Your Business with Custom Web Solutions`,
     description: `Certified Full Stack Web Developer with 2+ years of experience. Expert in Ruby on Rails, React, and JavaScript. Demonstrated proficiency in dynamic web applications. Ready to master new technologies for your projects.`,
@@ -55,7 +56,8 @@ export default function RootLayout({ children }) {
         <Analytics />
         <NavigationBar />
         {children}
-        </body>
+        <Footer />
+      </body>
     </html>
   )
 }

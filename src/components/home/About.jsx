@@ -22,7 +22,7 @@ export default function About() {
     const [professional, setprofessional] = useState(true);
     const { ref, inView } = useInView();
     return (
-        <div id="about" ref={ref} className="min-h-screen box-border flex flex-col lg:flex-row items-center animate-text bg-gradient-to-r from-white/5 to-blue-500/5 text-white justify-between px-5 md:px-10 lg:px-14 py-10 md:py-24 gap-10 w-full h-full overflow-hidden flex-1">
+        <div id="about" ref={ref} className="min-h-screen box-border flex flex-col lg:flex-row items-center animate-text bg-gradient-to-r from-white/5 to-blue-500/5 text-white justify-between px-5 md:px-10 lg:px-14 py-10 md:py-24 gap-5 md:gap-10 w-full h-full overflow-hidden flex-1">
             <motion.div
                 initial={{ x: '-100%', opacity: 0 }}
                 animate={inView ? { x: 0, opacity: 1 } : { x: '-100%', opacity: 0 }}
@@ -34,7 +34,7 @@ export default function About() {
                 initial={{ x: '100%', opacity: 0 }}
                 animate={inView ? { x: 0, opacity: 1 } : { x: '100%', opacity: 0 }}
                 transition={{ type: 'spring', stiffness: 30, duration: 1 }}
-                className={`flex flex-col w-full md:w-7/12 gap-2 md:gap-5`}>
+                className={`flex flex-col w-full md:w-7/12 gap-2 md:gap-5 items-center md:items-start`}>
                 <h1 className={`${crete_round.className} text-2xl text-center md:text-left md:text-6xl font-semibold`}>About me</h1>
                 <div className={`flex flex-row w-fit text-xl`}>
                     <span className={`text-lg md:text-2xl p-2 px-5 cursor-pointer border-r-2 select-none rounded-l-xl ${professional ? 'bg-blue-500/80' : 'bg-white/10'}`} onClick={() => setprofessional(true)}>Professional</span>
@@ -42,10 +42,10 @@ export default function About() {
                 </div>
                 {professional ?
                     (<>
-                        <p className='text-base md:text-xl font-normal'>Immersed in remote development, I specialize in building stunning landing pages to full-stack websites. Early delivery is my secret to success. Working across time zones, I excel in remote collaboration. As a seasoned web developer, I combine technical expertise with creative flair. From captivating designs to seamless user experiences, I conquer complex challenges with innovative solutions. Let&apos;s shape your exceptional online presence together. Explore my skills and resume below to get started on our digital journey.</p>
-                        <div className={`flex flex-row gap-10`}>
-                            <Link2 to="skills" smooth={true} duration={1000} className={`text-base md:text-lg bg-white/30 rounded-lg border-2 border-blue-500/30 p-2 px-5 hover:bg-blue-500/30 hover:scale-105 hover:border-blue-500 transition-all duration-150`}>Skills</Link2>
-                            <Link href="./assets/resume.pdf" target="_blank" rel="noreferrer" className={`text-base md:text-lg bg-white/30 rounded-lg border-2 border-blue-500/30 p-2 px-5 hover:bg-blue-500/30 hover:scale-105 hover:border-blue-500 transition-all duration-150`}>Resume</Link>
+                        <p className='text-base md:text-xl font-normal text-center md:text-left'>Immersed in remote development, I specialize in building stunning landing pages to full-stack websites. Early delivery is my secret to success. Working across time zones, I excel in remote collaboration. As a seasoned web developer, I combine technical expertise with creative flair. From captivating designs to seamless user experiences, I conquer complex challenges with innovative solutions. Let&apos;s shape your exceptional online presence together. Explore my skills and resume below to get started on our digital journey.</p>
+                        <div className={`flex flex-row gap-5 md:gap-10 self-stretch md:w-5/12`}>
+                            <Link2 to="skills" smooth={true} duration={1000} className={`text-base text-center flex-1 md:flex-0 md:text-lg bg-white/30 rounded-lg border-2 border-blue-500/30 p-2 px-5 hover:bg-blue-500/30 hover:scale-105 hover:border-blue-500 transition-all duration-150`}>Skills</Link2>
+                            <Link href="./assets/resume.pdf" target="_blank" rel="noreferrer" className={`text-base text-center flex-1 md:flex-0 md:text-lg bg-white/30 rounded-lg border-2 border-blue-500/30 p-2 px-5 hover:bg-blue-500/30 hover:scale-105 hover:border-blue-500 transition-all duration-150`}>Resume</Link>
                         </div>
                     </>)
                     :

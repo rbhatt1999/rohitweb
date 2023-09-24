@@ -40,14 +40,14 @@ export default function Skills() {
                 className={`max-w-sm flex flex-col border-2 border-blue-500 rounded-3xl cursor-pointer flex-1 p-5 gap-5 hoverblueShadow hover:scale-105`}>
                     <h2 className='text-lg text-center md:text-2xl font-semibold'>FRONT-END</h2>
                     <ul className='flex flex-col gap-4'>
-                        <li className='flex flex-row justify-between border-b-2 pb-2 border-white text-2xl'><AiFillHtml5 /> HTML</li>
-                        <li className='flex flex-row justify-between border-b-2 pb-2 border-white text-2xl'> <IoLogoCss3 /> CSS</li>
-                        <li className='flex flex-row justify-between border-b-2 pb-2 border-white text-2xl'><TbBrandJavascript /> JavaScript</li>
-                        <li className='flex flex-row justify-between border-b-2 pb-2 border-white text-2xl'><DiReact /> React</li>
-                        <li className='flex flex-row justify-between border-b-2 pb-2 border-white text-2xl'><TbBrandRedux /> Redux</li>
-                        <li className='flex flex-row justify-between border-b-2 pb-2 border-white text-2xl'><FaBootstrap /> Bootstrap</li>
-                        <li className='flex flex-row justify-between border-b-2 pb-2 border-white text-2xl'><FiFramer /> FramerMotion</li>
-                        <li className='flex flex-row justify-between border-b-2 pb-2 border-white text-2xl'><SiTailwindcss /> Tailwind</li>
+                        <li className='flex flex-row justify-between border-b-2 pb-2 border-white text-lg md:text-2xl'><AiFillHtml5 /> HTML</li>
+                        <li className='flex flex-row justify-between border-b-2 pb-2 border-white text-lg md:text-2xl'> <IoLogoCss3 /> CSS</li>
+                        <li className='flex flex-row justify-between border-b-2 pb-2 border-white text-lg md:text-2xl'><TbBrandJavascript /> JavaScript</li>
+                        <li className='flex flex-row justify-between border-b-2 pb-2 border-white text-lg md:text-2xl'><DiReact /> React</li>
+                        <li className='flex flex-row justify-between border-b-2 pb-2 border-white text-lg md:text-2xl'><TbBrandRedux /> Redux</li>
+                        <li className='flex flex-row justify-between border-b-2 pb-2 border-white text-lg md:text-2xl'><FaBootstrap /> Bootstrap</li>
+                        <li className='flex flex-row justify-between border-b-2 pb-2 border-white text-lg md:text-2xl'><FiFramer /> FramerMotion</li>
+                        <li className='flex flex-row justify-between border-b-2 pb-2 border-white text-lg md:text-2xl'><SiTailwindcss /> Tailwind</li>
                     </ul>
                 </motion.div>
                 <motion.div
@@ -57,14 +57,14 @@ export default function Skills() {
                 className={`max-w-sm flex flex-col border-2 border-blue-500 rounded-3xl cursor-pointer flex-1 p-5 gap-5 hoverblueShadow hover:scale-105`}>
                     <h2 className='text-lg text-center md:text-2xl font-semibold'>BACK-END</h2>
                     <ul className='flex flex-col gap-4'>
-                        <li className='flex flex-row justify-between border-b-2 pb-2 border-white text-2xl'><SiPostgresql /> PostgreSQL</li>
-                        <li className='flex flex-row justify-between border-b-2 pb-2 border-white text-2xl'><DiRuby />Ruby</li>
-                        <li className='flex flex-row justify-between border-b-2 pb-2 border-white text-2xl'><SiRubyonrails /> Ruby on rails</li>
-                        <li className='flex flex-row justify-between border-b-2 pb-2 border-white text-2xl'><SiAuth0 /> JWT</li>
-                        <li className='flex flex-row justify-between border-b-2 pb-2 border-white text-2xl'><HiOutlineColorSwatch /> Rwag</li>
-                        <li className='flex flex-row justify-between border-b-2 pb-2 border-white text-2xl'><HiLockClosed /> CanCanCan</li>
-                        <li className='flex flex-row justify-between border-b-2 pb-2 border-white text-2xl'><HiOutlineDeviceTablet /> Devise</li>
-                        <li className='flex flex-row justify-between border-b-2 pb-2 border-white text-2xl'><IoLogoNodejs /> Node.js</li>
+                        <li className='flex flex-row justify-between border-b-2 pb-2 border-white text-lg md:text-2xl'><SiPostgresql /> PostgreSQL</li>
+                        <li className='flex flex-row justify-between border-b-2 pb-2 border-white text-lg md:text-2xl'><DiRuby />Ruby</li>
+                        <li className='flex flex-row justify-between border-b-2 pb-2 border-white text-lg md:text-2xl'><SiRubyonrails /> Ruby on rails</li>
+                        <li className='flex flex-row justify-between border-b-2 pb-2 border-white text-lg md:text-2xl'><SiAuth0 /> JWT</li>
+                        <li className='flex flex-row justify-between border-b-2 pb-2 border-white text-lg md:text-2xl'><HiOutlineColorSwatch /> Rwag</li>
+                        <li className='flex flex-row justify-between border-b-2 pb-2 border-white text-lg md:text-2xl'><HiLockClosed /> CanCanCan</li>
+                        <li className='flex flex-row justify-between border-b-2 pb-2 border-white text-lg md:text-2xl'><HiOutlineDeviceTablet /> Devise</li>
+                        <li className='flex flex-row justify-between border-b-2 pb-2 border-white text-lg md:text-2xl'><IoLogoNodejs /> Node.js</li>
                     </ul>
                 </motion.div>
                 <motion.div
@@ -74,14 +74,14 @@ export default function Skills() {
                 className={`max-w-sm flex flex-col border-2 border-blue-500 rounded-3xl cursor-pointer flex-1 p-5 gap-5 hoverblueShadow hover:scale-105`}>
                     <h2 className='text-lg text-center md:text-2xl font-semibold'>OTHER SKILLS</h2>
                     <ul className='flex flex-col gap-4'>
-                        <li className='flex flex-row justify-between border-b-2 pb-2 border-white text-2xl'><BsGit /> Git</li>
-                        <li className='flex flex-row justify-between border-b-2 pb-2 border-white text-2xl'><AiFillGithub /> GitHub</li>
-                        <li className='flex flex-row justify-between border-b-2 pb-2 border-white text-2xl'><SiHeroku /> Heroku</li>
-                        <li className='flex flex-row justify-between border-b-2 pb-2 border-white text-2xl'> <SiNetlify /> Netlify</li>
-                        <li className='flex flex-row justify-between border-b-2 pb-2 border-white text-2xl'><SiPostman /> Postman</li>
-                        <li className='flex flex-row justify-between border-b-2 pb-2 border-white text-2xl'><SiVisualstudiocode />VS Code</li>
-                        <li className='flex flex-row justify-between border-b-2 pb-2 border-white text-2xl'><BsFillTerminalFill /> Terminal</li>
-                        <li className='flex flex-row justify-between border-b-2 pb-2 border-white text-2xl'><AiFillGitlab /> GitLab</li>
+                        <li className='flex flex-row justify-between border-b-2 pb-2 border-white text-lg md:text-2xl'><BsGit /> Git</li>
+                        <li className='flex flex-row justify-between border-b-2 pb-2 border-white text-lg md:text-2xl'><AiFillGithub /> GitHub</li>
+                        <li className='flex flex-row justify-between border-b-2 pb-2 border-white text-lg md:text-2xl'><SiHeroku /> Heroku</li>
+                        <li className='flex flex-row justify-between border-b-2 pb-2 border-white text-lg md:text-2xl'> <SiNetlify /> Netlify</li>
+                        <li className='flex flex-row justify-between border-b-2 pb-2 border-white text-lg md:text-2xl'><SiPostman /> Postman</li>
+                        <li className='flex flex-row justify-between border-b-2 pb-2 border-white text-lg md:text-2xl'><SiVisualstudiocode />VS Code</li>
+                        <li className='flex flex-row justify-between border-b-2 pb-2 border-white text-lg md:text-2xl'><BsFillTerminalFill /> Terminal</li>
+                        <li className='flex flex-row justify-between border-b-2 pb-2 border-white text-lg md:text-2xl'><AiFillGitlab /> GitLab</li>
                     </ul>
                 </motion.div>
             </div>
