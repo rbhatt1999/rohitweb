@@ -103,7 +103,7 @@ export default async function page({ params, searchParams }) {
               <BlogsList data={data} totalPage={totalPage} page={page} search={search} afterurl={`archive/${slug}`} />
           }
         </div>
-        <div className='flex flex-col w-full flex-1'>
+        <div className='flex flex-col w-full flex-1 relative'>
           <SideBar search={search} afterurl={`archive/${slug}`} />
         </div>
       </div>

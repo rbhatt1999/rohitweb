@@ -264,7 +264,7 @@ export default async function page({ params }) {
               )
             }
           </section>
-          <div className='w-full flex-1 flex flex-col'>
+          <div className='w-full flex-1 flex flex-col relative'>
             <SideBar />
           </div>
         </div >

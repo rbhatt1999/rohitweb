@@ -99,7 +99,7 @@ export default async function page({params,searchParams}) {
             data.blog.length === 0 ? <h1 className='text-5xl font-bold text-center text-neutral-700'>No Blogs Found</h1>:<BlogsList data={data.blog} totalPage={data.totalPage} page={page} search={search} afterurl={`social-awareness/categories/${slug}`} />
           }
         </div>
-        <div className='flex flex-col w-full flex-1'>
+        <div className='flex flex-col w-full flex-1 relative'>
         <SideBar search={search} afterurl={`categories/${slug}`} />
         </div>
       </div>

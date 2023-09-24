@@ -62,7 +62,7 @@ export default async function page({ searchParams }) {
         }
 
         </div>
-        <div className='flex flex-col w-full flex-1'>
+        <div className='flex flex-col w-full flex-1 relative'>
           <SideBar search={search} afterurl='blogs' />
         </div>
       </div>
