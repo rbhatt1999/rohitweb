@@ -92,7 +92,7 @@ export default async function page({ params }) {
     <>
       <main className={`relative flex min-h-screen blog-section flex-col items-center mt-16 ${sora.className}`}>
         <div className='flex flex-col md:flex-row w-full gap-8 px-2 py-12 md:px-40'>
-          <section className="flex flex-col w-full gap-5 justify-center md:w-8/12 break-words overflow-x-hidden">
+          <section className="flex flex-col w-full gap-5 justify-center md:w-8/12 overflow-x-hidden break-words">
             <div className="flex flex-col justify-center w-full border-y-2 border-stone-200/5  py-2 flex-1 gap-2 md:gap-5">
               <span className='text-left text-base text-white'>
                 <Link href={`/blogs`}>Blogs</Link> / <Link href={`/categories/${data.category.slug}`}>{data.category.name}</Link> / <Link href={`/blogs/${data.blog.slug}`}>{data.blog.title}</Link>
@@ -130,7 +130,7 @@ export default async function page({ params }) {
                             section.list.map((listItem, index3) => (
                               <li key={index3} className='text-white flex flex-row gap-2'>
                                 <span className='text-blue-400 font-semibold select-none'>{index3 + 1}.</span>
-                                <span>
+                                <span className='overflow-x-hidden'>
                                   {
                                     listItem.h1 && <span className='text-blue-400 font-semibold'>{parse(listItem.h1)}: </span>
                                   }
