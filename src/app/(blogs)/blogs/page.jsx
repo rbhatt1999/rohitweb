@@ -37,7 +37,7 @@ export default async function page({ searchParams }) {
   }
   const { data, totalPage } = await getBlogs(page, search);
   return (
-    <main className={`relative flex flex-col items-center mt-16 ${dmSans.className} overflow-x-hidden`}>
+    <main className={`relative flex flex-col items-center mt-16 ${dmSans.className}`}>
       <section className="flex flex-col md:flex-row w-full bg-white/5 items-center justify-center px-2 py-12 md:py-24 md:px-20">
         <div className="flex flex-col justify-center items-center flex-1 gap-2 md:gap-5">
           <h1 className="text-3xl md:text-5xl font-bold text-center text-blue-400">

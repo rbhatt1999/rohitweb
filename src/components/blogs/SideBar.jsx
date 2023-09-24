@@ -23,7 +23,7 @@ const getrecentfiveblogs = async () => {
 export default async function SideBar({search, afterurl}) {
   const data = await getrecentfiveblogs();
   return (
-    <div className='flex flex-col w-full gap-5 bg-white/5 p-5 rounded-xl'>
+    <div className='flex flex-col w-full gap-5 bg-white/5 p-5 rounded-xl md:sticky md:top-24'>
       <div className='flex flex-row gap-2 border-b-2 border-neutral-300 pb-8'>
         <Search search={search} afterurl={afterurl} />
         </div>
