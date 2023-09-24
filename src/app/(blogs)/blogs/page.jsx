@@ -11,6 +11,48 @@ const dmSans = DM_Sans({
   subsets: ['latin'],
 })
 
+export const metadata = {
+  title: `Exploring the Latest Web Technology Trends and Innovations`,
+  description: `Learn about multiple web development technologies like Ruby on Rails, React, JavaScript, and many more. Explore the latest web technology trends and innovations.`, 
+  images: [
+    {
+      url: 'https://i.ibb.co/BL54PXc/blogs.webp',
+      width: 800,
+      height: 500,
+      alt: 'Rohit Bhatt',
+    },
+  ],
+  url: `${url}/blogs`,
+  type: 'website',
+  keywords: ['Rohit Bhatt', 'Custom Web Solutions', 'Full Stack Web Developer', 'Ruby on Rails', 'React', 'JavaScript', 'Dynamic Web Applications', 'Web Development', 'Web Developer', 'Web Solutions', 'Web Solutions Provider', 'Web Solutions Provider in India', 'Web Solutions Provider in Utarakhand', 'Web Solutions Provider in Ahmedabad', 'Web Solutions Provider in Gujarat', 'Web Solutions Provider in India', 'Web Solutions Provider in USA', 'Web Solutions Provider in Canada', 'Web Solutions Provider in Australia', 'Web Solutions Provider in UK', 'Web Solutions Provider in UAE', 'Web Solutions Provider in Dubai', 'Web Solutions Provider in Singapore', 'Web Solutions Provider in Malaysia', 'Web Solutions Provider in New Zealand', 'Web Solutions Provider in South Africa', 'Web Solutions Provider in Europe', 'Web Solutions Provider in Asia', 'Web Solutions Provider in North America', 'Web Solutions Provider in South America', 'Web Solutions Provider in Central America', 'Web Solutions Provider in Africa', 'Web Solutions Provider in Delhi'],
+  openGraph: {
+    title: `Exploring the Latest Web Technology Trends and Innovations`,
+    description: `Learn about multiple web development technologies like Ruby on Rails, React, JavaScript, and many more. Explore the latest web technology trends and innovations.`,
+    images: [
+      {
+        url: 'https://i.ibb.co/BL54PXc/blogs.webp',
+        width: 500,
+        height: 800,
+        alt: 'Rohit Bhatt',
+      },
+    ],
+    url: `${url}/blogs`,
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: `Exploring the Latest Web Technology Trends and Innovations`,
+    description: `Learn about multiple web development technologies like Ruby on Rails, React, JavaScript, and many more. Explore the latest web technology trends and innovations.`,
+    images: ['https://i.ibb.co/BL54PXc/blogs.webp'],
+    creator: '@Rohit__Bhatt_',
+    url: `${url}/blogs`,
+    type: 'website',
+  },
+  alternates: {
+    canonical: `${url}/blogs`,
+  },
+}
+
 export async function getBlogs(page=false, search=false, all=false) {
   let res
   try {
@@ -40,8 +82,8 @@ export default async function page({ searchParams }) {
     <main className={`relative flex flex-col items-center mt-16 ${dmSans.className}`}>
       <section className="flex flex-col md:flex-row w-full bg-white/5 items-center justify-center px-2 py-12 md:py-24 md:px-20">
         <div className="flex flex-col justify-center items-center flex-1 gap-2 md:gap-5">
-          <h1 className="text-3xl md:text-5xl font-bold text-center text-blue-400">
-          Unlocking the Future: Exploring the Latest Web Technology Trends and Innovations
+          <h1 className="text-2xl md:text-4xl font-bold text-center text-blue-400">
+          Exploring the Latest Web Technology Trends and Innovations
           </h1>
           {
             search && (

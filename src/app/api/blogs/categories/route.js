@@ -3,10 +3,10 @@ import categoryData from "../category";
 
 
 export async function GET(req) {
-    let cat = req.nextUrl.searchParams.get("cat")
-    let category = categoryData.find((item) => {
-        return item.slug === cat;
-    });
-  return NextResponse.json(category);
+    let cat = req.nextUrl.searchParams.get("cat") || null;
+    let category = null;
+    if (cat) {
+        category = categoryData.find((category) => category.slug === cat);
+    }
+  return NextResponse.json(category ? category : categoryData);
 }
-
