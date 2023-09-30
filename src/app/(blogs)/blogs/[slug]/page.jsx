@@ -119,13 +119,13 @@ export default async function page({ params }) {
                         section.h1 && <h2 className="text-lg md:text-xl font-bold text-left anchor-tag text-blue-400">{parse(section.h1)}</h2>
                       }
                       {
-                        section.h2 && <h3 className="text-base md:text-lg font-semibold text-left anchor-tag text-blue-400">{parse(section.h2)}</h3>
+                        section.h2 && <h3 className="text-base md:text-lg font-semibold text-left anchor-tag text-blue-400/90">{parse(section.h2)}</h3>
                       }
                       {
                         section.p && <p className="text-base md:text-lg font-light anchor-tag text-left text-white">{parse(section.p)}</p>
                       }
                       {
-                        section.list && <ul className="text-base md:text-lg flex flex-col gap-2 font-light text-left anchor-tag pt-5">
+                        section.list && <ul className={`text-base md:text-lg flex flex-col gap-2 font-light text-left anchor-tag ${section.p ? 'pt-5' : ''}`}>
                           {
                             section.list.map((listItem, index3) => (
                               <li key={index3} className='text-white flex flex-row gap-2'>
@@ -168,13 +168,13 @@ export default async function page({ params }) {
                                     subSection.h1 && <h2 className="text-lg md:text-xl font-bold text-left anchor-tag text-blue-400">{parse(subSection.h1)}</h2>
                                   }
                                   {
-                                    subSection.h2 && <h3 className="text-base md:text-lg font-semibold text-left anchor-tag text-blue-400">{parse(subSection.h2)}</h3>
+                                    subSection.h2 && <h3 className="text-base md:text-lg font-semibold text-left anchor-tag text-blue-400/90">{parse(subSection.h2)}</h3>
                                   }
                                   {
                                     subSection.p && <p className="text-base md:text-lg font-light text-left anchor-tag text-white">{parse(subSection.p)}</p>
                                   }
                                   {
-                                    subSection.list && <ul className="text-base md:text-lg flex flex-col gap-2 font-light text-left anchor-tag pt-5">
+                                    subSection.list && <ul className={`text-base md:text-lg flex flex-col gap-2 font-light text-left anchor-tag ${section.p ? 'pt-5' : ''}`}>
                                       {
                                         subSection.list.map((listItem, index3) => (
                                           <li key={index3} className='text-white flex flex-row gap-2'>
