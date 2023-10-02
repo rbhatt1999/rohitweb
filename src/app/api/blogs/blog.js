@@ -108,7 +108,7 @@ const blogdata = [
           allow do
             # Specify which origins are allowed to make CORS requests
             origins 'localhost:3000', 'example.com'
-        
+
             # Specify which resources are allowed and which methods and headers are supported
             resource '/api/*',
               headers: :any,
@@ -280,7 +280,259 @@ const blogdata = [
       show: true,
       title: `Mastering Cross-Origin Communication with Rack CORS in Rails`,
       slug: `mastering-cross-origin-communication-with-rack-cors-in-rails`,
-    },      
+    },
+  },
+  {
+    title: 'Ruby Builder Pattern: A Step-by-Step Guide to Creating Complex Objects',
+    slug: 'ruby-builder-pattern-a-step-by-step-guide-to-creating-complex-objects',
+    id: 4,
+    category_id: 4,
+    description: `Learn how to use the Builder pattern in Ruby on Rails to create complex objects with many options. The Builder pattern separates the job of putting together an object from how it looks, making it easier to create objects with lots of options without getting lost.`,
+    image: {
+      src: `https://i.ibb.co/zNH0q6T/Builder-Design-Pattern.webp`,
+      alt: `Ruby Builder Pattern: A Step-by-Step Guide to Creating Complex Objects`,
+    },
+    owner: `Rohit Bhatt`,
+    tags: ['ruby', 'builder pattern', 'design patterns',  'Ruby on Rails', 'Complex objects', 'Object-oriented programming'],
+    date: '2023-10-02',
+    summary: `When writing code, we all face a common issue of creating complex objects with many possible configuration options. This can be a daunting task, especially if we need to create these objects in a consistent and error-prone. It is where the pattern comes into play. The Builder pattern is a design pattern that can help us to solve this problem. It allows us to create complex objects step by step, and it provides a clear and concise way to structure our code. In this article, we will take a look at how to implement the Builder pattern in Ruby on Rails. We will also discuss the benefits of using the Builder pattern and when you should use it in your own code.`,
+    sections: [
+      {
+        h1: `What is a Builder Pattern?`,
+        p: `The Builder pattern is created on the principle of separation of concerns. This means that the construction of an object is separated from its representation. This makes it easier to create objects with a lot of possible configuration options, and it also helps to ensure that objects are created correctly.`,
+      },
+      {
+        h1: `How the Builder pattern works`,
+        p: `In the Builder pattern, the responsibility for constructing an object is delegated to a separate class called the Builder. The Builder class provides methods that can be used to configure the object step by step. Once the object is configured, the Builder class can be used to create the final object.<br/>This separation of concerns makes it easier to test and maintain our code. For example, we can test the Builder class without having to worry about the specific implementation of the object being built. We can also easily add new configuration options to the object without having to modify the code that uses the object.<br/>Let's see an example where we're making a pizza. What we'll do is initialize the pizza class by taking the values and putting them into the variables. This approach can become cumbersome, especially when creating objects with many optional attributes. Keeping track of which values to set and which to leave out can quickly become a headache.`,
+        subSections: [
+          {
+            h2: `Example of a Problem`,
+            html: {
+              type: "code",
+              value: `class Pizza
+  attr_accessor :size, :cheese, :sauce, :toppings
+  def initialize(size, cheese, sauce, toppings)
+    @size = size
+    @cheese = cheese
+    @sauce = sauce
+    @toppings = toppings
+  end
+
+  def describe
+    puts "Size: #{@size}"
+    puts "Cheese: #{@cheese}"
+    puts "Sauce: #{@sauce}"
+    puts "Toppings: #{@toppings.join(', ')}"
+  end
+end
+
+
+# Usage
+pizza = Pizza.new("Medium", "Mozzarella", "Tomato", ["Mushrooms", "Pepperoni"])
+pizza.describe`,
+language: "ruby",
+            },
+          },
+          {
+            p: `That's where the Builder Pattern comes into play.<br/>The Builder Pattern provides an elegant solution to this challenge. It allows us to construct complex objects step by step, providing clear methods to set each attribute. This not only makes the code more readable and maintainable, but it also ensures that we don't miss any important details in the object creation process.<br/>Let's delve into an example using the Builder Pattern to create our pizza.`,
+          },
+          {
+            h2: `Example of Builder Pattern`,
+            p: `1. First, we'll create a Pizza Class`,
+            html: {
+              type: "code",
+              value: `class Pizza
+  attr_accessor :size, :cheese, :sauce, :toppings
+
+  def describe
+    puts "Size: #{@size}"
+    puts "Cheese: #{@cheese}"
+    puts "Sauce: #{@sauce}"
+    puts "Toppings: #{@toppings.join(', ')}"
+  end
+
+end`,
+              language: 'ruby',
+            }
+          },
+          {
+            p: `Next, we'll create specialized builders for different types of pizzas, each inheriting from the base builder.`,
+            html: {
+              type: "code",
+              value: `class BasePizzaBuilder
+  def initialize
+    @pizza = Pizza.new
+  end
+
+  def build
+    raise NotImplementedError, "#{self.class} has not implemented method '#{__method__}'"
+  end
+end`,
+              language: 'ruby',
+            }
+          },
+          {
+            p: `Now, we'll create the BasePizzaBuilder class, which will serve as a placeholder for potential future extensions.`,
+            html: {
+              type: "code",
+              value: `class SpecialPizzaBuilder < BasePizzaBuilder
+  def build
+    @pizza.size = 'Large'
+    @pizza.cheese = 'Mozzarella'
+    @pizza.sauce = 'Pesto'
+    @pizza.toppings = %w[Tomatoes Basil]
+    @pizza
+  end
+end
+
+
+class VegetarianPizzaBuilder < BasePizzaBuilder
+  def build
+    @pizza.size = 'Medium'
+    @pizza.cheese = 'Feta'
+    @pizza.sauce = 'Marinara'
+    @pizza.toppings = %w[Spinach Olives]
+    @pizza
+  end
+end`,
+              language: 'ruby',
+            }
+          },
+          {
+            p: `Finally, we'll create the Director, which will coordinate the construction process using a specific builder.`,
+            html: {
+              type: "code",
+              value: `# Optional Step: Create a Director (Optional)
+# The Director is optional in the Builder Pattern. It's useful when there's a need to
+# coordinate the construction process of complex objects. If the construction logic
+# is straightforward and doesn't require any specific coordination, you can omit the
+# Director and directly use the builder to construct the object.
+class PizzaDirector
+  def initialize(builder)
+    @builder = builder
+  end
+
+  def build_pizza
+    @builder.build
+  end
+end
+# The role of the Director is similar to that of a waiter in a restaurant.
+# It receives the order (in our case, from the builder) and passes it on to the chef.`,
+              language: 'ruby',
+            }
+          },
+          {
+            h1: `Usage`,
+            p: ``,
+            html: {
+              type: "code",
+              value: `# Usage
+special_pizza_builder = SpecialPizzaBuilder.new
+vegetarian_pizza_builder = VegetarianPizzaBuilder.new
+
+director = PizzaDirector.new(special_pizza_builder)
+special_pizza = director.build_pizza
+special_pizza.describe
+
+director = PizzaDirector.new(vegetarian_pizza_builder)
+vegetarian_pizza = director.build_pizza
+vegetarian_pizza.describe`,
+              language: 'ruby',
+            }
+          },
+          {
+            p: `We can also do it without director class here is an example -`,
+            html: {
+              type: "code",
+              value: `vegetarian_pizza2_builder = VegetarianPizzaBuilder.new
+vegetarian_pizza2 = vegetarian_pizza2_builder.build
+vegetarian_pizza2.describe`,
+              language: 'ruby',
+            }
+          }
+        ]
+      },
+      {
+        h1: `Another way of doing it`,
+        p: `We can do it another way as well. Unlike the traditional approach that involves creating a base builder class, we've opted for a simpler alternative. In this alternative, we focus on a single class: PizzaBuilder. This class takes on the responsibility of assembling pizzas. It provides straightforward methods for specifying the pizza's size, adding cheese, sauce, and toppings.<br/>To enhance flexibility, we've introduced a special feature - the self.build method. This method accepts a block of code, allowing you to customize the pizza's attributes on-the-fly. This approach eliminates the need for a separate base builder class, making the process more streamlined and intuitive.<br/>In practice, this method proves to be highly adaptable and user-friendly. It grants developers the ability to craft pizzas with precision, tailoring them to specific preferences. This approach can be extended to various scenarios involving complex object creation, offering a clean and efficient solution.`,
+        html: {
+          type: "code",
+          value: `class Pizza
+  attr_accessor :size, :cheese, :sauce, :toppings
+
+  def describe
+    puts "Size: #{@size}"
+    puts "Cheese: #{@cheese}"
+    puts "Sauce: #{@sauce}"
+    puts "Toppings: #{@toppings.join(', ')}"
+  end
+end
+
+class PizzaBuilder
+  def initialize
+    @pizza = Pizza.new
+  end
+
+  def set_size(size)
+    @pizza.size = size
+  end
+
+  def add_cheese(cheese)
+    @pizza.cheese = cheese
+  end
+
+  def add_sauce(sauce)
+    @pizza.sauce = sauce
+  end
+
+  def add_toppings(toppings)
+    @pizza.toppings = [] if @pizza.toppings.nil?
+    @pizza.toppings << toppings
+  end
+
+  def pizza
+    @pizza
+  end
+
+  def self.build
+    builder = new
+    yield(builder)
+    builder.pizza
+  end
+end
+
+pizza_builder = PizzaBuilder.new
+pizza_builder.set_size("small")
+pizza_builder.add_cheese("swiss")
+pizza_builder.add_sauce("tomato")
+pizza_builder.add_toppings("mushrooms")
+pizza = pizza_builder.pizza
+pizza.describe
+
+pizza2 = PizzaBuilder.build do |b|
+  b.set_size("large")
+  b.add_cheese("swiss")
+  b.add_sauce("tomato")
+  b.add_toppings("mushrooms")
+  b.add_toppings("peppers")
+end
+pizza2.describe`,
+        }
+      },
+      {
+        h1: `Conclusion`,
+        p: `In coding, building complex objects with many choices can be tricky. The Builder pattern steps in to make this easier. It helps us create these objects bit by bit, giving us a clear way to organize our code. In this article, we explored how to use the Builder pattern in Ruby on Rails. We learned its benefits and when it's best to use it in our own code.<br/>The Builder pattern is like having a special assistant just for making things. It separates the job of putting together an object from how it looks. This means we can create objects with lots of options without getting lost, and it ensures they're made just right. It's a handy tool in our coding toolkit!`,
+      }
+    ],
+    advertisements: {
+      show: false,
+    },
+    referBlog: {
+      show: true,
+      title: `Mastering Cross-Origin Communication with Rack CORS in Rails`,
+      slug: `mastering-cross-origin-communication-with-rack-cors-in-rails`,
+    },
+
   }
 ];
 

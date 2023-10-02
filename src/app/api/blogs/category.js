@@ -34,6 +34,18 @@ const categoryData = [
       alt: `About Rohit Bhatt Professional Journey`,
     },
     tags: ['personal', 'life', 'journey'],
+  },
+  {
+    name: "Design Patterns",
+    slug: "design-patterns",
+    id: 4,
+    title: "Design Patterns in Ruby: Write Better Ruby Code with the Essential Patterns",
+    description: "Learn how to use the most popular design patterns in Ruby to write code that is more reusable, flexible, and maintainable.",
+    image: {
+      src: `https://i.ibb.co/r5hjNgx/Design-Patterns-series.webp`,
+      alt: `Design Patterns in Ruby: Write Better Ruby Code with the Essential Patterns`,
+    },
+    tags: ['ruby', 'design-patterns', 'backend'],
   }
 ]
 

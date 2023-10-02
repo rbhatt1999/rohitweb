@@ -91,7 +91,7 @@ export default async function page({ params }) {
   return (
     <>
       <main className={`relative flex min-h-screen blog-section flex-col items-center mt-16 ${sora.className}`}>
-        <div className='flex flex-col md:flex-row w-full gap-8 px-2 py-12 md:px-40'>
+        <div className='flex flex-col md:flex-row w-full gap-8 px-2 py-12 md:px-10 lg:px-20 xl:px-40'>
           <section className="flex flex-col w-full gap-5 justify-center md:w-8/12 overflow-x-hidden break-words">
             <div className="flex flex-col justify-center w-full border-y-2 border-stone-200/5  py-2 flex-1 gap-2 md:gap-5">
               <span className='text-left text-base text-white'>
@@ -152,7 +152,7 @@ export default async function page({ params }) {
                         section.html &&
                         <>
                           {
-                            section.html.type === 'code' && <div className="flex flex-col justify-center self-center gap-1 w-full pt-5">
+                            section.html.type === 'code' && <div className="flex flex-col justify-center self-center gap-1 w-full">
                               <CodeBlockViewer code={section.html.value} language={section.html.language} />
                             </div>
                           }
@@ -204,7 +204,7 @@ export default async function page({ params }) {
                                     subSection.html &&
                                     <>
                                       {
-                                        subSection.html.type === 'code' && <div className="flex flex-col justify-center self-center gap-1 w-full pt-5">
+                                        subSection.html.type === 'code' && <div className="flex flex-col justify-center self-center gap-1 w-full">
                                           <CodeBlockViewer code={subSection.html.value} language={subSection.html.language} />
                                         </div>
                                       }
