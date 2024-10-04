@@ -6,7 +6,7 @@ const blogdata = [
     category_id: 3,
     description: `The story of how I went from a construction worker to a full stack developer.`,
     image: {
-      src: `https://i.ibb.co/7X80NxH/From-Construction-to-Coding-My-Journey-to-Full-Stack-Development.webp`,
+      src: `https://website-images-rohitcodes.s3.ap-south-1.amazonaws.com/From-Construction-to-Coding-My-Journey-to-Full-Stack-Development.webp`,
       alt: `From Construction to Coding: My Journey to Full Stack Development`,
     },
     owner: `Rohit Bhatt`,
@@ -533,7 +533,236 @@ pizza2.describe`,
       slug: `mastering-cross-origin-communication-with-rack-cors-in-rails`,
     },
 
-  }
+  },
+  {
+    title: `A Guide to Using Sidekiq for Background Jobs in Ruby on Rails`,
+    slug: `a-guide-to-using-sidekiq-for-background-jobs-in-ruby-on-rails`,
+    id: 5,
+    category_id: 2,
+    description: `A detailed guide on setting up and using Sidekiq in Ruby on Rails to handle background jobs efficiently, complete with code examples and tips for job retries and error handling. Perfect for Rails developers looking to improve application performance and manage long-running tasks asynchronously.`,
+    image: {
+      src: `https://website-images-rohitcodes.s3.ap-south-1.amazonaws.com/Sidekiq.webp`,
+      alt: `A Guide to Using Sidekiq for Background Jobs in Ruby on Rails`,
+    },
+    owner: `Rohit Bhatt`,
+    tags: [`sidekiq`, `ruby on rails`, `background jobs`, `asynchronous tasks`, `performance optimization`, `error handling`, `job retries`],
+    date: '2024-10-04',
+    summary: `As web applications grow, they often need to handle long-running tasks without slowing down user interactions. Sidekiq is a popular choice among Ruby on Rails developers for processing background jobs efficiently. This guide will cover what Sidekiq is, how to set it up in a Rails application, and provide practical examples to illustrate its usage.`,
+    advertisements: {
+      show: false,
+    },
+    referBlog: {
+      show: true,
+      title: `Mastering Cross-Origin Communication with Rack CORS in Rails`,
+      slug: `mastering-cross-origin-communication-with-rack-cors-in-rails`,
+    },
+    sections: [
+      {
+        h1: `What is Sidekiq?`,
+        p: `Sidekiq is a background job processing library for Ruby. It allows developers to run tasks in the background, freeing up web requests to respond quickly to users. Unlike traditional job processors that may create separate processes, Sidekiq uses threads, which makes it lightweight and fast.`,
+      },
+      {
+        h2: `Key Features of Sidekiq`,
+        list: [
+          {
+            'h1': `Concurrency`,
+            'p': `Sidekiq can process multiple jobs concurrently, making it efficient for handling large volumes of tasks.`,
+          },
+          {
+            'h1': `Reliability`,
+            'p': `Jobs are stored in Redis, ensuring that they can be retried in case of failures.`,
+          },
+          {
+            'h1': `Web Interface`,
+            'p': `Sidekiq offers a dashboard for monitoring jobs, making it easier to track progress and troubleshoot issues.`,
+          },
+          {
+            'h1': `Scalability`,
+            'p': `As your application grows, you can add more worker processes to handle increased loads.`,
+          }
+        ]
+      },
+      {
+        h1: `Setting Up Sidekiq in a Rails Application`,
+        p: `Here's how to integrate Sidekiq into your Rails project step by step.`,
+        list: [
+          {
+            p: `First, add the Sidekiq gem to your Rails application. Open your Gemfile and include the following line:`,
+          }],
+        },
+          {
+            html: {
+              type: "code",
+              value: `gem 'sidekiq'`,
+              class: "ruby",
+            }
+          },
+          {
+            p: `Run the following command to install the gem:`,
+          },
+          {
+            html: {
+              type: "code",
+              value: `bundle install`,
+              class: "bash",
+            }
+          },
+          {
+            p: `Next, you need to configure Sidekiq to connect to Redis. Create an initializer file for Sidekiq at config/initializers/sidekiq.rb and add the following code:`,
+          },
+          {
+            html: {
+              type: "code",
+              value: `require 'sidekiq'
+Sidekiq.configure_server do |config|
+  config.redis = { url: 'redis://localhost:6379/0' }
+end
+
+Sidekiq.configure_client do |config|
+  config.redis = { url: 'redis://localhost:6379/0' }
+end
+`,
+              class: "ruby",
+            }
+          },
+          {
+            p: `Make sure you have Redis installed and running. You can check its status with:`,
+          },
+          {
+            html: {
+              type: "code",
+              value: `redis-cli ping`,
+              class: "bash",
+            }
+          },
+          {
+            p: `If it returns PONG, you’re good to go.`,
+          },
+      {
+        h1: `Create a Background Worker`,
+        p: `Now, let’s create a worker that will define a job to be processed in the background. Generate a new worker using the following command:`,
+        html: {
+          type: "code",
+          value: `rails generate sidekiq:worker HardWorker`,
+          class: "bash",
+        }
+      },
+      {
+        h2: `This will create a new file at app/workers/hard_worker.rb. Open that file and modify it like this:`,
+        html: {
+          type: "code",
+          value: `class HardWorker
+  include Sidekiq::Worker
+
+  def perform(name, count)
+    puts "Started work for #{name}..."
+    count.times do |i|
+      sleep(1)  # Simulating a long-running task
+      puts "Processed task ##{i + 1} for #{name}"
+    end
+    puts "Completed work for #{name}!"
+  end
+end`,
+          class: "ruby",
+        }
+      },
+      {
+        h1: `Enqueue Jobs`,
+        p: `With the worker created, you can now enqueue jobs to be processed. Here’s how you might do this from a controller:`,
+        html: {
+          type: "code",
+          value: `class TasksController < ApplicationController
+  def create
+    name = params[:name]
+    count = params[:count].to_i
+    HardWorker.perform_async(name, count)
+    render json: { status: 'Job is enqueued and will be processed in the background.' }
+  end
+end`,
+          class: "ruby",
+        }
+      },
+      {
+        h1: `Start Sidekiq`,
+        p: `Now that everything is set up, you can start the Sidekiq process. Open a terminal and run:`,
+        html: {
+          type: "code",
+          value: `bundle exec sidekiq`,
+          class: "bash",
+        }
+      },
+      {
+        h1: `Monitor Your Jobs`,
+        p: `Sidekiq includes a web interface for monitoring jobs. To enable this, modify your routes.rb file:`,
+        html: {
+          type: "code",
+          value: `require 'sidekiq/web'
+Rails.application.routes.draw do
+  # Other routes...
+
+  mount Sidekiq::Web => '/sidekiq'
+end`,
+          class: "ruby",
+        }
+      },
+      {
+        h1: `Handling Job Failures and Retries`,
+        p: `Sidekiq has a built-in retry mechanism for failed jobs. By default, if a job fails, Sidekiq will attempt to retry it several times before marking it as failed. You can customize this behavior using the sidekiq_options method in your worker class:`,
+        html: {
+          type: "code",
+          value: `class HardWorker
+  include Sidekiq::Worker
+
+  sidekiq_options retry: 3  # Set the number of retries
+
+  def perform(name, count)
+    raise "Simulated error!" if count < 0  # Simulate an error
+    puts "Started work for #{name}..."
+    count.times do |i|
+      sleep(1)
+      puts "Processed task ##{i + 1} for #{name}"
+    end
+    puts "Completed work for #{name}!"
+  end
+end`,
+          class: "ruby",
+        }
+      },
+      {
+        h1: `Custom Error Handling`,
+        p: `If you want to add custom error handling, you can wrap your job logic in a begin-rescue block:`,
+        html: {
+          type: "code",
+          value: `class HardWorker
+  include Sidekiq::Worker
+
+  sidekiq_options retry: 3
+
+  def perform(name, count)
+    begin
+      raise "Simulated error!" if count < 0  # Simulate an error
+      puts "Started work for #{name}..."
+      count.times do |i|
+        sleep(1)
+        puts "Processed task ##{i + 1} for #{name}"
+      end
+      puts "Completed work for #{name}!"
+    rescue StandardError => e
+      logger.error "Failed to process job for #{name}: #{e.message}"
+      # Additional error handling (e.g., notifications) can go here
+    end
+  end
+end`,
+          class: "ruby",
+        }
+      },
+      {
+        h1: `Conclusion`,
+        p: `Integrating Sidekiq into your Ruby on Rails application allows you to handle background jobs efficiently, keeping your application responsive even when performing resource-intensive tasks. With its ease of setup, robust features, and user-friendly monitoring interface, Sidekiq is a valuable tool for any Rails developer.<br/><br/>By following the steps in this guide, you should be able to implement Sidekiq in your application and manage background processing with confidence. As you continue to develop your Rails applications, consider how background job processing can enhance performance and improve user experience.`,
+      }
+    ],
+  },
 ];
 
 export default blogdata;
+
