@@ -854,7 +854,80 @@ end`,
       "title": "A Guide to Using Sidekiq for Background Jobs in Ruby on Rails",
       "slug": "a-guide-to-using-sidekiq-for-background-jobs-in-ruby-on-rails"
     }
+  },
+  {
+  title: "Understanding PostgreSQL MVCC: How Postgres Handles Concurrency Gracefully",
+  slug: "understanding-postgresql-mvcc-how-postgres-handles-concurrency-gracefully",
+  id: 6,
+  category_id: 6,
+  description: "Learn how PostgreSQL uses MVCC to manage concurrency without locking — enabling performant, concurrent, and consistent data access.",
+  image: {
+    src: "https://website-images-rohitcodes.s3.ap-south-1.amazonaws.com/understanding-postgresql-mvcc-how-postgres-handles-concurrency-gracefully.webp",
+    alt: "PostgreSQL MVCC Concurrency Explained"
+  },
+  owner: "Rohit Bhatt",
+  tags: ["postgres", "mvcc", "concurrency", "database internals", "transaction isolation"],
+  date: "2025-06-22",
+  summary: "MVCC (Multi-Version Concurrency Control) is the backbone of PostgreSQL’s concurrency model. Unlike locking mechanisms that stall readers or writers, MVCC allows multiple transactions to access the database simultaneously without stepping on each other’s toes. This blog dives deep into how PostgreSQL achieves this magic, what snapshots and visibility maps are, and how vacuuming keeps things in check.",
+  sections: [
+    {
+      h1: "What is MVCC?",
+      p: "PostgreSQL uses MVCC (Multi-Version Concurrency Control) to provide concurrent access to data without locking read operations. Every time a row is updated or deleted, Postgres doesn’t overwrite it — it creates a new version and marks the old one accordingly."
+    },
+    {
+      h1: "Why Not Locks?",
+      p: "Traditional databases might use locks to serialize transactions, which hurts performance. MVCC avoids this by creating multiple row versions and using transaction snapshots to determine which row version is visible to which transaction."
+    },
+    {
+      h1: "How MVCC Works Internally",
+      p: "Each row in a PostgreSQL table includes hidden system columns: `xmin` and `xmax`, which store inserting and deleting transaction IDs respectively. When a transaction runs, it uses a snapshot to determine which rows to see."
+    },
+    {
+      html: {
+        type: "code",
+        language: "sql",
+        value: "SELECT xmin, xmax, * FROM users;"
+      }
+    },
+    {
+      h1: "Role of VACUUM",
+      p: "Old row versions (dead tuples) aren't removed immediately. PostgreSQL cleans them up with the VACUUM process, which helps prevent table bloat and improves performance. AUTOVACUUM usually handles this, but manual intervention is sometimes needed."
+    },
+    {
+      h1: "Snapshots & Isolation",
+      p: "Snapshots consist of the current transaction ID, in-progress transactions, and high watermark. They help Postgres enforce isolation levels like Repeatable Read and Serializable without using heavy locks."
+    },
+    {
+      h1: "Common MVCC Pitfalls",
+      list: [
+        {
+          h1: "Long-Running Transactions",
+          p: "They prevent cleanup of old row versions, causing bloat and slowdowns."
+        },
+        {
+          h1: "Bloating",
+          p: "Delayed VACUUM or frequent updates can cause excessive dead tuples."
+        },
+        {
+          h1: "Hint Bits & Visibility Maps",
+          p: "Postgres uses them to speed up row visibility checks and optimize VACUUM runs."
+        }
+      ]
+    },
+    {
+      h1: "Conclusion",
+      p: "MVCC is what makes PostgreSQL excellent for high-concurrency environments. Understanding its internals helps you optimize queries, maintain performance, and avoid common pitfalls like table bloat. It’s a powerful mechanism — once mastered, it makes you a more effective database engineer."
+    }
+  ],
+  advertisements: {
+    show: false
+  },
+  referBlog: {
+    show: true,
+    title: "PostgreSQL Query Performance Tips",
+    slug: "postgresql-explain-analyze-decode-your-query-performance"
   }
+},
 ];
 
 export default blogdata;

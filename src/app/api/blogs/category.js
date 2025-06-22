@@ -54,7 +54,7 @@ const categoryData = [
     title: "PostgreSQL Tips, Tricks, and Performance Guides",
     description: "Deep dive into PostgreSQL: from indexes to query planning, and everything in between.",
     image: {
-      src: `https://i.ibb.co/tYvFK7K/postgres-explain-analyze.webp`,
+      src: `https://website-images-rohitcodes.s3.ap-south-1.amazonaws.com/postgres.webp`,
       alt: `PostgreSQL Tips, Tricks, and Performance Guides`,
     },
     tags: ['postgres', 'database', 'sql']
