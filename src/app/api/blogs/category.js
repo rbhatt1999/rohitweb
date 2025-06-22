@@ -46,7 +46,20 @@ const categoryData = [
       alt: `Design Patterns in Ruby: Write Better Ruby Code with the Essential Patterns`,
     },
     tags: ['ruby', 'design-patterns', 'backend'],
+  },
+  {
+    name: "Postgres",
+    slug: "postgres",
+    id: 6,
+    title: "PostgreSQL Tips, Tricks, and Performance Guides",
+    description: "Deep dive into PostgreSQL: from indexes to query planning, and everything in between.",
+    image: {
+      src: `https://i.ibb.co/tYvFK7K/postgres-explain-analyze.webp`,
+      alt: `PostgreSQL Tips, Tricks, and Performance Guides`,
+    },
+    tags: ['postgres', 'database', 'sql']
   }
+
 ]
 
 export default categoryData;
