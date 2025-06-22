@@ -211,7 +211,7 @@ const blogdata = [
                 p: `Next.js has a larger and more active ecosystem than Vue, which means that there are more resources available to help you develop your application.`,
               }
             ]
-          },{
+          }, {
             h2: `Next.js vs Angular`,
             list: [
               {
@@ -293,7 +293,7 @@ const blogdata = [
       alt: `Ruby Builder Pattern: A Step-by-Step Guide to Creating Complex Objects`,
     },
     owner: `Rohit Bhatt`,
-    tags: ['ruby', 'builder pattern', 'design patterns',  'Ruby on Rails', 'Complex objects', 'Object-oriented programming'],
+    tags: ['ruby', 'builder pattern', 'design patterns', 'Ruby on Rails', 'Complex objects', 'Object-oriented programming'],
     date: '2023-10-02',
     summary: `When writing code, we all face a common issue of creating complex objects with many possible configuration options. This can be a daunting task, especially if we need to create these objects in a consistent and error-prone. It is where the pattern comes into play. The Builder pattern is a design pattern that can help us to solve this problem. It allows us to create complex objects step by step, and it provides a clear and concise way to structure our code. In this article, we will take a look at how to implement the Builder pattern in Ruby on Rails. We will also discuss the benefits of using the Builder pattern and when you should use it in your own code.`,
     sections: [
@@ -330,7 +330,7 @@ end
 # Usage
 pizza = Pizza.new("Medium", "Mozzarella", "Tomato", ["Mushrooms", "Pepperoni"])
 pizza.describe`,
-language: "ruby",
+              language: "ruby",
             },
           },
           {
@@ -589,31 +589,31 @@ pizza2.describe`,
           {
             p: `First, add the Sidekiq gem to your Rails application. Open your Gemfile and include the following line:`,
           }],
-        },
-          {
-            html: {
-              type: "code",
-              value: `gem 'sidekiq'`,
-              class: "ruby",
-            }
-          },
-          {
-            p: `Run the following command to install the gem:`,
-          },
-          {
-            html: {
-              type: "code",
-              value: `bundle install`,
-              class: "bash",
-            }
-          },
-          {
-            p: `Next, you need to configure Sidekiq to connect to Redis. Create an initializer file for Sidekiq at config/initializers/sidekiq.rb and add the following code:`,
-          },
-          {
-            html: {
-              type: "code",
-              value: `require 'sidekiq'
+      },
+      {
+        html: {
+          type: "code",
+          value: `gem 'sidekiq'`,
+          class: "ruby",
+        }
+      },
+      {
+        p: `Run the following command to install the gem:`,
+      },
+      {
+        html: {
+          type: "code",
+          value: `bundle install`,
+          class: "bash",
+        }
+      },
+      {
+        p: `Next, you need to configure Sidekiq to connect to Redis. Create an initializer file for Sidekiq at config/initializers/sidekiq.rb and add the following code:`,
+      },
+      {
+        html: {
+          type: "code",
+          value: `require 'sidekiq'
 Sidekiq.configure_server do |config|
   config.redis = { url: 'redis://localhost:6379/0' }
 end
@@ -622,22 +622,22 @@ Sidekiq.configure_client do |config|
   config.redis = { url: 'redis://localhost:6379/0' }
 end
 `,
-              class: "ruby",
-            }
-          },
-          {
-            p: `Make sure you have Redis installed and running. You can check its status with:`,
-          },
-          {
-            html: {
-              type: "code",
-              value: `redis-cli ping`,
-              class: "bash",
-            }
-          },
-          {
-            p: `If it returns PONG, you’re good to go.`,
-          },
+          class: "ruby",
+        }
+      },
+      {
+        p: `Make sure you have Redis installed and running. You can check its status with:`,
+      },
+      {
+        html: {
+          type: "code",
+          value: `redis-cli ping`,
+          class: "bash",
+        }
+      },
+      {
+        p: `If it returns PONG, you’re good to go.`,
+      },
       {
         h1: `Create a Background Worker`,
         p: `Now, let’s create a worker that will define a job to be processed in the background. Generate a new worker using the following command:`,
@@ -762,6 +762,99 @@ end`,
       }
     ],
   },
+  {
+    "title": "PostgreSQL EXPLAIN ANALYZE: Decode Your Query Performance Like a Pro",
+    "slug": "postgresql-explain-analyze-decode-your-query-performance",
+    "id": 6,
+    "category_id": 6,
+    "description": "Master PostgreSQL's EXPLAIN ANALYZE to understand and optimize query performance using execution plans.",
+    "image": {
+      "src": "https://website-images-rohitcodes.s3.ap-south-1.amazonaws.com/postgresql-explain-analyze-decode-your-query-performance.webp",
+      "alt": "PostgreSQL EXPLAIN ANALYZE: Decode Your Query Performance Like a Pro"
+    },
+    "owner": "Rohit Bhatt",
+    "tags": ["postgres", "database", "query optimization", "explain analyze", "sql performance"],
+    "date": "2025-06-22",
+    "summary": "EXPLAIN ANALYZE in PostgreSQL is like turning on X-ray vision for your queries. It lets you peek under the hood of your SQL to see what the planner thinks *and* what actually happened. Whether you're fighting slow queries or just flexing your database muscles, mastering EXPLAIN ANALYZE can save you hours of debugging and boost app performance.",
+    "sections": [
+      {
+        "h1": "Why EXPLAIN ANALYZE?",
+        "p": "Ever wondered why your query is slow despite using an index? Or why a join is taking forever? PostgreSQL's EXPLAIN ANALYZE can show you exactly how your query is being executed — from row estimates to actual execution time."
+      },
+      {
+        "h1": "How It Works",
+        "p": "`EXPLAIN` provides the execution plan. `ANALYZE` runs the query and shows real stats. Combined, they become a powerful diagnostic tool.",
+        "html": {
+          "type": "code",
+          "value": "EXPLAIN ANALYZE SELECT * FROM users WHERE email = 'test@example.com';",
+          "language": "sql"
+        }
+      },
+      {
+        "h1": "Key Sections in the Output",
+        "list": [
+          {
+            "h1": "Seq Scan vs Index Scan",
+            "p": "Shows whether PostgreSQL is reading all rows or using an index. Index Scans are typically faster, but not always."
+          },
+          {
+            "h1": "Rows",
+            "p": "`rows=...` shows how many rows PostgreSQL *expected* and how many it actually *got* — mismatches here mean outdated statistics or poor planning."
+          },
+          {
+            "h1": "Cost",
+            "p": "`cost=start..end` estimates CPU and I/O load. It’s not time, but a relative metric for planner comparison."
+          },
+          {
+            "h1": "Time",
+            "p": "`actual time=...` is where the truth lies. This tells you the real time PostgreSQL spent on that node of execution."
+          }
+        ]
+      },
+      {
+        "h1": "Example Walkthrough",
+        "p": "Let’s look at a sample EXPLAIN ANALYZE output and break it down.",
+        "html": {
+          "type": "code",
+          "value": "EXPLAIN ANALYZE SELECT * FROM orders WHERE user_id = 42;\n\nIndex Scan using index_orders_on_user_id on orders  (cost=0.29..8.50 rows=1 width=244)\n  Index Cond: (user_id = 42)\n  Rows Removed by Filter: 0\n  Planning Time: 0.123 ms\n  Execution Time: 0.456 ms",
+          "language": "sql"
+        }
+      },
+      {
+        "h1": "Tips to Use EXPLAIN ANALYZE Effectively",
+        "list": [
+          {
+            "h1": "ALWAYS run with ANALYZE",
+            "p": "Don’t just use EXPLAIN — ANALYZE shows actual performance."
+          },
+          {
+            "h1": "Compare estimates vs reality",
+            "p": "Huge mismatches? Your statistics may need updating: `ANALYZE your_table`."
+          },
+          {
+            "h1": "Beware of Nested Loops",
+            "p": "They're cheap for small datasets but deadly on large joins. Look for Merge Join or Hash Join instead."
+          },
+          {
+            "h1": "Use `BUFFERS` for I/O insight",
+            "p": "Add `EXPLAIN (ANALYZE, BUFFERS)` to see cache hits and disk reads."
+          }
+        ]
+      },
+      {
+        "h1": "Conclusion",
+        "p": "PostgreSQL EXPLAIN ANALYZE is a must-have tool for any backend dev, DBA, or performance freak. Think of it as the `rails console` of database introspection — fast, powerful, and dangerously addictive. Learn to read it, and you'll solve query bottlenecks in minutes."
+      }
+    ],
+    "advertisements": {
+      "show": false
+    },
+    "referBlog": {
+      "show": true,
+      "title": "A Guide to Using Sidekiq for Background Jobs in Ruby on Rails",
+      "slug": "a-guide-to-using-sidekiq-for-background-jobs-in-ruby-on-rails"
+    }
+  }
 ];
 
 export default blogdata;
