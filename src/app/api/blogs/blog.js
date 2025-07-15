@@ -928,7 +928,139 @@ end`,
     slug: "postgresql-explain-analyze-decode-your-query-performance"
   }
 },
-];
+{
+  "title": "When Rows Don’t Die: MVCC, Index Bloat & How PostgreSQL Stores Your Data",
+  "slug": "when-rows-dont-die-mvcc-index-bloat-postgresql-storage",
+  "id": 7,
+  "category_id": 6,
+  "description": "Think updating or deleting a row in PostgreSQL wipes it out? Not quite. Under the hood, Postgres is quietly hoarding old data, filling up your disk and slowing things down. Let’s talk about MVCC, VACUUM, index bloat, and why you need to babysit your database once in a while.",
+  "image": {
+    "src": "https://website-images-rohitcodes.s3.ap-south-1.amazonaws.com/when-rows-dont-die-mvcc-index-bloat-postgresql-storage.webp",
+    "alt": "When Rows Don’t Die: MVCC, Index Bloat & How PostgreSQL Stores Your Data"
+  },
+  "owner": "Rohit Bhatt",
+  "tags": ["postgres", "mvcc", "index bloat", "vacuum", "database internals", "performance tuning"],
+  "date": "2025-07-15",
+  "summary": "PostgreSQL doesn’t just update rows — it leaves the old ones lying around like forgotten leftovers. It’s called MVCC, and while it’s great for concurrency, it can make your indexes bloated and your queries slow. This blog walks through what really happens inside your DB, how to spot bloat, and what to do about it.",
+  "sections": [
+    {
+      "h1": "Let’s Clear the Air: Updates Don’t Overwrite Rows",
+      "p": "Here’s a surprise I wish someone had told me early: when you run an `UPDATE` or `DELETE` in PostgreSQL, the row doesn’t go away. Postgres just marks it as 'dead' and leaves it there. Why? Because of something called MVCC (Multi-Version Concurrency Control), which is how Postgres handles simultaneous reads and writes without locking everything up like a traffic jam."
+    },
+    {
+      "h1": "Inside PostgreSQL: Pages, Tuples, and Metadata",
+      "p": "Postgres stores your data in 8KB pages. These pages live inside heap files, and inside each page are rows — or 'tuples' as Postgres likes to call them. Every tuple has a header attached with hidden columns like:"
+    },
+    {
+      "list": [
+        {
+          "h1": "xmin",
+          "p": "Transaction ID that created the row."
+        },
+        {
+          "h1": "xmax",
+          "p": "Transaction ID that deleted or updated it."
+        },
+        {
+          "h1": "ctid",
+          "p": "Physical location of the row (page number + offset)."
+        },
+        {
+          "h1": "null bitmap",
+          "p": "Optimized way to keep track of NULL columns without wasting space."
+        }
+      ]
+    },
+    {
+      "h1": "MVCC: Why PostgreSQL is So Dang Concurrent",
+      "p": "MVCC lets Postgres show different versions of the same row to different users. When you update a row, Postgres inserts a brand-new version and marks the old one as dead. That way, if another transaction started before your update, it still sees the old row. It's genius — until you realize those dead rows don’t vanish automatically."
+    },
+    {
+      "h1": "Where the Trash Piles Up: Dead Tuples",
+      "p": "Postgres leaves dead rows lying around in both the heap and the indexes. That’s like deleting a file from your computer but it still shows up in your storage — until something (or someone) cleans it up. Over time, you end up with a lot of invisible junk. This makes queries slower and inflates your database size."
+    },
+    {
+      "h1": "Meet VACUUM: PostgreSQL’s Cleanup Crew",
+      "p": "VACUUM is the janitor that Postgres sends in to clear out dead tuples. It figures out which rows are no longer needed and marks that space as reusable. But here’s the kicker: regular VACUUM doesn’t make the file smaller. That requires VACUUM FULL, which rewrites the entire table and locks it while doing so. So:"
+    },
+    {
+      "list": [
+        {
+          "h1": "VACUUM",
+          "p": "Cleans the mess quietly, no locking, but doesn’t shrink the file."
+        },
+        {
+          "h1": "VACUUM FULL",
+          "p": "Actually frees disk space — but blocks access during cleanup."
+        }
+      ]
+    },
+    {
+      "h1": "The Index Story: Fast Until It’s Not",
+      "p": "You add indexes to speed up lookups, right? Great! But here’s the trap — indexes store pointers to specific row versions. So every time you update a row, Postgres adds a new pointer and keeps the old one hanging around. It doesn’t remove that old pointer until you rebuild the index. Over time, the index grows and grows… even if your data doesn’t."
+    },
+    {
+      "h1": "This Is Called Index Bloat",
+      "p": "Dead pointers in your indexes make them fat and slow. You still have to scan through them, even if half the entries point to dead rows. VACUUM won’t remove them — it just marks them as unusable. To fix that, you need REINDEX."
+    },
+    {
+      "h1": "Let’s See Bloat in Action",
+      "html": {
+        "type": "code",
+        "language": "sql",
+        "value": "CREATE TABLE users(id SERIAL, name TEXT);\nCREATE INDEX idx_name ON users(name);\n\nINSERT INTO users(name)\nSELECT 'alice' FROM generate_series(1, 1000000);\n\nUPDATE users SET name = 'bob' WHERE name = 'alice';"
+      },
+      "p": "This creates 1 million dead rows and 1 million dead index entries — just from a single update. That’s how easy it is to bloat your DB without realizing it."
+    },
+    {
+      "h1": "How to Fix and Avoid Index Bloat",
+      "list": [
+        {
+          "h1": "Make Sure Autovacuum Is Doing Its Job",
+          "p": "Postgres runs autovacuum automatically — but you can (and should) tune the settings for high-write tables."
+        },
+        {
+          "h1": "Use REINDEX CONCURRENTLY",
+          "p": "Rebuild indexes in the background without locking the table. Super useful for production systems."
+        },
+        {
+          "h1": "Don’t Update Unless You Have To",
+          "p": "Even `UPDATE users SET status = 'active' WHERE status = 'active'` creates a new version. Avoid it."
+        },
+        {
+          "h1": "Use fillfactor on indexes",
+          "p": "Leave space in index pages for future updates. Example:\n`CREATE INDEX idx_name ON users(name) WITH (fillfactor = 80);`"
+        }
+      ]
+    },
+    {
+      "h1": "How to Monitor Index Size and Bloat",
+      "p": "You can use built-in views to keep an eye on your indexes:"
+    },
+    {
+      "html": {
+        "type": "code",
+        "language": "sql",
+        "value": "SELECT\n  relname AS index_name,\n  pg_size_pretty(pg_relation_size(indexrelid)) AS size\nFROM\n  pg_stat_user_indexes\nORDER BY\n  pg_relation_size(indexrelid) DESC;"
+      }
+    },
+    {
+      "p": "Want more detailed bloat info? Install the `pgstattuple` extension — it gives you stats like how much of your index is dead weight."
+    },
+    {
+      "h1": "Wrap-Up: Your Database Has a Body — Keep It Clean",
+      "p": "PostgreSQL is amazing, but it won’t clean up after itself unless you ask. MVCC gives you concurrency, but it leaves behind clutter. Indexes make reads fast, but without a little care, they become junk drawers. Schedule regular VACUUMs, monitor index sizes, use REINDEX, and don’t do unnecessary writes. Your future self (and your query planner) will thank you."
+    }
+  ],
+  "advertisements": {
+    "show": false
+  },
+  "referBlog": {
+    "show": true,
+    "title": "Understanding PostgreSQL MVCC: How Postgres Handles Concurrency Gracefully",
+    "slug": "understanding-postgresql-mvcc-how-postgres-handles-concurrency-gracefully"
+  }
+}];
 
 export default blogdata;
 
