@@ -856,211 +856,471 @@ end`,
     }
   },
   {
-  title: "Understanding PostgreSQL MVCC: How Postgres Handles Concurrency Gracefully",
-  slug: "understanding-postgresql-mvcc-how-postgres-handles-concurrency-gracefully",
-  id: 6,
-  category_id: 6,
-  description: "Learn how PostgreSQL uses MVCC to manage concurrency without locking — enabling performant, concurrent, and consistent data access.",
-  image: {
-    src: "https://website-images-rohitcodes.s3.ap-south-1.amazonaws.com/understanding-postgresql-mvcc-how-postgres-handles-concurrency-gracefully.webp",
-    alt: "PostgreSQL MVCC Concurrency Explained"
-  },
-  owner: "Rohit Bhatt",
-  tags: ["postgres", "mvcc", "concurrency", "database internals", "transaction isolation"],
-  date: "2025-06-22",
-  summary: "MVCC (Multi-Version Concurrency Control) is the backbone of PostgreSQL’s concurrency model. Unlike locking mechanisms that stall readers or writers, MVCC allows multiple transactions to access the database simultaneously without stepping on each other’s toes. This blog dives deep into how PostgreSQL achieves this magic, what snapshots and visibility maps are, and how vacuuming keeps things in check.",
-  sections: [
-    {
-      h1: "What is MVCC?",
-      p: "PostgreSQL uses MVCC (Multi-Version Concurrency Control) to provide concurrent access to data without locking read operations. Every time a row is updated or deleted, Postgres doesn’t overwrite it — it creates a new version and marks the old one accordingly."
+    title: "Understanding PostgreSQL MVCC: How Postgres Handles Concurrency Gracefully",
+    slug: "understanding-postgresql-mvcc-how-postgres-handles-concurrency-gracefully",
+    id: 6,
+    category_id: 6,
+    description: "Learn how PostgreSQL uses MVCC to manage concurrency without locking — enabling performant, concurrent, and consistent data access.",
+    image: {
+      src: "https://website-images-rohitcodes.s3.ap-south-1.amazonaws.com/understanding-postgresql-mvcc-how-postgres-handles-concurrency-gracefully.webp",
+      alt: "PostgreSQL MVCC Concurrency Explained"
     },
-    {
-      h1: "Why Not Locks?",
-      p: "Traditional databases might use locks to serialize transactions, which hurts performance. MVCC avoids this by creating multiple row versions and using transaction snapshots to determine which row version is visible to which transaction."
-    },
-    {
-      h1: "How MVCC Works Internally",
-      p: "Each row in a PostgreSQL table includes hidden system columns: `xmin` and `xmax`, which store inserting and deleting transaction IDs respectively. When a transaction runs, it uses a snapshot to determine which rows to see."
-    },
-    {
-      html: {
-        type: "code",
-        language: "sql",
-        value: "SELECT xmin, xmax, * FROM users;"
-      }
-    },
-    {
-      h1: "Role of VACUUM",
-      p: "Old row versions (dead tuples) aren't removed immediately. PostgreSQL cleans them up with the VACUUM process, which helps prevent table bloat and improves performance. AUTOVACUUM usually handles this, but manual intervention is sometimes needed."
-    },
-    {
-      h1: "Snapshots & Isolation",
-      p: "Snapshots consist of the current transaction ID, in-progress transactions, and high watermark. They help Postgres enforce isolation levels like Repeatable Read and Serializable without using heavy locks."
-    },
-    {
-      h1: "Common MVCC Pitfalls",
-      list: [
-        {
-          h1: "Long-Running Transactions",
-          p: "They prevent cleanup of old row versions, causing bloat and slowdowns."
-        },
-        {
-          h1: "Bloating",
-          p: "Delayed VACUUM or frequent updates can cause excessive dead tuples."
-        },
-        {
-          h1: "Hint Bits & Visibility Maps",
-          p: "Postgres uses them to speed up row visibility checks and optimize VACUUM runs."
-        }
-      ]
-    },
-    {
-      h1: "Conclusion",
-      p: "MVCC is what makes PostgreSQL excellent for high-concurrency environments. Understanding its internals helps you optimize queries, maintain performance, and avoid common pitfalls like table bloat. It’s a powerful mechanism — once mastered, it makes you a more effective database engineer."
-    }
-  ],
-  advertisements: {
-    show: false
-  },
-  referBlog: {
-    show: true,
-    title: "PostgreSQL Query Performance Tips",
-    slug: "postgresql-explain-analyze-decode-your-query-performance"
-  }
-},
-{
-  "title": "When Rows Don’t Die: MVCC, Index Bloat & How PostgreSQL Stores Your Data",
-  "slug": "when-rows-dont-die-mvcc-index-bloat-postgresql-storage",
-  "id": 7,
-  "category_id": 6,
-  "description": "Think updating or deleting a row in PostgreSQL wipes it out? Not quite. Under the hood, Postgres is quietly hoarding old data, filling up your disk and slowing things down. Let’s talk about MVCC, VACUUM, index bloat, and why you need to babysit your database once in a while.",
-  "image": {
-    "src": "https://website-images-rohitcodes.s3.ap-south-1.amazonaws.com/when-rows-dont-die-mvcc-index-bloat-postgresql-storage.webp",
-    "alt": "When Rows Don’t Die: MVCC, Index Bloat & How PostgreSQL Stores Your Data"
-  },
-  "owner": "Rohit Bhatt",
-  "tags": ["postgres", "mvcc", "index bloat", "vacuum", "database internals", "performance tuning"],
-  "date": "2025-07-15",
-  "summary": "PostgreSQL doesn’t just update rows — it leaves the old ones lying around like forgotten leftovers. It’s called MVCC, and while it’s great for concurrency, it can make your indexes bloated and your queries slow. This blog walks through what really happens inside your DB, how to spot bloat, and what to do about it.",
-  "sections": [
-    {
-      "h1": "Let’s Clear the Air: Updates Don’t Overwrite Rows",
-      "p": "Here’s a surprise I wish someone had told me early: when you run an `UPDATE` or `DELETE` in PostgreSQL, the row doesn’t go away. Postgres just marks it as 'dead' and leaves it there. Why? Because of something called MVCC (Multi-Version Concurrency Control), which is how Postgres handles simultaneous reads and writes without locking everything up like a traffic jam."
-    },
-    {
-      "h1": "Inside PostgreSQL: Pages, Tuples, and Metadata",
-      "p": "Postgres stores your data in 8KB pages. These pages live inside heap files, and inside each page are rows — or 'tuples' as Postgres likes to call them. Every tuple has a header attached with hidden columns like:"
-    },
-    {
-      "list": [
-        {
-          "h1": "xmin",
-          "p": "Transaction ID that created the row."
-        },
-        {
-          "h1": "xmax",
-          "p": "Transaction ID that deleted or updated it."
-        },
-        {
-          "h1": "ctid",
-          "p": "Physical location of the row (page number + offset)."
-        },
-        {
-          "h1": "null bitmap",
-          "p": "Optimized way to keep track of NULL columns without wasting space."
-        }
-      ]
-    },
-    {
-      "h1": "MVCC: Why PostgreSQL is So Dang Concurrent",
-      "p": "MVCC lets Postgres show different versions of the same row to different users. When you update a row, Postgres inserts a brand-new version and marks the old one as dead. That way, if another transaction started before your update, it still sees the old row. It's genius — until you realize those dead rows don’t vanish automatically."
-    },
-    {
-      "h1": "Where the Trash Piles Up: Dead Tuples",
-      "p": "Postgres leaves dead rows lying around in both the heap and the indexes. That’s like deleting a file from your computer but it still shows up in your storage — until something (or someone) cleans it up. Over time, you end up with a lot of invisible junk. This makes queries slower and inflates your database size."
-    },
-    {
-      "h1": "Meet VACUUM: PostgreSQL’s Cleanup Crew",
-      "p": "VACUUM is the janitor that Postgres sends in to clear out dead tuples. It figures out which rows are no longer needed and marks that space as reusable. But here’s the kicker: regular VACUUM doesn’t make the file smaller. That requires VACUUM FULL, which rewrites the entire table and locks it while doing so. So:"
-    },
-    {
-      "list": [
-        {
-          "h1": "VACUUM",
-          "p": "Cleans the mess quietly, no locking, but doesn’t shrink the file."
-        },
-        {
-          "h1": "VACUUM FULL",
-          "p": "Actually frees disk space — but blocks access during cleanup."
-        }
-      ]
-    },
-    {
-      "h1": "The Index Story: Fast Until It’s Not",
-      "p": "You add indexes to speed up lookups, right? Great! But here’s the trap — indexes store pointers to specific row versions. So every time you update a row, Postgres adds a new pointer and keeps the old one hanging around. It doesn’t remove that old pointer until you rebuild the index. Over time, the index grows and grows… even if your data doesn’t."
-    },
-    {
-      "h1": "This Is Called Index Bloat",
-      "p": "Dead pointers in your indexes make them fat and slow. You still have to scan through them, even if half the entries point to dead rows. VACUUM won’t remove them — it just marks them as unusable. To fix that, you need REINDEX."
-    },
-    {
-      "h1": "Let’s See Bloat in Action",
-      "html": {
-        "type": "code",
-        "language": "sql",
-        "value": "CREATE TABLE users(id SERIAL, name TEXT);\nCREATE INDEX idx_name ON users(name);\n\nINSERT INTO users(name)\nSELECT 'alice' FROM generate_series(1, 1000000);\n\nUPDATE users SET name = 'bob' WHERE name = 'alice';"
+    owner: "Rohit Bhatt",
+    tags: ["postgres", "mvcc", "concurrency", "database internals", "transaction isolation"],
+    date: "2025-06-22",
+    summary: "MVCC (Multi-Version Concurrency Control) is the backbone of PostgreSQL’s concurrency model. Unlike locking mechanisms that stall readers or writers, MVCC allows multiple transactions to access the database simultaneously without stepping on each other’s toes. This blog dives deep into how PostgreSQL achieves this magic, what snapshots and visibility maps are, and how vacuuming keeps things in check.",
+    sections: [
+      {
+        h1: "What is MVCC?",
+        p: "PostgreSQL uses MVCC (Multi-Version Concurrency Control) to provide concurrent access to data without locking read operations. Every time a row is updated or deleted, Postgres doesn’t overwrite it — it creates a new version and marks the old one accordingly."
       },
-      "p": "This creates 1 million dead rows and 1 million dead index entries — just from a single update. That’s how easy it is to bloat your DB without realizing it."
-    },
-    {
-      "h1": "How to Fix and Avoid Index Bloat",
-      "list": [
-        {
-          "h1": "Make Sure Autovacuum Is Doing Its Job",
-          "p": "Postgres runs autovacuum automatically — but you can (and should) tune the settings for high-write tables."
-        },
-        {
-          "h1": "Use REINDEX CONCURRENTLY",
-          "p": "Rebuild indexes in the background without locking the table. Super useful for production systems."
-        },
-        {
-          "h1": "Don’t Update Unless You Have To",
-          "p": "Even `UPDATE users SET status = 'active' WHERE status = 'active'` creates a new version. Avoid it."
-        },
-        {
-          "h1": "Use fillfactor on indexes",
-          "p": "Leave space in index pages for future updates. Example:\n`CREATE INDEX idx_name ON users(name) WITH (fillfactor = 80);`"
+      {
+        h1: "Why Not Locks?",
+        p: "Traditional databases might use locks to serialize transactions, which hurts performance. MVCC avoids this by creating multiple row versions and using transaction snapshots to determine which row version is visible to which transaction."
+      },
+      {
+        h1: "How MVCC Works Internally",
+        p: "Each row in a PostgreSQL table includes hidden system columns: `xmin` and `xmax`, which store inserting and deleting transaction IDs respectively. When a transaction runs, it uses a snapshot to determine which rows to see."
+      },
+      {
+        html: {
+          type: "code",
+          language: "sql",
+          value: "SELECT xmin, xmax, * FROM users;"
         }
-      ]
-    },
-    {
-      "h1": "How to Monitor Index Size and Bloat",
-      "p": "You can use built-in views to keep an eye on your indexes:"
-    },
-    {
-      "html": {
-        "type": "code",
-        "language": "sql",
-        "value": "SELECT\n  relname AS index_name,\n  pg_size_pretty(pg_relation_size(indexrelid)) AS size\nFROM\n  pg_stat_user_indexes\nORDER BY\n  pg_relation_size(indexrelid) DESC;"
+      },
+      {
+        h1: "Role of VACUUM",
+        p: "Old row versions (dead tuples) aren't removed immediately. PostgreSQL cleans them up with the VACUUM process, which helps prevent table bloat and improves performance. AUTOVACUUM usually handles this, but manual intervention is sometimes needed."
+      },
+      {
+        h1: "Snapshots & Isolation",
+        p: "Snapshots consist of the current transaction ID, in-progress transactions, and high watermark. They help Postgres enforce isolation levels like Repeatable Read and Serializable without using heavy locks."
+      },
+      {
+        h1: "Common MVCC Pitfalls",
+        list: [
+          {
+            h1: "Long-Running Transactions",
+            p: "They prevent cleanup of old row versions, causing bloat and slowdowns."
+          },
+          {
+            h1: "Bloating",
+            p: "Delayed VACUUM or frequent updates can cause excessive dead tuples."
+          },
+          {
+            h1: "Hint Bits & Visibility Maps",
+            p: "Postgres uses them to speed up row visibility checks and optimize VACUUM runs."
+          }
+        ]
+      },
+      {
+        h1: "Conclusion",
+        p: "MVCC is what makes PostgreSQL excellent for high-concurrency environments. Understanding its internals helps you optimize queries, maintain performance, and avoid common pitfalls like table bloat. It’s a powerful mechanism — once mastered, it makes you a more effective database engineer."
       }
+    ],
+    advertisements: {
+      show: false
     },
-    {
-      "p": "Want more detailed bloat info? Install the `pgstattuple` extension — it gives you stats like how much of your index is dead weight."
-    },
-    {
-      "h1": "Wrap-Up: Your Database Has a Body — Keep It Clean",
-      "p": "PostgreSQL is amazing, but it won’t clean up after itself unless you ask. MVCC gives you concurrency, but it leaves behind clutter. Indexes make reads fast, but without a little care, they become junk drawers. Schedule regular VACUUMs, monitor index sizes, use REINDEX, and don’t do unnecessary writes. Your future self (and your query planner) will thank you."
+    referBlog: {
+      show: true,
+      title: "PostgreSQL Query Performance Tips",
+      slug: "postgresql-explain-analyze-decode-your-query-performance"
     }
-  ],
-  "advertisements": {
-    "show": false
   },
-  "referBlog": {
-    "show": true,
-    "title": "Understanding PostgreSQL MVCC: How Postgres Handles Concurrency Gracefully",
-    "slug": "understanding-postgresql-mvcc-how-postgres-handles-concurrency-gracefully"
+  {
+    "title": "When Rows Don’t Die: MVCC, Index Bloat & How PostgreSQL Stores Your Data",
+    "slug": "when-rows-dont-die-mvcc-index-bloat-postgresql-storage",
+    "id": 7,
+    "category_id": 6,
+    "description": "Think updating or deleting a row in PostgreSQL wipes it out? Not quite. Under the hood, Postgres is quietly hoarding old data, filling up your disk and slowing things down. Let’s talk about MVCC, VACUUM, index bloat, and why you need to babysit your database once in a while.",
+    "image": {
+      "src": "https://website-images-rohitcodes.s3.ap-south-1.amazonaws.com/when-rows-dont-die-mvcc-index-bloat-postgresql-storage.webp",
+      "alt": "When Rows Don’t Die: MVCC, Index Bloat & How PostgreSQL Stores Your Data"
+    },
+    "owner": "Rohit Bhatt",
+    "tags": ["postgres", "mvcc", "index bloat", "vacuum", "database internals", "performance tuning"],
+    "date": "2025-07-15",
+    "summary": "PostgreSQL doesn’t just update rows — it leaves the old ones lying around like forgotten leftovers. It’s called MVCC, and while it’s great for concurrency, it can make your indexes bloated and your queries slow. This blog walks through what really happens inside your DB, how to spot bloat, and what to do about it.",
+    "sections": [
+      {
+        "h1": "Let’s Clear the Air: Updates Don’t Overwrite Rows",
+        "p": "Here’s a surprise I wish someone had told me early: when you run an `UPDATE` or `DELETE` in PostgreSQL, the row doesn’t go away. Postgres just marks it as 'dead' and leaves it there. Why? Because of something called MVCC (Multi-Version Concurrency Control), which is how Postgres handles simultaneous reads and writes without locking everything up like a traffic jam."
+      },
+      {
+        "h1": "Inside PostgreSQL: Pages, Tuples, and Metadata",
+        "p": "Postgres stores your data in 8KB pages. These pages live inside heap files, and inside each page are rows — or 'tuples' as Postgres likes to call them. Every tuple has a header attached with hidden columns like:"
+      },
+      {
+        "list": [
+          {
+            "h1": "xmin",
+            "p": "Transaction ID that created the row."
+          },
+          {
+            "h1": "xmax",
+            "p": "Transaction ID that deleted or updated it."
+          },
+          {
+            "h1": "ctid",
+            "p": "Physical location of the row (page number + offset)."
+          },
+          {
+            "h1": "null bitmap",
+            "p": "Optimized way to keep track of NULL columns without wasting space."
+          }
+        ]
+      },
+      {
+        "h1": "MVCC: Why PostgreSQL is So Dang Concurrent",
+        "p": "MVCC lets Postgres show different versions of the same row to different users. When you update a row, Postgres inserts a brand-new version and marks the old one as dead. That way, if another transaction started before your update, it still sees the old row. It's genius — until you realize those dead rows don’t vanish automatically."
+      },
+      {
+        "h1": "Where the Trash Piles Up: Dead Tuples",
+        "p": "Postgres leaves dead rows lying around in both the heap and the indexes. That’s like deleting a file from your computer but it still shows up in your storage — until something (or someone) cleans it up. Over time, you end up with a lot of invisible junk. This makes queries slower and inflates your database size."
+      },
+      {
+        "h1": "Meet VACUUM: PostgreSQL’s Cleanup Crew",
+        "p": "VACUUM is the janitor that Postgres sends in to clear out dead tuples. It figures out which rows are no longer needed and marks that space as reusable. But here’s the kicker: regular VACUUM doesn’t make the file smaller. That requires VACUUM FULL, which rewrites the entire table and locks it while doing so. So:"
+      },
+      {
+        "list": [
+          {
+            "h1": "VACUUM",
+            "p": "Cleans the mess quietly, no locking, but doesn’t shrink the file."
+          },
+          {
+            "h1": "VACUUM FULL",
+            "p": "Actually frees disk space — but blocks access during cleanup."
+          }
+        ]
+      },
+      {
+        "h1": "The Index Story: Fast Until It’s Not",
+        "p": "You add indexes to speed up lookups, right? Great! But here’s the trap — indexes store pointers to specific row versions. So every time you update a row, Postgres adds a new pointer and keeps the old one hanging around. It doesn’t remove that old pointer until you rebuild the index. Over time, the index grows and grows… even if your data doesn’t."
+      },
+      {
+        "h1": "This Is Called Index Bloat",
+        "p": "Dead pointers in your indexes make them fat and slow. You still have to scan through them, even if half the entries point to dead rows. VACUUM won’t remove them — it just marks them as unusable. To fix that, you need REINDEX."
+      },
+      {
+        "h1": "Let’s See Bloat in Action",
+        "html": {
+          "type": "code",
+          "language": "sql",
+          "value": "CREATE TABLE users(id SERIAL, name TEXT);\nCREATE INDEX idx_name ON users(name);\n\nINSERT INTO users(name)\nSELECT 'alice' FROM generate_series(1, 1000000);\n\nUPDATE users SET name = 'bob' WHERE name = 'alice';"
+        },
+        "p": "This creates 1 million dead rows and 1 million dead index entries — just from a single update. That’s how easy it is to bloat your DB without realizing it."
+      },
+      {
+        "h1": "How to Fix and Avoid Index Bloat",
+        "list": [
+          {
+            "h1": "Make Sure Autovacuum Is Doing Its Job",
+            "p": "Postgres runs autovacuum automatically — but you can (and should) tune the settings for high-write tables."
+          },
+          {
+            "h1": "Use REINDEX CONCURRENTLY",
+            "p": "Rebuild indexes in the background without locking the table. Super useful for production systems."
+          },
+          {
+            "h1": "Don’t Update Unless You Have To",
+            "p": "Even `UPDATE users SET status = 'active' WHERE status = 'active'` creates a new version. Avoid it."
+          },
+          {
+            "h1": "Use fillfactor on indexes",
+            "p": "Leave space in index pages for future updates. Example:\n`CREATE INDEX idx_name ON users(name) WITH (fillfactor = 80);`"
+          }
+        ]
+      },
+      {
+        "h1": "How to Monitor Index Size and Bloat",
+        "p": "You can use built-in views to keep an eye on your indexes:"
+      },
+      {
+        "html": {
+          "type": "code",
+          "language": "sql",
+          "value": "SELECT\n  relname AS index_name,\n  pg_size_pretty(pg_relation_size(indexrelid)) AS size\nFROM\n  pg_stat_user_indexes\nORDER BY\n  pg_relation_size(indexrelid) DESC;"
+        }
+      },
+      {
+        "p": "Want more detailed bloat info? Install the `pgstattuple` extension — it gives you stats like how much of your index is dead weight."
+      },
+      {
+        "h1": "Wrap-Up: Your Database Has a Body — Keep It Clean",
+        "p": "PostgreSQL is amazing, but it won’t clean up after itself unless you ask. MVCC gives you concurrency, but it leaves behind clutter. Indexes make reads fast, but without a little care, they become junk drawers. Schedule regular VACUUMs, monitor index sizes, use REINDEX, and don’t do unnecessary writes. Your future self (and your query planner) will thank you."
+      }
+    ],
+    "advertisements": {
+      "show": false
+    },
+    "referBlog": {
+      "show": true,
+      "title": "Understanding PostgreSQL MVCC: How Postgres Handles Concurrency Gracefully",
+      "slug": "understanding-postgresql-mvcc-how-postgres-handles-concurrency-gracefully"
+    }
+  },
+  {
+    "title": "Sorbet in Rails: Your Bug Radar Before Production Hits",
+    "slug": "sorbet-in-rails-your-bug-radar",
+    "category_id": 2,
+    "id": 7,
+    "description": "A hands-on guide for junior Rails devs to bring type safety into their codebase with Sorbet — a friendly intro to catching bugs before they break production.",
+    "image": {
+      "src": "https://website-images-rohitcodes.s3.ap-south-1.amazonaws.com/sorbet-in-rails-your-bug-radar.webp",
+      "alt": "Sorbet in Rails Blog Banner"
+    },
+    "owner": "Rohit Bhatt",
+    "tags": ["ruby", "rails", "sorbet", "static typing", "type checking"],
+    "date": "2025-07-23",
+    "summary": "Ruby is expressive, fun, and fast to write. But it's also... wild. With great freedom comes the risk of accidentally breaking things. Sorbet brings some guardrails to your Rails app. It’s a static type checker built just for Ruby — and this post is your beginner-friendly map to using it effectively in a Rails app.",
+    "sections": [
+      {
+        "h1": "Why Should You Care About Typing in Ruby?",
+        "p": "Imagine calling a method expecting an integer and accidentally passing a string. Ruby will let you do it — until runtime — when it crashes. Static typing helps catch those mistakes *before* your code even runs. That’s what Sorbet does. It doesn’t take away Ruby’s flexibility but lets you add helpful type hints, making bugs easier to catch and code easier to understand."
+      },
+      {
+        "h1": "What is Sorbet, Really?",
+        "p": "Sorbet is a static type checker made by Stripe. It lets you describe what types your methods expect and return. It’s like telling your future self (and your teammates), ‘Hey, this method always gives back a String.’ You can keep using Ruby like normal, but Sorbet will sit quietly in the background, keeping an eye out for mismatches."
+      },
+      {
+        "h1": "Getting Sorbet Up and Running in Rails",
+        "list": [
+          {
+            "h1": "1. Add the Gems",
+            "p": "Inside your Gemfile, add:\n```ruby\ngem 'sorbet'\ngem 'sorbet-runtime'\ngem 'sorbet-rails' # helps with Rails model types\n```"
+          },
+          {
+            "h1": "2. Bundle it up",
+            "p": "Run `bundle install` to get those gems installed."
+          },
+          {
+            "h1": "3. Set Up Sorbet",
+            "p": "Run:\n```bash\nbin/tapioca init    # sets up RBI generation\nsrb init             # creates the Sorbet folders\n```"
+          },
+          {
+            "h1": "4. Generate Type Definitions",
+            "p": "Let Sorbet learn about your app’s structure:\n```bash\nbin/tapioca generate\n```"
+          }
+        ]
+      },
+      {
+        "h1": "Annotating Your Code",
+        "p": "Now comes the fun part — writing code that talks back. Here’s how to annotate your methods:",
+        "html": {
+          "type": "code",
+          "language": "ruby",
+          "value": "class User < ApplicationRecord\n  extend T::Sig\n\n  sig { returns(String) }\n  def full_name\n    \"#{first_name} #{last_name}\"\n  end\n\n  sig { params(age: Integer).returns(T::Boolean) }\n  def eligible?(age)\n    age >= 18\n  end\nend"
+        }
+      },
+      {
+        "h1": "File-Level Strictness — You’re In Control",
+        "p": "At the top of every file, you can choose how strict Sorbet should be. This means you can start with training wheels and slowly go full strict ninja mode:",
+        "list": [
+          { "h1": "# typed: false", "p": "Ignore this file completely." },
+          { "h1": "# typed: true", "p": "Basic safety checks. A good starting point." },
+          { "h1": "# typed: strict", "p": "Now we’re serious. Everything must be typed." },
+          { "h1": "# typed: strong", "p": "Even more aggressive. Requires clean and consistent codebases." }
+        ]
+      },
+      {
+        "h1": "Things That Might Trip You Up",
+        "list": [
+          { "h1": "Method Signatures Everywhere", "p": "It’s more typing (literally), but those few lines save hours of debugging." },
+          { "h1": "Dynamic Ruby is Hard for Sorbet", "p": "Metaprogramming is tricky for static checkers. If needed, use `T.unsafe` or generate RBIs manually with `tapioca`." },
+          { "h1": "RBI Files Can Get Stale", "p": "If you change gem versions or method signatures, regenerate RBI files. A quick `tapioca generate` keeps things fresh." }
+        ]
+      },
+      {
+        "h1": "Wrapping Up",
+        "p": "Sorbet helps Rails apps grow with confidence. You won’t need to switch your style or rewrite everything — just add type hints gradually. If you’re just starting out in Ruby, Sorbet is like a second pair of eyes watching your back. And once you get the hang of it, you’ll wonder how you shipped code without it."
+      }
+    ],
+    "advertisements": { "show": false },
+    "referBlog": {
+      "show": true,
+      "title": "A Guide to Using Sidekiq for Background Jobs in Ruby on Rails",
+      "slug": "a-guide-to-using-sidekiq-for-background-jobs-in-ruby-on-rails"
+    }
+  },
+
+
+  {
+    title: "Advanced ActiveRecord Query Optimization in Rails: From Arel to Raw SQL",
+    slug: "advanced-activerecord-query-optimization-in-rails-from-arel-to-raw-sql",
+    id: 8,
+    category_id: 2,
+    description: "A deep dive into writing and optimizing complex queries in Rails using ActiveRecord, Arel, and raw SQL. Learn when to rely on ActiveRecord, when to drop down to Arel, and when to unleash raw SQL for performance-critical scenarios.",
+    image: {
+      src: "https://website-images-rohitcodes.s3.ap-south-1.amazonaws.com/advanced-activerecord-query-optimization-in-rails-from-arel-to-raw-sql.webp",
+      alt: "Advanced ActiveRecord Query Optimization in Rails"
+    },
+    owner: "Rohit Bhatt",
+    tags: ["rails", "activerecord", "sql", "arel", "performance", "query-optimization"],
+    date: "2025-08-29",
+    summary: "ActiveRecord is one of Rails’ greatest strengths — but when your queries get complex or performance becomes critical, knowing how to go beyond the basics is essential. In this article, we’ll explore how to push ActiveRecord to its limits, when to leverage Arel for fine-grained query building, and when raw SQL is the best tool for the job.",
+    sections: [
+      {
+        h1: "Why Query Optimization Matters in Rails",
+        p: "Rails apps start simple, but as features grow, so does query complexity. Eager loading can only take you so far. A dashboard with aggregated metrics, a report with complex joins, or a performance-sensitive API endpoint — all can slow down drastically if you stick to naive ActiveRecord usage. Optimizing queries directly impacts response times, database load, and ultimately user experience."
+      },
+      {
+        h1: "The Three Layers of Querying in Rails",
+        p: "Rails developers work with three main query layers. Understanding when to use each is crucial.",
+        list: [
+          { h1: "ActiveRecord", p: "High-level, object-oriented, easy to read and write. Perfect for 80% of use cases." },
+          { h1: "Arel", p: "Rails’ relational algebra engine. Verbose, but powerful for conditional queries and dynamic query building." },
+          { h1: "Raw SQL", p: "The escape hatch. Use for CTEs, window functions, and advanced PostgreSQL features that ActiveRecord/Arel don’t cover." }
+        ]
+      },
+      {
+        h1: "ActiveRecord: Start Simple",
+        p: "Let’s begin with a common reporting scenario: counting confirmed bookings per company. In ActiveRecord:",
+        html: {
+          type: "code",
+          value: `Company.joins(:bookings)
+  .where(bookings: { status: ['confirmed', 'completed'] })
+  .group('companies.id')
+  .count`,
+          language: "ruby"
+        }
+      },
+      {
+        h1: "ActiveRecord Limitations",
+        p: "This is fine, but once you need conditional counts (like confirmed vs cancelled vs pending), ActiveRecord gets messy. Chaining scopes creates SQL duplication, and trying to express conditional aggregations is awkward."
+      },
+      {
+        h1: "Enter Arel: Rails’ Hidden Power",
+        p: "Arel gives you precise SQL control while keeping Ruby syntax. Let’s redo the same query with conditional counts:",
+        html: {
+          type: "code",
+          value: `companies = Company.arel_table
+bookings  = Booking.arel_table
+
+query = companies
+  .join(bookings).on(bookings[:company_id].eq(companies[:id]))
+  .project(
+    companies[:id],
+    bookings[:id].count.as('total_bookings'),
+    Arel.sql("COUNT(CASE WHEN bookings.status = 'confirmed' THEN 1 END)").as('confirmed_count'),
+    Arel.sql("COUNT(CASE WHEN bookings.status = 'cancelled' THEN 1 END)").as('cancelled_count')
+  )
+  .group(companies[:id])
+
+Company.find_by_sql(query.to_sql)`,
+          language: "ruby"
+        }
+      },
+      {
+        h1: "Dynamic Query Building with Arel",
+        p: "Arel shines when queries are built dynamically. Example: filtering based on optional params.",
+        html: {
+          type: "code",
+          value: `def bookings_query(params)
+  bookings = Booking.arel_table
+  q = bookings.project(Arel.star)
+
+  q = q.where(bookings[:status].eq(params[:status])) if params[:status].present?
+  q = q.where(bookings[:appointment_date].gteq(params[:from])) if params[:from]
+  q = q.where(bookings[:appointment_date].lteq(params[:to])) if params[:to]
+
+  Booking.find_by_sql(q.to_sql)
+end`,
+          language: "ruby"
+        }
+      },
+      {
+        h1: "When Raw SQL is the Best Option",
+        p: "Arel has limits. For things like CTEs, window functions, JSONB operators, and lateral joins, you’ll often need raw SQL.",
+        subSections: [
+          {
+            h2: "Example: Common Table Expressions (CTEs)",
+            html: {
+              type: "code",
+              value: `Company.find_by_sql(<<~SQL)
+  WITH booking_counts AS (
+    SELECT company_id,
+           COUNT(*) AS total,
+           COUNT(*) FILTER (WHERE status = 'confirmed') AS confirmed,
+           COUNT(*) FILTER (WHERE status = 'cancelled') AS cancelled
+    FROM bookings
+    GROUP BY company_id
+  )
+  SELECT companies.id, companies.name, total, confirmed, cancelled
+  FROM companies
+  JOIN booking_counts ON booking_counts.company_id = companies.id
+SQL`,
+              language: "sql"
+            }
+          },
+          {
+            h2: "Example: Window Functions",
+            p: "Suppose you want the latest booking per customer:",
+            html: {
+              type: "code",
+              value: `Booking.find_by_sql(<<~SQL)
+  SELECT DISTINCT ON (customer_id) *
+  FROM bookings
+  ORDER BY customer_id, appointment_date DESC
+SQL`,
+              language: "sql"
+            }
+          },
+          {
+            h2: "Example: Lateral Joins",
+            p: "Get each company’s most recent booking:",
+            html: {
+              type: "code",
+              value: `Company.find_by_sql(<<~SQL)
+  SELECT companies.*, latest.*
+  FROM companies
+  JOIN LATERAL (
+    SELECT * FROM bookings
+    WHERE bookings.company_id = companies.id
+    ORDER BY appointment_date DESC
+    LIMIT 1
+  ) latest ON true
+SQL`,
+              language: "sql"
+            }
+          }
+        ]
+      },
+      {
+        h1: "Performance Tuning in Practice",
+        list: [
+          { h1: "Avoid N+1 Queries", p: "Use `includes` or `preload`. Use Bullet gem in dev to catch N+1s early." },
+          { h1: "Batch Processing", p: "Use `in_batches` or `find_in_batches` to avoid loading huge sets into memory." },
+          { h1: "Proper Indexing", p: "Always align queries with DB indexes. For Postgres, consider partial indexes and GIN/GIN_trgm for text searches." },
+          { h1: "Use EXPLAIN ANALYZE", p: "Check query plans regularly. ActiveRecord might look clean, but DB may choose a bad plan." }
+        ]
+      },
+      {
+        h1: "Practical Tips",
+        list: [
+          { h1: "Mix & Match", p: "Don’t be dogmatic. Start with ActiveRecord, drop into Arel when needed, and use raw SQL for the final 10%." },
+          { h1: "Keep Queries in Models/Scopes", p: "Encapsulate raw SQL in model scopes or service objects. Keeps controllers clean." },
+          { h1: "Test Your Queries", p: "Use RSpec + database cleaner to ensure queries produce expected results." }
+        ]
+      },
+      {
+        h1: "Conclusion",
+        p: "Mastering Rails queries means mastering all three layers: ActiveRecord for productivity, Arel for flexibility, and raw SQL for power. The trick is knowing when to switch layers. With this toolbox, you’ll write code that’s not just elegant, but fast and production-ready."
+      }
+    ],
+    advertisements: {
+      show: false
+    },
+    referBlog: {
+      show: true,
+      title: "PostgreSQL EXPLAIN ANALYZE: Decode Your Query Performance Like a Pro",
+      slug: "postgresql-explain-analyze-decode-your-query-performance"
+    }
   }
-}];
+
+
+];
 
 export default blogdata;
 
