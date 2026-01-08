@@ -5,6 +5,23 @@ const nextConfig = {
     // your project has ESLint errors.
     ignoreDuringBuilds: true,
   },
+  webpack: (config, options) => {
+    if (options.dev) {
+      config.module.rules.push({
+        test: /\.(js|jsx|ts|tsx)$/,
+        exclude: /node_modules/,
+        use: [
+          {
+            loader: '@locator/webpack-loader',
+            options: {
+              env: 'development',
+            },
+          },
+        ],
+      })
+    }
+    return config
+  },
   async redirects() {
     return [
       {

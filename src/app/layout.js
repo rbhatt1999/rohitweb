@@ -2,6 +2,7 @@ import NavigationBar from '@/components/Navigation/NavigationBar'
 import './globals.css'
 import { Roboto, Lato } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/react';
+import LocatorLoader from '@/components/LocatorLoader';
 import Footer from '@/components/Footer';
 
 
@@ -54,6 +55,7 @@ export default function RootLayout({ children }) {
     <html lang="en">
       <body className={`${lato.className} animate-text bg-gradient-to-r from-neutral-900 via-zinc-800 to-stone-800`}>
         <Analytics />
+        <LocatorLoader />
         <NavigationBar />
         {children}
         <Footer />
