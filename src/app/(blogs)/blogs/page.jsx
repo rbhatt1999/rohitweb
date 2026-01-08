@@ -13,7 +13,7 @@ const dmSans = DM_Sans({
 
 export const metadata = {
   title: `Exploring the Latest Web Technology Trends and Innovations`,
-  description: `Learn about multiple web development technologies like Ruby on Rails, React, JavaScript, and many more. Explore the latest web technology trends and innovations.`, 
+  description: `Learn about multiple web development technologies like Ruby on Rails, React, JavaScript, and many more. Explore the latest web technology trends and innovations.`,
   images: [
     {
       url: 'https://i.ibb.co/BL54PXc/blogs.webp',
@@ -53,7 +53,7 @@ export const metadata = {
   },
 }
 
-export async function getBlogs(page=false, search=false, all=false) {
+export async function getBlogs(page = false, search = false, all = false) {
   let res
   try {
     console.log(`${url}/api/blogs${page ? `?page=${page}` : ''}${search ? `&search=${search}` : ''}${all ? `?all=${true}` : ''}`)
@@ -83,7 +83,7 @@ export default async function page({ searchParams }) {
       <section className="flex flex-col md:flex-row w-full bg-white/5 items-center justify-center px-2 py-12 md:py-24 md:px-20">
         <div className="flex flex-col justify-center items-center flex-1 gap-2 md:gap-5">
           <h1 className="text-2xl md:text-4xl font-bold text-center text-blue-400">
-          Exploring the Latest Web Technology Trends and Innovations
+            Exploring the Latest Web Technology Trends and Innovations
           </h1>
           {
             search && (
@@ -94,14 +94,14 @@ export default async function page({ searchParams }) {
       </section>
       <div className='flex flex-col md:flex-row w-full gap-8 px-7 py-7 md:py-14 md:px-36'>
         <div className=' flex flex-col w-full md:w-8/12'>
-        {
+          {
             data.length === 0 ? (
               <div className='flex flex-col w-full gap-2 items-center justify-center'>
                 <h1 className='text-5xl font-bold pt-5 text-white'>No Blogs Found</h1>
               </div>
             ) :
-          <BlogsList data={data} totalPage={totalPage} page={page} search={search} afterurl='social-awareness/blogs' />
-        }
+              <BlogsList data={data} totalPage={totalPage} page={page} search={search} afterurl='blogs' />
+          }
 
         </div>
         <div className='flex flex-col w-full flex-1 relative'>
