@@ -58,6 +58,18 @@ const categoryData = [
       alt: `PostgreSQL Tips, Tricks, and Performance Guides`,
     },
     tags: ['postgres', 'database', 'sql']
+  },
+  {
+    name: "Artificial Intelligence",
+    slug: "artificial-intelligence",
+    id: 5,
+    title: "Artificial Intelligence: The Future of Technology",
+    description: "Explore the latest trends, tools, and insights in the world of Artificial Intelligence, Agents, and LLMs.",
+    image: {
+      src: `https://website-images-rohitcodes.s3.ap-south-1.amazonaws.com/artificial-intelligence-category.webp`,
+      alt: `Artificial Intelligence`,
+    },
+    tags: ['ai', 'artificial intelligence', 'llm', 'agents']
   }
 
 ]

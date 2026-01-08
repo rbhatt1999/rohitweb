@@ -1317,7 +1317,268 @@ SQL`,
       title: "PostgreSQL EXPLAIN ANALYZE: Decode Your Query Performance Like a Pro",
       slug: "postgresql-explain-analyze-decode-your-query-performance"
     }
-  }
+  },
+  {
+    title: `The Agentic Shift: A Comprehensive Analysis of the Artificial Intelligence Landscape in 2026`,
+    slug: `the-agentic-shift-artificial-intelligence-landscape-2026`,
+    id: 7,
+    category_id: 5,
+    description: `As we navigate the technological terrain of early 2026, the artificial intelligence sector has undergone a profound metamorphosis.`,
+    image: {
+      src: `https://website-images-rohitcodes.s3.ap-south-1.amazonaws.com/artificial-intelligence.webp`,
+      alt: `The Agentic Shift: A Comprehensive Analysis of the Artificial Intelligence Landscape in 2026`,
+    },
+    owner: `Rohit Bhatt`,
+    tags: [`AI`, `Artificial Intelligence`, `LLMs`, `Agents`, `Future Tech`],
+    date: '2026-01-08',
+    summary: `By 2026, AI isn’t about playing with prompts anymore — it’s about handing work over and keeping an eye on it. The article shows how people are moving from asking AI quick questions to letting it run full workflows, especially in coding, research, and operations. Open-source models like DeepSeek have shaken up the space by making powerful AI cheaper and accessible worldwide, while big companies are still figuring out how to use AI safely at scale. The biggest lesson is simple: AI works best when you treat it like a smart intern — give clear goals, watch what it does, and never assume it won’t mess up.`,
+    sections: [
+      {
+        h1: `1. Introduction: The End of the Novelty Phase`,
+        p: `As we navigate the technological terrain of early 2026, the artificial intelligence sector has undergone a profound metamorphosis. The era of breathless experimentation—characterized by the viral novelty of chatbots and the tentative exploration of generative prompts—has effectively concluded. In its place, a more rigorous, pragmatic, and complex reality has emerged: the era of Agentic Workflows.<br/><br/>The narrative of the past three years, from the initial release of ChatGPT to the proliferation of multimodal models, was defined by the question, "What can this tool do?" Today, the question has shifted to, "How does this tool work for me?" This distinction is not merely semantic; it represents a fundamental architectural shift in how human beings interact with machine intelligence. We are moving from a paradigm of "prompt and response"—a synchronous, transactional exchange where the human drives every step—to a paradigm of "delegation and supervision," where AI agents are entrusted with high-level goals and granted the autonomy to execute complex chains of reasoning and action to achieve them.<br/><br/>Telemetry data from late 2025 provides empirical evidence for this transition. Early large language model (LLM) adoption was dominated by short, conversational exchanges—quick questions, summarization requests, or simple creative prompts. However, traffic patterns analyzed in 2025 reveal a structural change: the majority of tokens are now linked to extended contexts, sustained internal reasoning, and sequences of actions that resemble workflow logic rather than single-turn interactions. Users are no longer just asking questions; they are building systems.<br/><br/>Yet, this transition is neither smooth nor evenly distributed. While global adoption of generative AI has risen—with roughly one in six people worldwide now using these tools—the enterprise landscape is defined by a dichotomy of individual productivity versus organizational inertia. While individual "power users" leverage sophisticated stacks of AI tools to amplify their output, large organizations struggle to scale these pockets of innovation into "material enterprise-level benefits". The bottleneck has shifted from access to technology to the "growing pains" of redesigning workflows, managing governance, and confronting the "hidden costs" of operationalizing intelligence.<br/><br/>Furthermore, 2025 marked a geopolitical and economic turning point with the "DeepSeek Moment." The release of high-performance, open-source models from non-traditional markets challenged the hegemony of established Western AI laboratories, fundamentally altering the economics of intelligence and democratizing access to state-of-the-art reasoning capabilities across the Global South and Eastern Europe.<br/><br/>This report serves as an exhaustive chronicle of this new reality. It dissects the tools, trends, and tensions defining the AI landscape in 2026, offering a granular analysis of the best-in-class solutions for coding, creative work, and enterprise automation, while critically examining the failure modes—from "slopsquatting" security risks to "subscription fatigue"—that threaten to stall progress.`,
+      },
+      {
+        h1: `2. The Geopolitics and Economics of Intelligence`,
+        p: `The foundation of the 2026 AI ecosystem is the model layer—the engines of inference that power every application, agent, and workflow. In 2025, this layer experienced a seismic disruption that ended the monopoly of the "closed labs" and ushered in a new era of open-weights competition.`,
+        subSections: [
+          {
+            h2: `2.1 The "DeepSeek Moment" and the Open-Source Renaissance`,
+            p: `For years, the narrative of AI development was dominated by a handful of Western giants—OpenAI, Google, and Anthropic. Their proprietary models set the benchmark for performance, and their pricing structures dictated the economics of the industry. This equilibrium was shattered in 2025 with the rise of DeepSeek, a Chinese research lab that released DeepSeek-V3, a model that rivaled the performance of GPT-4o and Claude 3.5 Sonnet but was released under an open-source MIT license.<br/><br/>The impact of DeepSeek-V3 was not just technical; it was structural. By leveraging a massive "Mixture-of-Experts" (MoE) architecture with 671 billion parameters (activating only 37 billion per token), DeepSeek demonstrated that state-of-the-art performance could be achieved with radical efficiency. The model was trained on 14.8 trillion tokens using only 2.788 million H800 GPU hours—a fraction of the compute resources rumored to be used by its Western competitors.<br/><br/>This efficiency translated directly into disruptive economics. In the open market, DeepSeek-V3 offered input processing at approximately $0.14 per million tokens, positioning it as a direct competitor to Meta's Llama 3 8B Instruct ($0.06 per million tokens) but with reasoning capabilities that punched far above its weight class. While Llama 3 remained the king of cost-efficiency for lightweight tasks, DeepSeek became the de facto standard for complex, heavy-lifting research and reasoning tasks in the open-source community.`,
+          },
+          {
+            h2: `The Global Diffusion of Open Models`,
+            p: `The release of DeepSeek-V3 triggered a rapid diffusion of advanced AI capabilities into markets long underserved by traditional providers. Telemetry indicates surging adoption across Russia, Iran, Cuba, Belarus, and notably, the entire African continent. By removing both the financial barriers (high subscription costs) and the technical barriers (access to restricted APIs), DeepSeek effectively "democratized" high-level intelligence.<br/><br/>This trend forces a re-evaluation of the "AI divide." While Western enterprises debate the regulatory implications of closed models, a parallel ecosystem is flourishing in the Global South, built on open-weights infrastructure that is sovereign, censorship-resistant, and cost-effective. This "bifurcation" of the AI stack—between the regulated, safety-constrained commercial APIs of the West and the raw, unrestricted power of open models—is a defining geopolitical theme of 2026.`,
+          },
+          {
+            h2: `2.2 The Model Hierarchy: A Tiered Ecosystem`,
+            p: `As the dust settles from the open-source explosion, a clear hierarchy of models has emerged, each serving distinct functional niches. The days of a single "best model" are over; developers and enterprises now select models based on a matrix of reasoning capability, speed, and cost.`,
+            list: [
+              {
+                h1: `The Reasoning Specialist: Claude 3.5 Sonnet`,
+                p: `Anthropic’s Claude 3.5 Sonnet has cemented its position as the premier model for tasks requiring deep reasoning, coding, and nuance. In benchmark after benchmark, it has demonstrated superiority over its peers in technical accuracy.<br/>* Graduate-Level Reasoning (GPQA): Claude 3.5 Sonnet leads with a score of 59.4% (0-shot Chain-of-Thought), significantly outpacing GPT-4o’s 53.6%.<br/>* Coding Proficiency: In internal agentic coding evaluations, Claude 3.5 Sonnet solved 64% of complex problems, nearly double the success rate of its predecessor, Claude 3 Opus (38%).<br/>* User Sentiment: Developers consistently report that Claude produces "cleaner," less verbose code and exhibits better structural understanding of complex projects. It has become the default "brain" behind advanced coding tools like Cursor.`
+              },
+              {
+                h1: `The Speed and Math Utility: GPT-4o`,
+                p: `OpenAI’s GPT-4o remains the workhorse of the industry, optimized for speed and multimodal versatility. While it may concede the "reasoning crown" to Claude in nuanced writing or architectural coding, it dominates in raw computational speed and mathematical logic.<br/>* Mathematical Benchmarks: GPT-4o scores 76.6% on the MATH benchmark (0-shot CoT), surpassing Claude 3.5 Sonnet’s 71.1%.<br/>* Latency: It is approximately 24% faster than Claude 3.5 Sonnet (average latency 7.5s vs 9.3s) and boasts a 2x faster time-to-first-token (0.56s vs 1.23s).<br/>* Use Case: These characteristics make GPT-4o the unrivaled choice for real-time applications, voice agents, and customer-facing chatbots where latency feels like intelligence.`
+              },
+              {
+                h1: `The Open-Source Workhorses: Llama 3 & DeepSeek`,
+                p: `Meta's Llama 3 series (including the 8B, 70B, and the massive 405B variants) continues to serve as the backbone of the "Sovereign AI" movement. For enterprises that cannot legally or strategically afford to send data to a third-party API, hosting Llama 3 locally or on a private cloud is the standard architecture. It offers a "good enough" baseline for general tasks at a price point that is effectively zero (excluding compute).<br/>DeepSeek V3 acts as the "Heavy Cruiser" of the open-weight world—deployed when Llama 3 8B is too "dumb" and Llama 3 405B is too expensive to run. It occupies the strategic middle ground of high performance and manageable inference costs.`
+              }
+            ]
+          },
+          {
+            h2: `2.3 The Economics of Tokens and "Subscription Fatigue"`,
+            p: `By 2026, the proliferation of these models and the tools built on top of them created a consumer crisis known as "Subscription Fatigue." Users found themselves bombarded with monthly fees—$20 for ChatGPT, $20 for Claude, $30 for a coding editor, $15 for an image generator. The cumulative cost of a personal AI stack began to exceed the utility for many casual users.<br/><br/>Data from the subscription analytics platform Adapty reveals a shift in consumer behavior: users are prioritizing flexibility over savings. Weekly subscriptions now capture 47% of all revenue in some app categories, as users refuse to lock themselves into annual or even monthly contracts for tools that might be obsolete in weeks.<br/><br/>This pressure is driving a market consolidation. Startups that merely "wrap" a model are dying. The winners of 2026 are "AI-First" platforms that offer a consolidated workspace—integrating writing, research, and analysis into a single subscription—or "Pay-Per-Outcome" models where users pay for the result (a completed website, a generated video) rather than access to the tool.`,
+          }
+        ]
+      },
+      {
+        h1: `3. The Developer Experience: The Era of Agentic Coding`,
+        p: `Nowhere is the impact of advanced models more visible than in software development. In 2025, coding transitioned from an act of writing to an act of reviewing. The Integrated Development Environment (IDE) is no longer just a text editor; it is a cockpit for orchestrating AI agents.`,
+        subSections: [
+          {
+            h2: `3.1 The IDE Wars: Cursor vs. Windsurf vs. Copilot`,
+            p: `The market has coalesced around three primary tools, each representing a distinct philosophy of how AI should assist in coding.`,
+            list: [
+              {
+                h1: `Cursor: The Native Challenger`,
+                p: `Cursor, a fork of VS Code, established itself as the "cult favorite" among AI-native developers. Its defining innovation is its implementation of "Tab" prediction. Unlike traditional autocomplete that suggests a few words, Cursor’s model (often powered by Claude 3.5 Sonnet) predicts the next logical edit, often suggesting entire blocks of code or multi-line diffs that account for context across the file. Its "Composer" mode allows developers to write natural language instructions ("Refactor this component to use React hooks and update the tests") and watch as the agent applies changes across multiple files simultaneously. Developers cite its speed and the ability to define custom behaviors via .cursorrules files as key advantages. However, because it is a fork, it sometimes lags behind the official VS Code ecosystem in extension compatibility, and its cloud-based nature raises security concerns for strict enterprise environments.`
+              },
+              {
+                h1: `Windsurf: The "Deep Context" Specialist`,
+                p: `Windsurf, developed by Codeium, emerged in late 2025 as the tool for "brownfield" development—working with large, existing, legacy codebases. Its "Cascade" flow is designed to maintain a deep, persistent understanding of the project's architecture, acting more like a senior engineer who knows the history of the repo than a rapid prototyper. Windsurf’s key differentiator is "flow state" preservation. It can propose changes in the background while the developer is reviewing previous diffs, preventing the "stop-and-wait" friction common in other tools. It is particularly favored in enterprise environments (Monorepos, regulated industries) because it offers on-premise deployment options and robust data retention controls.`
+              },
+              {
+                h1: `GitHub Copilot: The Enterprise Incumbent`,
+                p: `Initially slow to adopt agentic features, GitHub Copilot caught up in late 2025 with the release of "Agent Mode" for VS Code. This update allowed Copilot to perform multi-step refactoring and terminal command execution, bringing it to feature parity with Cursor for many tasks. Its primary strength is its ubiquity and pricing. at $10/month (included in many enterprise licenses), it is significantly cheaper than Cursor’s $20+ pro tiers. For large organizations already entrenched in the Microsoft/GitHub ecosystem, Copilot is the "safe" default. However, technical reviews often find that it requires more manual guidance ("hand-holding") to pass complex unit tests compared to the more autonomous nature of Cursor or Windsurf.`
+              }
+            ]
+          },
+          {
+            h2: `3.2 The Rise of "Vibe Coding"`,
+            p: `A new sociological phenomenon in development is "Vibe Coding"—the practice of building software by describing the feeling, behavior, or business logic (the "vibe") of an app, while leaving the implementation details entirely to the AI.<br/>Lovable.dev is the leader in this space for frontend prototyping. It allows users to generate full-stack web applications from a simple prompt ("Make a dashboard for a pet store with a dark mode aesthetic"). Lovable is optimized for speed and visual fidelity, making it the tool of choice for product managers and founders validating ideas. However, it is often a "walled garden"; once the application requires complex backend logic or custom integrations, users often hit a ceiling.<br/>Replit captures the users who graduate from Lovable. With its Replit Agent, it offers a complete cloud-based development environment that can provision databases, manage deployments, and architect complex backends. Replit’s agent is described as a "coding mentor"—it explains its plan, provisions the infrastructure, and deploys the app to a live URL, handling the full lifecycle from idea to production.`
+          },
+          {
+            h2: `3.3 The New Security Threat: "Slopsquatting"`,
+            p: `The heavy reliance on AI for coding has introduced a novel and dangerous supply chain vulnerability: "Slopsquatting."<br/>Large Language Models, despite their intelligence, hallucinate. When asked to write code, they occasionally suggest importing software libraries that do not exist. Malicious actors have begun to exploit this by scanning for common hallucinated package names and registering them on public package managers like npm or PyPI. When a developer (or an autonomous agent) blindly accepts the AI's suggestion and runs npm install [hallucinated-name], they install malware.<br/>Research from 2025 indicates that 5.2% of package suggestions from commercial models refer to non-existent packages, creating a massive attack surface. This underscores a critical lesson for 2026: Agentic code requires human audit. The "human-in-the-loop" is not just for quality; it is a security necessity.`
+          }
+        ]
+      },
+      {
+        h1: `4. The Agentic Economy: Automation and Orchestration`,
+        p: `While developers have their IDEs, the broader business world is being transformed by AI Agents—autonomous systems capable of perceiving data, making decisions, and executing tasks across different software platforms. 2026 is the year automation moved from "rigid triggers" to "fluid agency."`,
+        subSections: [
+          {
+            h2: `4.1 The Orchestration Wars: Zapier vs. Make vs. n8n`,
+            p: `The infrastructure for building these agents has triggered a three-way battle for dominance in the low-code space.`,
+            list: [
+              {
+                h1: `Zapier: The Accessibility King`,
+                p: `Zapier remains the entry point for most businesses. Its strength lies in its ecosystem—connecting over 6,000 apps. In 2025, it launched "Zapier Central," a behavior-based agent builder that allows users to "teach" bots to watch for specific data patterns and act. However, Zapier is often criticized for its "black box" nature and its pricing model, which can become prohibitively expensive at scale. Simple polling triggers (checking for new data) can consume task budgets rapidly, leading to "bill shock" for high-volume workflows.`
+              },
+              {
+                h1: `Make.com (formerly Integromat): The Architect's Tool`,
+                p: `Make is the preferred tool for technical operations and complex system architects. Its visual, node-based canvas allows for intricate branching logic, data transformation, and error handling that Zapier’s linear interface cannot support. Make shines in cost-efficiency for complex flows. Its pricing model is based on operations, but its ability to filter data before processing allows savvy users to optimize their spend. For "heavy" agentic workflows—such as a CRM system that enriches leads, scores them via an LLM, and then routes them to Slack—Make offers a lower total cost of ownership and greater transparency.`
+              },
+              {
+                h1: `n8n: The Sovereign Alternative`,
+                p: `n8n has surged in popularity as the "middleware" for the Sovereign AI movement. Unlike Zapier and Make, which are cloud-only SaaS products, n8n is "source-available" and can be self-hosted. This makes it the only viable option for enterprises with strict data governance requirements (e.g., healthcare, finance) who want to build agents that process sensitive data without sending it to a third-party automation cloud. n8n is increasingly used to bridge local LLMs (like Llama 3) with internal SQL databases, creating a secure, private agentic loop.`
+              }
+            ]
+          },
+          {
+            h2: `4.2 Specialized Frameworks: CrewAI & The "Context" Problem`,
+            p: `For developers building custom agents from scratch, CrewAI became the dominant framework in 2025. Unlike LangChain, which focuses on the mechanics of chaining prompts, CrewAI focuses on "Role-Playing." It allows developers to define a "Crew" of agents with specific personas (e.g., "Senior Researcher," "content Writer," "Editor") and goals, who then collaborate to achieve a task.<br/>However, the reality of deploying CrewAI in production has revealed significant challenges. The primary issue is "Context Explosion." When multiple agents collaborate, they must share conversation history and data. As the conversation grows, the "context window" fills up, leading to high costs, confusion among agents, and latency.`
+          },
+          {
+            h2: `4.3 The Hidden Costs of Agency: "Operational Intelligence Debt"`,
+            p: `A critical, often overlooked theme of 2026 is the "Hidden Cost" of running AI agents. Organizations that budgeted for "token costs" (the price of the API) are finding themselves overwhelmed by "Operational Intelligence Debt." This includes prompt maintenance, looping failures where agents burn through credits in retry loops, and the need for expensive observability tooling. Gartner predicts that 40% of agentic AI projects will fail to reach production by 2027, not because the technology isn't capable, but because the operational overhead destroys the ROI.`
+          }
+        ]
+      },
+      {
+        h1: `5. The Creative Frontier: Media, Design, and Physics`,
+        p: `In the creative industries, AI has moved from "generating assets" to "simulating reality." However, this ambition has collided with the fundamental limitations of current model architectures.`,
+        subSections: [
+          {
+            h2: `5.1 The "Physics Wall" in Video Generation`,
+            p: `2025 was the year of high-fidelity video generation. Tools like OpenAI's Sora 2, Google Veo, and Kling promised to revolutionize filmmaking. And while they can produce stunningly realistic textures (lighting, skin, reflections), they have hit a hard barrier known as the "Physics Wall." Research reveals that these models do not actually "learn" physics; they merely mimic surface-level patterns of motion, operating on "Dream Logic." The leads to "temporal inconsistencies" where objects morph or change velocity illogically.<br/><br/>The Tool Landscape:<br/>* Google Veo 3: Currently leads in "Prompt Adherence." It offers a "Fast" mode for rapid iteration and a "Quality" mode for final renders.<br/>* Kling: A Chinese model that has gained traction for its ability to generate longer clips (up to 2 minutes), though it suffers from physics hallucinations.<br/>* Sora 2: Remains the "high-end" option for visual fidelity but is criticized for its closed ecosystem and slow rollout.`
+          },
+          {
+            h2: `5.2 The Design Systems: V0 vs. Galileo`,
+            p: `In User Interface (UI) design, the workflow has bifurcated between "Code Generation" and "Visual Ideation."<br/>* V0 by Vercel: This tool dominates the developer-centric design market. It generates production-ready React and Tailwind CSS code. A developer can describe a "SaaS dashboard with a dark mode and charts," and V0 creates the copy-pasteable code.<br/>* Galileo AI: This tool serves the designer-centric market. It generates high-fidelity Figma designs. It is used for the ideation phase—creating mockups, exploring styles, and presenting concepts to clients.`
+          },
+          {
+            h2: `5.3 Copywriting and Compliance: The Enterprise Split`,
+            p: `In the world of text generation, the market has split between "Creative" tools and "Compliant" tools.<br/>* Jasper & Copy.ai: These platforms have pivoted to serve marketing teams, offering "Brand Voice" features that ensure content sounds like the company.<br/>* Writer.com: This platform has captured the regulated enterprise market. Its key differentiator is compliance, offering "citation checking" and "guardrails" that prevent the AI from making unauthorized claims.`
+          }
+        ]
+      },
+      {
+        h1: `6. Enterprise Transformation: The Search for ROI`,
+        p: `For the Fortune 500, 2026 is the year of "Show me the money." The vague promise of "AI productivity" is being replaced by hard metrics.`,
+        subSections: [
+          {
+            h2: `6.1 Specialized Agents vs. General Copilots`,
+            p: `A major trend in enterprise software is the realization that "General Purpose Copilots" (like Microsoft 365 Copilot) are insufficient for specialized roles. For example, in Finance, simple assistance isn't enough; specialized agents like ChatFin are emerging to actively execute workflows like reconciling bank statements. In Customer Support, Intercom Fin aims to autonomously resolve tickets, while Zendesk AI focuses on augmenting human agents.`
+          },
+          {
+            h2: `6.2 The "Ban" Culture and the Trust Gap`,
+            p: `Despite the potential, corporate adoption is facing a massive headwind: Security. By 2025, 27% of organizations had banned Generative AI tools at least temporarily due to fears of Data Leakage. This has created a "Trust Gap," driving enterprises towards "Sovereign AI" providers (like n8n and self-hosted Llama 3) and forcing major providers to offer dedicated, isolated environments.`
+          }
+        ]
+      },
+      {
+        h1: `7. Personal Productivity: The Knowledge Worker's OS`,
+        p: `For the individual knowledge worker, the toolset has evolved from "tools that help me write" to "tools that help me think."`,
+        subSections: [
+          {
+            h2: `7.1 The "Deep Research" Stack: Perplexity vs. NotebookLM`,
+            p: `The act of "Googling" is becoming obsolete for complex information retrieval.<br/>* Perplexity Pro: Has become the "Answer Engine" for professionals. It aggregates web sources, reads the content, and synthesizes a cited answer.<br/>* NotebookLM (Google): Has created a new category of "Source-Grounded AI." It works only with the documents you upload. Its "Audio Overview" feature—which turns a dry report into an engaging podcast—became a viral sensation.`
+          },
+          {
+            h2: `7.2 Data Analysis: The Death of the Spreadsheet Formula?`,
+            p: `* Julius AI: Has emerged as the "Data Scientist in a Box." You can upload a spreadsheet, and Julius acts as a collaborative analyst, creating interactive visualizations and showing the Python code behind the analysis.<br/>* Excel Copilot: Remains the standard for corporate users due to security integration, but power users often find its reasoning capabilities limited compared to Julius.`
+          }
+        ]
+      },
+      {
+        h1: `8. Failure Modes and Future Outlook`,
+        p: `As we look to the remainder of 2026, we must acknowledge the fragility of this new ecosystem. The "AI Agent" is a powerful concept, but it is currently a fragile software reality.`,
+        subSections: [
+          {
+            h2: `8.1 Why AI Projects Fail`,
+            p: `Many pilots failed because they simply dumped documents into a database ("Dumb RAG") without governance, leading to hallucinations. Additionally, in creative fields, a "hallucination" is an idea, but in banking, it is fraud. The industry is still struggling to solve "semantic drift" where agents deviate from instructions. Integration fragility is also a major issue.`
+          },
+          {
+            h2: `8.2 Conclusion: The Maturity Phase`,
+            p: `The "hype cycle" is over. We are now in the "deployment cycle." The winners of 2026 are not necessarily the ones with the most funding, but those that have solved the User Experience of Agency. For the user, the strategy is clear: Consolidate and Delegate. Treat AI not as a tool to be used, but as an intern to be managed. The AI workforce has arrived; the challenge now is learning how to lead it.`
+          }
+        ]
+      },
+      {
+        h1: `Works cited`,
+        list: [
+          { p: `<a classname='!text-white font-bold' target='_blank' href='https://medium.com/@cdcore/what-the-state-of-ai-in-2025-tells-us-what-to-expect-in-2026-ee0fea1d580c'> What the State of AI in 2025 Tells Us to Expect in 2026 | by Cordero Core - Medium</a>` },
+          { p: `<a classname='!text-white font-bold' target='_blank' href='https://blogs.microsoft.com/on-the-issues/2026/01/08/global-ai-adoption-in-2025/'> Global AI adoption in 2025 amid a widening digital divide - Microsoft On the Issues</a>` },
+          { p: `<a classname='!text-white font-bold' target='_blank' href='https://www.mckinsey.com/capabilities/quantumblack/our-insights/the-state-of-ai'> The state of AI in 2025: Agents, innovation, and transformation - McKinsey</a>` },
+          { p: `<a classname='!text-white font-bold' target='_blank' href='https://vegavid.com/blog/hidden-costs-of-running-ai-agents'> What Is the Biggest Hidden Cost of Running an AI Agent? - Vegavid Technology</a>` },
+          { p: `<a classname='!text-white font-bold' target='_blank' href='https://medium.com/@asimsultan2/deepseek-vs-llama-3-the-true-llm-game-changer-1226c438230a'> DeepSeek vs. Llama 3: The True LLM Game Changer? | by Asimsultan (Head of AI) | Medium</a>` },
+          { p: `<a classname='!text-white font-bold' target='_blank' href='https://docsbot.ai/models/compare/deepseek-v3/llama-3-8b-instruct'> DeepSeek-V3 vs Llama 3 8B Instruct - Detailed Performance & Feature Comparison</a>` },
+          { p: `<a classname='!text-white font-bold' target='_blank' href='https://www.analyticsvidhya.com/blog/2025/01/deepseek-v3-vs-gpt-4o-vs-llama-3-3-70b/'> DeepSeek-V3 vs GPT-4o vs Llama 3.3 70B: Find the Best AI Model - Analytics Vidhya</a>` },
+          { p: `<a classname='!text-white font-bold' target='_blank' href='https://www.sentisight.ai/claude-3-5-sonnet-vs-gpt-4o-ultimate-comparison/'> Claude 3.5 Sonnet vs GPT-4o: Complete AI Model Comparison - SentiSight.ai</a>` },
+          { p: `<a classname='!text-white font-bold' target='_blank' href='https://pieces.app/blog/how-to-use-gpt-4o-gemini-1-5-pro-and-claude-3-5-sonnet-free'> Claude 3.5 sonnet Vs GPT-4o: Key details and comparison - Pieces for Developers</a>` },
+          { p: `<a classname='!text-white font-bold' target='_blank' href='https://www.reddit.com/r/ClaudeAI/comments/1dqj1lg/claude_35_sonnet_vs_gpt4_a_programmers/'> Claude 3.5 Sonnet vs GPT-4: A programmer's perspective on AI assistants - Reddit</a>` },
+          { p: `<a classname='!text-white font-bold' target='_blank' href='https://www.creativebloq.com/art/digital-art/subscription-fatigue-is-real-and-2026-will-be-the-breaking-point-for-artists'> Subscription fatigue is real, and 2026 will be the breaking point for artists</a>` },
+          { p: `<a classname='!text-white font-bold' target='_blank' href='https://adapty.io/blog/9-subscription-trends-dominating-2025/'> 9 Subscription Economy Trends & Fatigue Statistics in 2025 - Adapty</a>` },
+          { p: `<a classname='!text-white font-bold' target='_blank' href='https://techround.co.uk/startups/expert-predictions-startup-trends-2026/'> Expert Predictions For Startup Trends In 2026</a>` },
+          { p: `<a classname='!text-white font-bold' target='_blank' href='https://www.builder.io/blog/cursor-vs-windsurf-vs-github-copilot'> Cursor vs Windsurf vs GitHub Copilot - Builder.io</a>` },
+          { p: `<a classname='!text-white font-bold' target='_blank' href='https://martinterhaak.medium.com/best-ai-coding-agents-summer-2025-c4d20cd0c846'> Best AI Coding Agents Summer 2025 | by Martin ter Haak - Medium</a>` },
+          { p: `<a classname='!text-white font-bold' target='_blank' href='https://medium.com/@shadetreeit/cursor-vs-windsurf-vs-vs-code-with-copilot-where-to-put-your-money-e381f9ae281e'> Cursor vs Windsurf vs VS Code with Copilot: Where to Put Your Money - Medium</a>` },
+          { p: `<a classname='!text-white font-bold' target='_blank' href='https://hackernoon.com/choosing-the-right-ai-ide-for-your-team-cursor-vs-windsurf-vs-copilot'> Choosing the Right AI IDE for Your Team: Cursor vs. Windsurf vs. Copilot | HackerNoon</a>` },
+          { p: `<a classname='!text-white font-bold' target='_blank' href='https://uibakery.io/blog/windsurf-vs-cursor-vs-copilot'> Windsurf vs Cursor vs Copilot: Which AI-Powered Dev Tool Wins? | UI Bakery Blog</a>` },
+          { p: `<a classname='!text-white font-bold' target='_blank' href='https://www.reddit.com/r/GithubCopilot/comments/1jnboan/github_copilot_vs_cursor_in_2025_why_im_paying/'> GitHub Copilot vs Cursor in 2025: Why I'm paying half price for the same features - Reddit</a>` },
+          { p: `<a classname='!text-white font-bold' target='_blank' href='https://lovable.dev/guides/lovable-vs-replit-vs-bubble-comparison'> Lovable vs. Replit vs. Bubble: Which AI-Powered No-Code Builder Fits Your Workflow?</a>` },
+          { p: `<a classname='!text-white font-bold' target='_blank' href='https://www.superblocks.com/blog/lovable-vs-replit'> Lovable vs Replit vs Superblocks: Which One Should You Use?</a>` },
+          { p: `<a classname='!text-white font-bold' target='_blank' href='https://replit.com/discover/replit-vs-lovable'> Replit vs Lovable: Best AI App Builder Comparison</a>` },
+          { p: `<a classname='!text-white font-bold' target='_blank' href='https://www.openxcell.com/blog/replit-vs-lovable/'> Replit vs Lovable: The AI Agent Showdown - Openxcell</a>` },
+          { p: `<a classname='!text-white font-bold' target='_blank' href='https://www.theregister.com/2025/04/12/ai_code_suggestions_sabotage_supply_chain/'>AI code suggestions sabotage software supply chain - The Register</a>` },
+          { p: `<a classname='!text-white font-bold' target='_blank' href='https://genesysgrowth.com/blog/zapier-ai-vs-make-com-ai-vs-n8n-ai'>Zapier AI vs Make.com AI vs n8n AI – A Complete Guide for Marketing Leaders in 2025</a>` },
+          { p: `<a classname='!text-white font-bold' target='_blank' href='https://zapier.com/blog/zapier-vs-make/'>Zapier vs. Make: Which is best? [2025]</a>` },
+          { p: `<a classname='!text-white font-bold' target='_blank' href='https://www.kuse.ai/blog/workflows-productivity/top-21-ai-workflow-tools-in-2025-for-faster-automation'>Top 21 AI Workflow Tools in 2025 for Faster Automation - Kuse</a>` },
+          { p: `<a classname='!text-white font-bold' target='_blank' href='https://www.eesel.ai/blog/make-vs-zapier'>Make vs Zapier: Which automation tool is right for you in 2025? - eesel AI</a>` },
+          { p: `<a classname='!text-white font-bold' target='_blank' href='https://www.reddit.com/r/ProductivityApps/comments/1nclwvz/10_best_ai_productivity_tools_in_2025_that/'>10 best AI productivity tools in 2025 (that actually save time) : r/ProductivityApps - Reddit</a>` },
+          { p: `<a classname='!text-white font-bold' target='_blank' href='https://www.reddit.com/r/AI_Agents/comments/1jor562/zapier_vs_make_which_ones_a_better_tool_to_create/'>Zapier vs Make: Which one's a better tool to create AI agents for a beginner? - Reddit</a>` },
+          { p: `<a classname='!text-white font-bold' target='_blank' href='https://www.diaflow.io/blog/7-best-ai-workflow-automation-tools-in-2025-ranked-and-reviewed'>7 Best AI Workflow Automation Tools in 2025 (Ranked & Reviewed) - Diaflow</a>` },
+          { p: `<a classname='!text-white font-bold' target='_blank' href='https://reply.io/blog/crew-ai-review/'>CrewAI Review 2025: The Right Sales Tool for Your Business? - Reply.io</a>` },
+          { p: `<a classname='!text-white font-bold' target='_blank' href='https://www.reddit.com/r/AI_Agents/comments/1l6rw2n/whos_using_crewai_really/'>Who's using crewAI really? : r/AI_Agents - Reddit</a>` },
+          { p: `<a classname='!text-white font-bold' target='_blank' href='https://medium.com/@michael.hannecke/why-ai-agents-fail-in-production-what-ive-learned-the-hard-way-05f5df98cbe5'>Why AI Agents Fail in Production: What I've Learned the Hard Way | Medium</a>` },
+          { p: `<a classname='!text-white font-bold' target='_blank' href='https://galileo.ai/blog/hidden-cost-of-agentic-ai'>The Hidden Cost of Agentic AI: Why Most Projects Fail Before Reaching Production</a>` },
+          { p: `<a classname='!text-white font-bold' target='_blank' href='https://kingy.ai/news/ai-video-models-fail-to-grasp-basic-physics-a-reality-check-for-openais-sora/'>AI Video Models Fail to Grasp Basic Physics: A Reality Check for OpenAI's Sora - Kingy AI</a>` },
+          { p: `<a classname='!text-white font-bold' target='_blank' href='https://www.reddit.com/r/mlscaling/comments/1irwvb9/do_generative_video_models_learn_physical/'>"Do generative video models learn physical principles from watching videos?", Motamed et al 2025 (no; undermined by fictional data & esthetic/tuning training?) : r/mlscaling - Reddit</a>` },
+          { p: `<a classname='!text-white font-bold' target='_blank' href='https://medium.com/@nandinilreddy/why-ai-videos-look-fake-and-how-physics-can-fix-it-bb84149831d8'>Why AI Videos Look Fake (And How Physics Can Fix It) | by Nandini Lokesh Reddy</a>` },
+          { p: `<a classname='!text-white font-bold' target='_blank' href='https://overchat.ai/ai-hub/best-ai-video-generation-tools-for-2025'>Best AI Video Generation Tools for 2025: Comprehensive Guide | AI Hub</a>` },
+          { p: `<a classname='!text-white font-bold' target='_blank' href='https://www.imagine.art/blogs/veo-3-vs-top-ai-video-generators'>Veo 3 vs Top AI Video Generators: Sora, Runway, Kling, Seedance, and More Compared</a>` },
+          { p: `<a classname='!text-white font-bold' target='_blank' href='https://www.youtube.com/watch?v=hmgMlp4a4ao'>NEW AI Video Generator Kling 2.6 DESTROYS Veo 3.1 & Sora 2? Full Comparison</a>` },
+          { p: `<a classname='!text-white font-bold' target='_blank' href='https://www.youtube.com/watch?v=NmCAtCueJI8'>The BEST AI Video Generator? Sora vs Veo vs Runway vs Wan!</a>` },
+          { p: `<a classname='!text-white font-bold' target='_blank' href='https://dev.to/hashbyt/top-ai-ui-generators-for-a-faster-ui-design-in-2025-45d2'>Top AI UI Generators for a Faster UI Design in 2025 - DEV Community</a>` },
+          { p: `<a classname='!text-white font-bold' target='_blank' href='https://medium.com/@hashbyt/https-hashbyt-com-blog-ai-ui-generators-2025-comparison-ux-pilot-v0-dev-galileo-visily-03edacc5c778'>Top 4 AI UI Generators in 2025: UX Pilot, v0.dev, Galileo AI & Visily | Medium</a>` },
+          { p: `<a classname='!text-white font-bold' target='_blank' href='https://adamfard.com/blog/ai-ui-generator'>Top AI UI Generator: For a faster UI Design in 2026 - Adam Fard Studio</a>` },
+          { p: `<a classname='!text-white font-bold' target='_blank' href='https://www.reddit.com/r/product_design/comments/1hcj56d/ai_product_design_tools_comparisons_v0_bolt/'>AI Product Design Tools comparisons - v0, Bolt, Polymet, Uizard and Galilelo, Dec 2024</a>` },
+          { p: `<a classname='!text-white font-bold' target='_blank' href='https://www.eesel.ai/blog/jasper-vs-copy-ai'>Jasper vs Copy AI: Which AI writer is right for your team in 2025? - eesel AI</a>` },
+          { p: `<a classname='!text-white font-bold' target='_blank' href='https://zapier.com/blog/jasper-vs-copy-ai/'>Jasper vs. Copy.ai: Which is best? [2025] - Zapier</a>` },
+          { p: `<a classname='!text-white font-bold' target='_blank' href='https://www.reddit.com/r/AiReviewInsiderHQ/comments/1o8ujgo/jasper_vs_copyai_for_seo_longform_2025_quality/'>Jasper vs Copy.ai for SEO Long-Form (2025): Quality, Accuracy & Fact-Check Rate - Reddit</a>` },
+          { p: `<a classname='!text-white font-bold' target='_blank' href='https://chatfin.ai/blog/dynamics-365-copilot-vs-specialized-finance-agents-whats-the-difference/'>Dynamics 365 Copilot vs. Specialized Finance Agents: What's the Difference? - ChatFin - AI</a>` },
+          { p: `<a classname='!text-white font-bold' target='_blank' href='https://dynamicscommunities.com/ug/microsoft-copilot-vs-microsoft-copilot-for-finance-understanding-key-differences-and-benefits-for-users/'>Microsoft Copilot vs. Microsoft Copilot for Finance: Understanding Key Differences and Benefits for Users - Dynamics Communities</a>` },
+          { p: `<a classname='!text-white font-bold' target='_blank' href='https://fin.ai/learn/fin-vs-zendesk'>Fin vs. Zendesk AI: Detailed Comparison for 2025</a>` },
+          { p: `<a classname='!text-white font-bold' target='_blank' href='https://www.intercom.com/blog/intercom-vs-zendesk-two-ai-agents-put-to-the-test/'>Intercom vs Zendesk: Two AI agents put to the test</a>` },
+          { p: `<a classname='!text-white font-bold' target='_blank' href='https://www.zendesk.com/service/comparison/zendesk-vs-intercom/'>AI built for resolutions: Why Zendesk outperforms Intercom</a>` },
+          { p: `<a classname='!text-white font-bold' target='_blank' href='https://swifteq.com/post/zendesk-ai-agents-vs-intercom-fin'>How Zendesk AI Agents and Intercom Fin Stack Up in Real Customer Support Scenarios</a>` },
+          { p: `<a classname='!text-white font-bold' target='_blank' href='https://www.legaldive.com/news/one-in-four-companies-ban-genai/706219/'>One in four companies bans GenAI - Legal Dive</a>` },
+          { p: `<a classname='!text-white font-bold' target='_blank' href='https://www.cloudflare.com/the-net/banning-ai/'>Should you ban employee use of AI? - Cloudflare</a>` },
+          { p: `<a classname='!text-white font-bold' target='_blank' href='https://moveo.ai/blog/companies-that-banned-chatgpt'>Companies Banning ChatGPT (2025): The Enterprise Security List - Moveo.AI</a>` },
+          { p: `<a classname='!text-white font-bold' target='_blank' href='https://www.tomsguide.com/ai/i-tested-notebooklm-vs-perplexity-for-deep-research-with-5-difficult-prompts-heres-the-clear-winner'>I tested NotebookLM vs. Perplexity for deep research with 5 difficult prompts — here's the clear winner | Tom's Guide</a>` },
+          { p: `<a classname='!text-white font-bold' target='_blank' href='https://www.elite.cloud/post/the-ultimate-ai-assistant-showdown-notebooklm-chatgpt-notion-or-perplexity/'>The Ultimate AI Assistant Showdown: NotebookLM, ChatGPT, Notion, or Perplexity?</a>` },
+          { p: `<a classname='!text-white font-bold' target='_blank' href='https://blog.google/products/google-cloud/ai-business-trends-report-2026/'>5 ways AI agents will transform the way we work in 2026</a>` },
+          { p: `<a classname='!text-white font-bold' target='_blank' href='https://julius.ai/articles/julius-ai-vs-chatgpt'>Julius AI vs. ChatGPT: What's Better for Data Analysis and You?</a>` },
+          { p: `<a classname='!text-white font-bold' target='_blank' href='https://julius.ai/compare/julius-vs-chatgpt'>AI for Data Analysis | Julius vs. ChatGPT: How do they compare?</a>` },
+          { p: `<a classname='!text-white font-bold' target='_blank' href='https://powerdrill.ai/blog/top-ai-tools-for-excel-data-analysis'>Top 10 AI Tools for Excel Data Analysis in November, 2025</a>` },
+          { p: `<a classname='!text-white font-bold' target='_blank' href='https://composio.dev/blog/why-ai-agent-pilots-fail-2026-integration-roadmap'>The 2025 AI Agent Report: Why AI Pilots Fail in Production and the 2026 Integration Roadmap - Composio</a>` },
+          { p: `<a classname='!text-white font-bold' target='_blank' href='https://galileo.ai/blog/ai-hallucination-examples'>10 AI Hallucinations Every Company Must Avoid | Galileo</a>` },
+          { p: `<a classname='!text-white font-bold' target='_blank' href='https://medium.com/@datajournal/the-8-best-ai-coding-tools-in-2025-cb323c5b9780'>The 8 Best AI Coding Tools in 2025</a>` }
+        ]
+      }
+    ],
+    advertisements: {
+      show: false,
+    },
+    referBlog: {
+      show: true,
+      title: `Next.js vs Vue, Angular, Go, and Ruby on Rails: Which Framework is Right for You?`,
+      slug: `next-js-vs-vue-angular-go-and-ruby-on-rails-which-framework-is-right-for-you`,
+    },
+  },
 
 
 ];
