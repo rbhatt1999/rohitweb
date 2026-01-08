@@ -26,49 +26,49 @@ export default function BlogsList({ data, totalPage, page, search, afterurl }) {
         ))
       }
       {
-                totalPage > 1 && (
-                    <div className="flex flex-row items-center justify-center gap-2">
-                        {
-                            (page > 1) && (
-                                <Link href={`${url}/${afterurl}?page=${page - 1}${search ? `&search=${search}` : ''}`} className='flex flex-row items-center justify-center gap-1 px-2 py-1 rounded-md shadow-md drop-shadow-md bg-neutral-100 text-white hover:bg-neutral-200'>
-                                    <span className="text-sm font-medium">Prev</span>
-                                </Link>
-                            )
-                        }
-                        {
-                            new Array(totalPage).fill(0).map((_, index) => (
-                                <Fragment key={index}>
-                                    {
-                                        (index < 2 || index > totalPage - 3 || index === page - 1) && (
-                                            <Link href={`${url}/${afterurl}?page=${index + 1}${search ? `&search=${search}` : ''}`} className={`flex flex-row items-center justify-center gap-1 px-2 py-1 rounded-md shadow-md drop-shadow-md ${index === page - 1 ? 'bg-primary-100 text-primary-800' : 'bg-neutral-100 text-white'} hover:bg-neutral-200`}>
-                                                <span className="text-sm font-medium">{index + 1}</span>
-                                            </Link>
-                                        )
-
-                                    }
-                                    {
-                                        (index === 2 && index !== page - 1 && totalPage > 4) && (
-                                            <span className="text-sm font-medium">...</span>
-                                        )
-                                    }
-                                    {
-                                        (index === totalPage - 3 && index !== page - 1 && totalPage > 4) && (
-                                            <span className="text-sm font-medium">...</span>
-                                        )
-                                    }
-                                </Fragment>
-                            ))
-                        }
-                        {
-                            (page < totalPage) && (
-                                <Link href={`${url}/${afterurl}?page=${page + 1}${search ? `&search=${search}` : ''}`} className='flex flex-row items-center justify-center gap-1 px-2 py-1 rounded-md shadow-md drop-shadow-md bg-neutral-100 text-white hover:bg-neutral-200'>
-                                    <span className="text-sm font-medium">Next</span>
-                                </Link>
-                            )
-                        }
-                    </div>
-                )
+        totalPage > 1 && (
+          <div className="flex flex-row items-center justify-center gap-2">
+            {
+              (page > 1) && (
+                <Link href={`${url}/${afterurl}?page=${page - 1}${search ? `&search=${search}` : ''}`} className='flex flex-row items-center justify-center gap-1 px-3 py-1.5 rounded-md shadow-sm transition-colors duration-200 bg-neutral-800 text-white hover:bg-neutral-700'>
+                  <span className="text-sm font-medium">Prev</span>
+                </Link>
+              )
             }
+            {
+              new Array(totalPage).fill(0).map((_, index) => (
+                <Fragment key={index}>
+                  {
+                    (index < 2 || index > totalPage - 3 || index === page - 1) && (
+                      <Link href={`${url}/${afterurl}?page=${index + 1}${search ? `&search=${search}` : ''}`} className={`flex flex-row items-center justify-center gap-1 px-3 py-1.5 rounded-md shadow-sm transition-colors duration-200 ${index === page - 1 ? 'bg-blue-600 text-white' : 'bg-neutral-800 text-white hover:bg-neutral-700'}`}>
+                        <span className="text-sm font-medium">{index + 1}</span>
+                      </Link>
+                    )
+
+                  }
+                  {
+                    (index === 2 && index !== page - 1 && totalPage > 4) && (
+                      <span className="text-sm font-medium text-white/50">...</span>
+                    )
+                  }
+                  {
+                    (index === totalPage - 3 && index !== page - 1 && totalPage > 4) && (
+                      <span className="text-sm font-medium text-white/50">...</span>
+                    )
+                  }
+                </Fragment>
+              ))
+            }
+            {
+              (page < totalPage) && (
+                <Link href={`${url}/${afterurl}?page=${page + 1}${search ? `&search=${search}` : ''}`} className='flex flex-row items-center justify-center gap-1 px-3 py-1.5 rounded-md shadow-sm transition-colors duration-200 bg-neutral-800 text-white hover:bg-neutral-700'>
+                  <span className="text-sm font-medium">Next</span>
+                </Link>
+              )
+            }
+          </div>
+        )
+      }
     </div>
   )
 }
