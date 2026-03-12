@@ -2064,6 +2064,283 @@ SQL`,
       title: `The Agentic Shift: A Comprehensive Analysis of the Artificial Intelligence Landscape in 2026`,
       slug: `the-agentic-shift-artificial-intelligence-landscape-2026`,
     },
+  },
+  {
+    title: `Building the Future: A Developer's Guide to Agentic AI Workflows in Ruby`,
+    slug: `building-the-future-a-developers-guide-to-agentic-ai-workflows-in-ruby`,
+    id: 9,
+    category_id: 5,
+    description: `A practical guide for Ruby and Rails developers on building agentic AI workflows: from tools and skills to MCP, multi-agent pipelines, and production guardrails.`,
+    image: {
+      src: `https://website-images-rohitcodes.s3.ap-south-1.amazonaws.com/building-the-future-a-developers-guide-to-agentic-ai-workflows-in-ruby.webp`,
+      alt: `Building the Future: A Developer's Guide to Agentic AI Workflows in Ruby`,
+    },
+    owner: `Rohit Bhatt`,
+    tags: [`ruby`, `rails`, `agentic ai`, `llm`, `mcp`, `langchainrb`, `active agent`],
+    date: '2026-03-12',
+    summary: `We are crossing the threshold into "System 2" AI: agentic workflows. For Ruby and Rails developers, this means moving from stateless chat to orchestrating autonomous agents that plan, reason, and execute. This guide covers tools vs skills, MCP, multi-agent pipelines, and production infrastructure.`,
+    sections: [
+      {
+        h1: `1. Introduction`,
+        p: `If you've been writing code over the last year, you've likely used AI as an advanced autocomplete. You hit Tab, and a block of code appears. While helpful, this is fundamentally "System 1" thinking—rapid, reactive pattern matching.<br/><br/>We are now crossing the threshold into "System 2" AI: agentic workflows. Instead of relying on a stateless chat window, we are embedding foundation models into autonomous, distributed software systems capable of planning, reasoning, and executing complex tasks over time. For Ruby and Rails developers, this is a massive paradigm shift. We are moving from writing deterministic CI/CD scripts to orchestrating non-deterministic AI agents that can read our logs, navigate our file systems, and issue pull requests.`,
+      },
+      {
+        h1: `2. What Agentic Development Means`,
+        p: `To build these systems, we need to clarify our terminology, as "agent" is heavily overused.`,
+        list: [
+          {
+            h1: `Simple AI Prompting`,
+            p: `This is stateless and reactive. You send a string of text with your code, and the LLM returns a string of text. It has no memory and cannot impact the outside world.`,
+          },
+          {
+            h1: `Tool-Using Agents`,
+            p: `This is where agency begins. An agent is given a specific prompt, a goal, and access to "tools" (Ruby methods that execute external actions, like querying a database or running a shell command). The agent determines when and how to use those tools based on its reasoning loop.`,
+          },
+          {
+            h1: `Multi-Agent Workflows`,
+            p: `A single agent gets confused if given too many tools or too broad a scope. Multi-agent systems solve this by creating specialized sub-agents (e.g., one for writing code, one for running tests) that collaborate, critique each other, and hand off state.`,
+          },
+        ],
+      },
+      {
+        h1: `3. Using Agents for Daily Development Tasks`,
+        p: `As developers, we can leverage agentic workflows to automate the most tedious parts of our day. Instead of manually digging through a massive Rails monolith, an agent with access to your file system can dynamically search for usages of a deprecated method and rewrite them.<br/><br/>Real-world developer tasks for agents include:`,
+        list: [
+          {
+            h1: `Understanding Large Codebases`,
+            p: `Agents can map out how a specific Rails controller interacts with a constellation of Service Objects.`,
+          },
+          {
+            h1: `Debugging Production Issues`,
+            p: `An agent can read a Sentry stack trace, fetch the corresponding commit from Git, and propose a hotfix.`,
+          },
+          {
+            h1: `Generating RSpec Tests`,
+            p: `Agents can analyze complex model validations and generate extensive test coverage, accounting for edge cases.`,
+          },
+          {
+            h1: `Refactoring Legacy Services`,
+            p: `You can task an agent with splitting a 1,000-line User model into distinct concerns.`,
+          },
+        ],
+      },
+      {
+        h1: `4. Sub-Agent Workflows for Development`,
+        p: `To make agents reliable, we use the "divide and conquer" multi-agent pattern. If you want an AI to write a feature, you don't use one massive prompt. You build a pipeline of specialized agents:`,
+        list: [
+          {
+            h1: `The Researcher Agent`,
+            p: `Researches the codebase to identify which files need to be touched for the current scope of work.`,
+          },
+          {
+            h1: `The Planner Agent`,
+            p: `Receives the Task/Bug and outlines the architectural changes needed.`,
+          },
+          {
+            h1: `The Test Generator Agent`,
+            p: `Uses the plan to write tests first (TDD). Generates RSpec files that define the expected behavior before any implementation.`,
+          },
+          {
+            h1: `The Code Writer Agent`,
+            p: `Receives the plan and the tests, then writes the actual Rails models and controllers to make the tests pass.`,
+          },
+          {
+            h1: `The Code Review Agent`,
+            p: `Executes the tests. If the tests fail, it feeds the RSpec failure output back to the Code Writer Agent to try again (this is the Reflection loop).`,
+          },
+        ],
+      },
+      {
+        p: `While frameworks like LangGraph (graph-based state machines), CrewAI (role-based workplaces), and AutoGen (conversational group chats) dominate the Python ecosystem, the Ruby community has powerful equivalents. Frameworks like langchainrb and Active Agent allow us to build these orchestrated pipelines natively within our Rails apps.`,
+      },
+      {
+        h1: `5. Tools vs Skills`,
+        p: `A frequent architectural mistake is conflating "tools" with "skills".<br/><br/>A tool is a raw, stateless mechanical capability—like a Ruby method that executes a raw SQL query or triggers a shell command. Exposing raw tools to an LLM is dangerous and leads to hallucinations.<br/><br/>A skill is a higher-order cognitive wrapper. It encapsulates the raw tool, dependency injection, and a highly specific system prompt that restricts how the tool should be used.<br/><br/>Here is how you define a raw tool and wrap it into a cognitive skill in Ruby:`,
+        html: {
+          type: "code",
+          value: `# 1. The Raw Tool (Mechanical Capability)
+class GitTool
+  def current_diff
+    \`git diff main\`
+  end
+end
+
+# 2. The Skill (Cognitive Wrapper)
+class CodeReviewSkill
+  def initialize
+    @git_tool = GitTool.new
+    # The skill holds strict operational boundaries
+    @system_prompt = <<~PROMPT
+      You are a strict Senior Ruby Engineer. Review the provided git diff.
+      Focus ONLY on security vulnerabilities and N+1 queries.
+      Do NOT comment on stylistic formatting.
+    PROMPT
+  end
+
+  def execute_review
+    diff_content = @git_tool.current_diff
+
+    # Using a standard Ruby LLM client to orchestrate the skill
+    client = OpenAI::Client.new(access_token: ENV)
+    response = client.chat(
+      parameters: {
+        model: "gpt-4o",
+        messages:
+      }
+    )
+    response.dig("choices", 0, "message", "content")
+  end
+end`,
+          language: "ruby",
+        },
+      },
+      {
+        h1: `6. Using MCP with Developer Tools`,
+        p: `Historically, if you wanted your agent to read a local file, query a PostgreSQL database, and fetch a Slack message, you had to write custom API wrappers for every single service. This created an N×M integration bottleneck.<br/><br/>Anthropic solved this with the Model Context Protocol (MCP). MCP acts as the "Universal Plug" for AI. It separates the reasoning of the AI (the Host) from the data source (the Server) using a standardized JSON-RPC architecture.<br/><br/>MCP exposes three core primitives:`,
+        list: [
+          {
+            h1: `Resources`,
+            p: `Context-on-demand (e.g., reading a local log file).`,
+          },
+          {
+            h1: `Prompts`,
+            p: `Reusable templates.`,
+          },
+          {
+            h1: `Tools`,
+            p: `Executable actions (e.g., executing a Git commit).`,
+          },
+        ],
+        p: `Using the fast-mcp Ruby gem, we can easily expose our local development environment to any MCP-compliant AI (like Claude Desktop or Cursor):`,
+        html: {
+          type: "code",
+          value: `require 'fast_mcp'
+
+# Initialize an MCP server
+server = FastMcp::Server.new(name: 'rails-local-dev', version: '1.0.0')
+
+# Define an MCP Tool using Dry-Schema for strict validation
+class RunRspecTool < FastMcp::Tool
+  description "Runs RSpec tests for a specific file and returns the output"
+
+  arguments do
+    required(:file_path).filled(:string).description("Path to the spec file")
+  end
+
+  def call(file_path:)
+    # Execute the local test and return the raw output to the LLM
+    \`bundle exec rspec #{file_path}\`
+  end
+end
+
+server.register_tool(RunRspecTool)
+# The server can now be connected to via standard STDIO transport`,
+          language: "ruby",
+        },
+      },
+      {
+        h1: `7. Real Agent Workflows Developers Can Build`,
+        p: `Let's look at how you can wire these concepts into real workflows using Rails conventions.`,
+        subSections: [
+          {
+            h2: `Example 1: Debugging a Production Error`,
+            p: `An agent receives an exception notification. It uses a tool to fetch the last 100 lines of the production log, uses a GitHub tool to fetch the last commit touching the faulty file, and synthesizes a Root Cause Analysis document.`,
+          },
+          {
+            h2: `Example 2: Generating RSpec Tests Automatically`,
+            p: `Using the Active Agent gem, we can define an agent specifically for writing tests.`,
+            html: {
+              type: "code",
+              value: `# app/agents/rspec_generator_agent.rb
+class RspecGeneratorAgent < ActiveAgent::Base
+  generate_with :openai, model: "gpt-4o"
+
+  # The system instructions
+  instructions <<~PROMPT
+    You are an expert Ruby testing engineer.
+    Given a Rails model, generate a comprehensive RSpec file.
+    Always include tests for validations, associations, and custom methods.
+  PROMPT
+
+  def generate(model_code)
+    # Renders a view template (app/views/agents/rspec_generator/generate.text.erb)
+    prompt(model_code: model_code).generate_now
+  end
+end
+
+# Usage:
+# RspecGeneratorAgent.new.generate(File.read('app/models/user.rb')).message`,
+              language: "ruby",
+            },
+          },
+          {
+            h2: `Example 3: Refactoring a Large Rails Service`,
+            p: `A Refactoring Agent is given an MCP tool to read app/services/fat_service.rb. It creates an architectural plan, and then uses a write_file tool to extract the logic into three separate, isolated service classes, followed by running the test suite to ensure nothing broke.`,
+          },
+          {
+            h2: `Example 4: Planning a Feature Implementation`,
+            p: `A Planning Agent queries your task board (via MCP). It extracts the acceptance criteria, reads your db/schema.rb, and generates a step-by-step checklist of the migrations and controllers needed before you even write a line of code.`,
+          },
+        ],
+      },
+      {
+        h1: `8. Production Infrastructure for Agents`,
+        p: `Deploying agents into production isn't like deploying a standard web app. Because they are non-deterministic, they require serious defense-in-depth.`,
+        list: [
+          {
+            h1: `Sentinel Agents`,
+            p: `Before a user's prompt ever reaches your expensive, tool-calling agent, it should pass through a "Sentinel" agent. This is a fast, cheap model (like Llama-3-8B) whose only job is to evaluate the input for prompt injection. If the risk score is too high, it blocks the request instantly.`,
+          },
+          {
+            h1: `Circuit Breakers`,
+            p: `Agents are prone to "retry storms." If a downstream API fails, an unsupervised agent might retry the call 100 times in a second, causing a self-inflicted DDoS attack. Always wrap your tools in a Circuit Breaker pattern. If the tool fails 5 times, the circuit "opens" and forces the agent to fail fast or execute a fallback strategy.`,
+          },
+          {
+            h1: `Schema Validation`,
+            p: `Never trust the raw string output of an LLM. Use strict structural validation (like Ruby's Dry-Schema) at the boundary layer before passing data to your database.`,
+          },
+          {
+            h1: `Data Minimization`,
+            p: `Implement automated redaction to strip PII (Personal Identifiable Information) before it ever hits the LLM's context window.`,
+          },
+        ],
+      },
+      {
+        h1: `9. Advanced Agent Memory`,
+        p: `An agent without memory forgets who you are the second the API call finishes. Production systems use a three-tier memory architecture:`,
+        list: [
+          {
+            h1: `Short-Term (Working) Memory`,
+            p: `Managed via Redis or fast relational tables (like PostgreSQL). This tracks the current conversational state and recent tool calls.`,
+          },
+          {
+            h1: `Long-Term (Episodic/Factual) Memory`,
+            p: `Handled by Vector databases (like pgvector). This stores massive amounts of unstructured knowledge. You can natively bind your Rails models to vector stores using gems like langchainrb.`,
+          },
+          {
+            h1: `Procedural Memory`,
+            p: `If an agent figures out a complex workaround to a bug, it caches that exact execution trajectory so it doesn't have to waste expensive reasoning tokens figuring it out again next time.`,
+          },
+        ],
+        p: `While Vector RAG is great for fuzzy semantic searches, the industry is increasingly moving toward GraphRAG for agentic systems. GraphRAG maps knowledge explicitly via nodes and edges, allowing agents to navigate complex, multi-hop relationships (e.g., "What sequence of events led to this specific outage?") with far greater accuracy.`,
+      },
+      {
+        h1: `10. Observability and Debugging`,
+        p: `When a multi-agent system hallucinates an action, traditional logs won't help you. You need to know why the agent made a decision.<br/><br/>The industry standard is OpenTelemetry (OTEL). By instrumenting your agents, you generate a visual "trajectory" of the execution tree. A trace will show you the exact user prompt, the context fetched from the vector database, the LLM's internal reasoning (Chain of Thought), and the exact payload sent to the tool. Platforms like LangSmith, Arize Phoenix, and Portkey ingest these OTEL traces, allowing you to pinpoint exactly where the hallucination occurred.<br/><br/>Always implement Human-in-the-Loop (HITL) breakpoints for high-risk actions. If an agent wants to execute a destructive database migration, the workflow should pause and request asynchronous human approval before proceeding.`,
+      },
+      {
+        h1: `11. Conclusion`,
+        p: `The transition to agentic AI is transforming the role of the developer. We are moving from writing every line of imperative logic to architecting resilient, observable systems where AI workers handle the implementation details. By utilizing patterns like Planner-Executor, standardizing our toolsets with the Model Context Protocol, and enforcing strict orchestration guardrails, we can build robust, autonomous workflows right inside our existing Ruby applications. Agentic AI is no longer a prototype; it is the new baseline for enterprise software engineering.`,
+      },
+    ],
+    advertisements: {
+      show: false,
+    },
+    referBlog: {
+      show: true,
+      title: `The Agentic Shift: A Comprehensive Analysis of the Artificial Intelligence Landscape in 2026`,
+      slug: `the-agentic-shift-artificial-intelligence-landscape-2026`,
+    },
   }
 ];
 
