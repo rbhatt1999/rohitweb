@@ -1,15 +1,9 @@
 import NavigationBar from '@/components/Navigation/NavigationBar'
 import './globals.css'
-import { Roboto, Lato } from 'next/font/google'
+import { lato } from '@/lib/fonts'
 import { Analytics } from '@vercel/analytics/react';
 import LocatorLoader from '@/components/LocatorLoader';
 import Footer from '@/components/Footer';
-
-
-const lato = Lato({
-  weight: ['100', '300', '400', '700', '900'],
-  subsets: ['latin'],
-})
 
 export const metadata = {
   title: `Empower Your Business with Custom Web Solutions`,

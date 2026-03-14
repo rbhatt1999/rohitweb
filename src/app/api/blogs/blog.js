@@ -2077,7 +2077,7 @@ SQL`,
     },
     owner: `Rohit Bhatt`,
     tags: [`ruby`, `rails`, `agentic ai`, `llm`, `mcp`, `langchainrb`, `active agent`],
-    date: '2026-03-12',
+    date: '2026-03-14',
     summary: `We are crossing the threshold into "System 2" AI: agentic workflows. For Ruby and Rails developers, this means moving from stateless chat to orchestrating autonomous agents that plan, reason, and execute. This guide covers tools vs skills, MCP, multi-agent pipelines, and production infrastructure.`,
     sections: [
       {
@@ -2158,36 +2158,44 @@ SQL`,
         p: `A frequent architectural mistake is conflating "tools" with "skills".<br/><br/>A tool is a raw, stateless mechanical capability—like a Ruby method that executes a raw SQL query or triggers a shell command. Exposing raw tools to an LLM is dangerous and leads to hallucinations.<br/><br/>A skill is a higher-order cognitive wrapper. It encapsulates the raw tool, dependency injection, and a highly specific system prompt that restricts how the tool should be used.<br/><br/>Here is how you define a raw tool and wrap it into a cognitive skill in Ruby:`,
         html: {
           type: "code",
-          value: `# 1. The Raw Tool (Mechanical Capability)
-class GitTool
+          value: `class GitTool
   def current_diff
     \`git diff main\`
   end
 end
 
-# 2. The Skill (Cognitive Wrapper)
 class CodeReviewSkill
   def initialize
     @git_tool = GitTool.new
-    # The skill holds strict operational boundaries
+
     @system_prompt = <<~PROMPT
-      You are a strict Senior Ruby Engineer. Review the provided git diff.
-      Focus ONLY on security vulnerabilities and N+1 queries.
-      Do NOT comment on stylistic formatting.
+      You are a strict Senior Ruby Engineer reviewing a pull request.
+
+      Review the provided git diff and ONLY report:
+      - Security vulnerabilities
+      - Potential N+1 queries
+
+      Do NOT comment on formatting, style, or naming.
     PROMPT
   end
 
   def execute_review
     diff_content = @git_tool.current_diff
 
-    # Using a standard Ruby LLM client to orchestrate the skill
-    client = OpenAI::Client.new(access_token: ENV)
+    client = OpenAI::Client.new(
+      access_token: ENV["OPENAI_API_KEY"]
+    )
+
     response = client.chat(
       parameters: {
         model: "gpt-4o",
-        messages:
+        messages: [
+          { role: "system", content: @system_prompt },
+          { role: "user", content: diff_content }
+        ]
       }
     )
+
     response.dig("choices", 0, "message", "content")
   end
 end`,
