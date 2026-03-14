@@ -1,5 +1,5 @@
 import React from 'react'
-import { Sora } from 'next/font/google'
+import { sora } from '@/lib/fonts'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import parse from 'html-react-parser'
@@ -11,12 +11,6 @@ import { BsLinkedin } from 'react-icons/bs'
 import { BiLogoWhatsapp } from 'react-icons/bi'
 import { redirect } from 'next/navigation'
 import CodeBlockViewer from '@/components/blogs/CodeBlockViewer'
-
-
-const sora = Sora({
-  weight: ['100', '200', '300', '400', '500', '600', '700', '800'],
-  subsets: ['latin'],
-})
 
 export async function generateMetadata({ params }) {
   const { slug } = params

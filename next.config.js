@@ -1,4 +1,6 @@
 /** @type {import('next').NextConfig} */
+const path = require('path');
+
 const nextConfig = {
   eslint: {
     // Warning: This allows production builds to successfully complete even if
@@ -6,6 +8,12 @@ const nextConfig = {
     ignoreDuringBuilds: true,
   },
   webpack: (config, options) => {
+    if (!options.dev) {
+      config.resolve.alias = {
+        ...config.resolve.alias,
+        '@locator/runtime': path.resolve(__dirname, 'src/lib/locator-runtime-stub.js'),
+      };
+    }
     if (options.dev) {
       config.module.rules.push({
         test: /\.(js|jsx|ts|tsx)$/,

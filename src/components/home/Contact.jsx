@@ -2,22 +2,11 @@
 import React, { useState } from 'react'
 import contactimg from '@/assets/images/contact-form.png'
 import Image from 'next/image'
-import { Sora, Crete_Round } from 'next/font/google'
+import { sora, crete_round } from '@/lib/fonts'
 import { useInView } from 'react-intersection-observer'
 import { AnimatePresence, motion } from 'framer-motion'
 import { AiFillGithub, AiFillLinkedin, AiOutlineTwitter, AiFillMediumSquare } from 'react-icons/ai'
 import Link from 'next/link'
-
-const sora = Sora({
-    weight: ['100', '200', '300', '400', '500', '600', '700', '800'],
-    subsets: ['latin'],
-})
-
-const crete_round = Crete_Round({
-    weight: ['400'],
-    subsets: ['latin'],
-})
-
 
 export default function Contact() {
     const { ref, inView } = useInView();

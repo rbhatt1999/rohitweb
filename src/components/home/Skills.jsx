@@ -1,7 +1,7 @@
 'use client'
 import { useState } from 'react'
 import { motion } from 'framer-motion'
-import { Sora, Crete_Round } from 'next/font/google'
+import { sora, crete_round } from '@/lib/fonts'
 import { useInView } from 'react-intersection-observer'
 import { AiFillHtml5, AiFillGitlab, AiFillGithub } from 'react-icons/ai'
 import { IoLogoCss3, IoLogoNodejs } from 'react-icons/io'
@@ -12,16 +12,6 @@ import { FiFramer } from 'react-icons/fi'
 import { SiTailwindcss, SiPostman, SiVisualstudiocode, SiNetlify, SiPostgresql, SiRubyonrails, SiAuth0, SiHeroku } from 'react-icons/si'
 import { HiOutlineColorSwatch, HiLockClosed, HiOutlineDeviceTablet } from 'react-icons/hi'
 import { BsGit, BsFillTerminalFill } from 'react-icons/bs'
-
-const sora = Sora({
-    weight: ['100', '200', '300', '400', '500', '600', '700', '800'],
-    subsets: ['latin'],
-})
-
-const crete_round = Crete_Round({
-    weight: ['400'],
-    subsets: ['latin'],
-})
 
 export default function Skills() {
     const { ref, inView } = useInView();

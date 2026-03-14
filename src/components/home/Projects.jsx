@@ -1,6 +1,6 @@
 'use client'
 import React from 'react'
-import { Sora, Crete_Round } from 'next/font/google'
+import { sora, crete_round } from '@/lib/fonts'
 import { useInView } from 'react-intersection-observer'
 import { AnimatePresence, motion } from 'framer-motion'
 import project1 from '@/assets/images/project-1.png'
@@ -11,16 +11,6 @@ import project5 from '@/assets/images/project-5.png'
 import project6 from '@/assets/images/project-6.png'
 import Image from 'next/image'
 import ProjectPopup from './ProjectPopup'
-
-const sora = Sora({
-    weight: ['100', '200', '300', '400', '500', '600', '700', '800'],
-    subsets: ['latin'],
-})
-
-const crete_round = Crete_Round({
-    weight: ['400'],
-    subsets: ['latin'],
-})
 
 export default function Projects() {
     const { ref, inView } = useInView();
