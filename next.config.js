@@ -8,12 +8,10 @@ const nextConfig = {
     ignoreDuringBuilds: true,
   },
   webpack: (config, options) => {
-    if (!options.dev) {
-      config.resolve.alias = {
-        ...config.resolve.alias,
-        '@locator/runtime': path.resolve(__dirname, 'src/lib/locator-runtime-stub.js'),
-      };
-    }
+    config.resolve.alias = {
+      ...config.resolve.alias,
+      '@locator/runtime': path.resolve(__dirname, 'src/lib/locator-runtime-stub.js'),
+    };
     if (options.dev) {
       config.module.rules.push({
         test: /\.(js|jsx|ts|tsx)$/,
