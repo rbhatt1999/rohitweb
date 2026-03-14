@@ -40,14 +40,29 @@
   margin: 5px 0;
 }
 
-.anchor-tag a {
-  color: #1e00b5;
-  text-decoration: none;
+/* Blog content: links readable on dark background */
+.blog-section .anchor-tag a {
+  color: #7dd3fc; /* sky-300 – works on dark bg */
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  transition: color 0.15s ease;
 }
 
-.anchor-tag a:hover {
-  color: #1e00b5;
+.blog-section .anchor-tag a:hover {
+  color: #bae6fd; /* sky-200 */
   text-decoration: underline;
+}
+
+/* Bold text in blog body – align with headings */
+.blog-section .anchor-tag strong {
+  color: rgb(147 197 253); /* blue-300 */
+  font-weight: 600;
+}
+
+/* Slightly looser line height for long-form readability */
+.blog-section p.anchor-tag,
+.blog-section .sectionAnchor p.anchor-tag {
+  line-height: 1.7;
 }
 
 .loader {

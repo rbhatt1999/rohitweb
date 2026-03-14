@@ -2104,7 +2104,7 @@ SQL`,
       },
       {
         h1: `3. Using Agents for Daily Development Tasks`,
-        p: `As developers, we can leverage agentic workflows to automate the most tedious parts of our day. Instead of manually digging through a massive Rails monolith, an agent with access to your file system can dynamically search for usages of a deprecated method and rewrite them.<br/><br/>Real-world developer tasks for agents include:`,
+        p: `Not every problem needs an agent. When a single prompt or a small, fixed chain suffices, prefer that—you'll save cost and avoid unnecessary failure modes. Use agentic workflows when the task has clear sub-tasks that benefit from tools or multiple reasoning steps. As a rule of thumb: use a single tool-using agent for one clear task with few tools; multi-agent when you need distinct roles and handoffs; and a full deterministic pipeline with agents at decision points for production (see Section 7).<br/><br/>As developers, we can leverage agentic workflows to automate the most tedious parts of our day. Instead of manually digging through a massive Rails monolith, an agent with access to your file system can dynamically search for usages of a deprecated method and rewrite them.<br/><br/>Real-world developer tasks for agents include:`,
         list: [
           {
             h1: `Understanding Large Codebases`,
@@ -2151,14 +2151,17 @@ SQL`,
         ],
       },
       {
-        p: `While frameworks like LangGraph (graph-based state machines), CrewAI (role-based workplaces), and AutoGen (conversational group chats) dominate the Python ecosystem, the Ruby community has powerful equivalents. Frameworks like langchainrb and Active Agent allow us to build these orchestrated pipelines natively within our Rails apps.`,
+        p: `This pipeline is an instance of the Planner-Executor pattern: the Researcher and Planner agents form the planning layer; the Test Generator, Code Writer, and Code Review agents form the execution layer (with a reflection loop when tests fail). While frameworks like LangGraph (graph-based state machines), CrewAI (role-based workplaces), and AutoGen (conversational group chats) dominate the Python ecosystem, the Ruby community has powerful equivalents. You can implement this pipeline using <a href='https://github.com/ttilberg/langchainrb' target='_blank' rel='noopener'>langchainrb</a> chains and tools, or <a href='https://docs.activeagents.ai/' target='_blank' rel='noopener'>Active Agent</a> controller-style agents and background jobs—both allow you to build these orchestrated pipelines natively within your Rails apps.`,
       },
       {
         h1: `5. Tools vs Skills`,
-        p: `A frequent architectural mistake is conflating "tools" with "skills".<br/><br/>A tool is a raw, stateless mechanical capability—like a Ruby method that executes a raw SQL query or triggers a shell command. Exposing raw tools to an LLM is dangerous and leads to hallucinations.<br/><br/>A skill is a higher-order cognitive wrapper. It encapsulates the raw tool, dependency injection, and a highly specific system prompt that restricts how the tool should be used.<br/><br/>Here is how you define a raw tool and wrap it into a cognitive skill in Ruby:`,
+        p: `A frequent architectural mistake is conflating "tools" with "skills".<br/><br/>A tool is a raw, stateless mechanical capability—like a Ruby method that executes a raw SQL query or triggers a shell command. Exposing raw tools to an LLM is dangerous and can lead to unintended or unsafe actions.<br/><br/>A skill is a higher-order cognitive wrapper. It encapsulates the raw tool, dependency injection, and a highly specific system prompt that restricts how the tool should be used.<br/><br/>Here is how you define a raw tool and wrap it into a cognitive skill in Ruby (using the <code>ruby-openai</code> gem):`,
         html: {
           type: "code",
-          value: `class GitTool
+          value: `# gem 'ruby-openai'
+require 'openai'
+
+class GitTool
   def current_diff
     \`git diff main\`
   end
@@ -2204,7 +2207,7 @@ end`,
       },
       {
         h1: `6. Using MCP with Developer Tools`,
-        p: `Historically, if you wanted your agent to read a local file, query a PostgreSQL database, and fetch a Slack message, you had to write custom API wrappers for every single service. This created an N×M integration bottleneck.<br/><br/>Anthropic solved this with the Model Context Protocol (MCP). MCP acts as the "Universal Plug" for AI. It separates the reasoning of the AI (the Host) from the data source (the Server) using a standardized JSON-RPC architecture.<br/><br/>MCP exposes three core primitives:`,
+        p: `Historically, if you wanted your agent to read a local file, query a PostgreSQL database, and fetch a Slack message, you had to write custom API wrappers for every single service. This created an M×N integration bottleneck (many models × many data sources).<br/><br/>Anthropic solved this with the Model Context Protocol (MCP). MCP acts as the "Universal Plug" for AI. It separates the reasoning of the AI (the Host) from the data source (the Server) using a standardized JSON-RPC architecture.<br/><br/>MCP exposes three core primitives:`,
         list: [
           {
             h1: `Resources`,
@@ -2219,81 +2222,81 @@ end`,
             p: `Executable actions (e.g., executing a Git commit).`,
           },
         ],
-        p: `Using the fast-mcp Ruby gem, we can easily expose our local development environment to any MCP-compliant AI (like Claude Desktop or Cursor):`,
+        p: `Besides <a href='https://github.com/yjacquin/fast-mcp' target='_blank' rel='noopener'>fast-mcp</a>, the official MCP Ruby SDK (maintained by Anthropic and Shopify) is an alternative for building MCP servers in Ruby. Using the fast-mcp gem, we can expose a custom MCP server that SSHs into a host and fetches lines from staging.log (optionally filtered by a keyword) for any MCP-compliant AI. The AI invokes the tool; your MCP server runs the SSH command and returns the log text:`,
         html: {
           type: "code",
           value: `require 'fast_mcp'
+require 'net/ssh'
+require 'shellwords'
 
-# Initialize an MCP server
-server = FastMcp::Server.new(name: 'rails-local-dev', version: '1.0.0')
+# Add gem 'net-ssh' to your Gemfile
+server = FastMcp::Server.new(name: 'rails-log-server', version: '1.0.0')
 
-# Define an MCP Tool using Dry-Schema for strict validation
-class RunRspecTool < FastMcp::Tool
-  description "Runs RSpec tests for a specific file and returns the output"
+# Custom MCP Tool: SSH into a server and fetch lines from staging.log, optionally filtered by keyword
+class FetchStagingLogsTool < FastMcp::Tool
+  description "SSHs into a server and fetches lines from a staging log file. Optionally filters by a keyword (e.g. error, request id). Use for debugging staging issues."
 
   arguments do
-    required(:file_path).filled(:string).description("Path to the spec file")
+    required(:host).filled(:string).description("SSH host (e.g. staging.myapp.com)")
+    required(:log_path).filled(:string).description("Path on the server to the log file (e.g. /var/log/staging.log)")
+    optional(:keyword).filled(:string).description("Only return lines containing this string (e.g. error, 500, or a request ID)")
+    optional(:lines).filled(:integer).default(100).description("Max number of lines to return from the end (default 100)")
   end
 
-  def call(file_path:)
-    # Execute the local test and return the raw output to the LLM
-    \`bundle exec rspec #{file_path}\`
+  def call(host:, log_path:, keyword: nil, lines: 100)
+    key_path = ENV.fetch('SSH_KEY_PATH', File.expand_path('~/.ssh/id_rsa'))
+    user = ENV.fetch('SSH_USER', 'deploy')
+    cmd = if keyword.to_s.strip.empty?
+      "tail -n #{lines.to_i} #{Shellwords.escape(log_path)}"
+    else
+      "grep -F #{Shellwords.escape(keyword)} #{Shellwords.escape(log_path)} | tail -n #{lines.to_i}"
+    end
+    output = nil
+    Net::SSH.start(host, user, keys: [key_path], keys_only: true, non_interactive: true) do |ssh|
+      output = ssh.exec!(cmd)
+    end
+    output.to_s
   end
 end
 
-server.register_tool(RunRspecTool)
-# The server can now be connected to via standard STDIO transport`,
+server.register_tool(FetchStagingLogsTool)
+# Connect via STDIO; the AI can ask e.g. \"fetch staging logs for keyword 'TimeoutError'\" and get filtered output.`,
           language: "ruby",
         },
       },
       {
         h1: `7. Real Agent Workflows Developers Can Build`,
-        p: `Let's look at how you can wire these concepts into real workflows using Rails conventions.`,
+        p: `The AI never has direct access to your machine or repo—it only sees data returned by tools it invokes (MCP, APIs) or context you pass in. In production, the most effective pattern is a deterministic multi-step workflow with agents at specific decision points: the flow (sequence, retries, state) is fixed in code, and LLMs handle only where judgment is needed. Start with human-in-the-loop on every output, then reduce oversight as the system proves itself. Below are workflow patterns you can implement in Ruby using the building blocks from earlier sections (tools, skills, MCP, pipelines).`,
         subSections: [
           {
-            h2: `Example 1: Debugging a Production Error`,
-            p: `An agent receives an exception notification. It uses a tool to fetch the last 100 lines of the production log, uses a GitHub tool to fetch the last commit touching the faulty file, and synthesizes a Root Cause Analysis document.`,
+            h2: `Multi-Agent Workflow 1: Customer Support Pipeline`,
+            p: `Incoming ticket flows through a fixed pipeline: a triage agent classifies urgency and type; a retrieval step uses tools (knowledge base, account history, CRM) to fetch context—your services run the queries and return the data. A composer agent drafts the response; a validator agent checks policy, tone, and compliance. Every output goes to human review before send (or auto-send once trust is earned). Used in production for thousands of tickets per month with 40–60% of research time recovered and a clear path to dialing down human review.`,
           },
           {
-            h2: `Example 2: Generating RSpec Tests Automatically`,
-            p: `Using the Active Agent gem, we can define an agent specifically for writing tests.`,
-            html: {
-              type: "code",
-              value: `# app/agents/rspec_generator_agent.rb
-class RspecGeneratorAgent < ActiveAgent::Base
-  generate_with :openai, model: "gpt-4o"
-
-  # The system instructions
-  instructions <<~PROMPT
-    You are an expert Ruby testing engineer.
-    Given a Rails model, generate a comprehensive RSpec file.
-    Always include tests for validations, associations, and custom methods.
-  PROMPT
-
-  def generate(model_code)
-    # Renders a view template (app/views/agents/rspec_generator/generate.text.erb)
-    prompt(model_code: model_code).generate_now
-  end
-end
-
-# Usage:
-# RspecGeneratorAgent.new.generate(File.read('app/models/user.rb')).message`,
-              language: "ruby",
-            },
+            h2: `Multi-Agent Workflow 2: Sales and Lead Pipeline`,
+            p: `New lead enters a deterministic flow: an identifier agent qualifies it; a researcher agent enriches it via tools (APIs, CRM)—tools return the data, the agent never touches your systems directly. A composer agent drafts personalized outreach; a validator runs quality and hallucination checks (often multiple layers: LLM-as-judge, source verification, API scoring). On pass, the system sends or schedules follow-up. This pattern (e.g. five agents: Identifier, Researcher, Composer, Validator, Orchestrator) delivers measurable gains in turnaround time, open rates, and conversion when the workflow engine handles sequencing and state and agents handle only the unpredictable parts.`,
           },
           {
-            h2: `Example 3: Refactoring a Large Rails Service`,
-            p: `A Refactoring Agent is given an MCP tool to read app/services/fat_service.rb. It creates an architectural plan, and then uses a write_file tool to extract the logic into three separate, isolated service classes, followed by running the test suite to ensure nothing broke.`,
+            h2: `Multi-Agent Workflow 3: Code Review and PR Pipeline`,
+            p: `On pull request or diff, tools supply the patch, test results, and lint output. Specialist agents (e.g. security, performance, test coverage, documentation) each evaluate their dimension in parallel, or a debate-style pair (e.g. one for edge cases, one for architecture) reviews and reconciles. Results are aggregated; a human approves or requests changes before merge. Optional: sandboxed execution, kill switches, and policy checks. The agent only sees what the tools return—no direct repo or CI access.`,
           },
           {
-            h2: `Example 4: Planning a Feature Implementation`,
-            p: `A Planning Agent queries your task board (via MCP). It extracts the acceptance criteria, reads your db/schema.rb, and generates a step-by-step checklist of the migrations and controllers needed before you even write a line of code.`,
+            h2: `Sequential Tool Chain: Debugging a Production Error`,
+            p: `A single agent orchestrates a sequence of tool calls. It receives an alert and invokes an MCP tool (or API) that fetches the last N lines of the production log—your server or log aggregator runs the query and returns the text. It then calls a GitHub MCP tool to fetch the last commit touching the faulty file; the tool runs in your environment and returns the diff. The agent synthesizes a Root Cause Analysis from these tool responses only; it never reaches into your systems directly.`,
+          },
+          {
+            h2: `Commit Gate: Run on Every Commit, Block on Failure`,
+            p: `A pre-commit hook or CI step runs on every commit. Tools provide the diff (e.g. MCP tool that runs git diff), test results, and optionally the ticket or PR description. An agent evaluates policy, security red flags, or alignment with acceptance criteria and returns block or allow. The hook blocks the commit when the result is block. The agent never runs git or tests—it only consumes tool output and decides.`,
+          },
+          {
+            h2: `Auto-Generate Postman Collection with Descriptions`,
+            p: `On API change or on demand, a tool or MCP resource supplies the API surface (OpenAPI spec or route list) from your environment. The agent generates a Postman collection JSON with meaningful descriptions per endpoint. A separate tool or script persists the file or uploads to Postman. The agent only receives the spec and returns the artifact; it does not access the repo or Postman API directly.`,
           },
         ],
       },
       {
         h1: `8. Production Infrastructure for Agents`,
-        p: `Deploying agents into production isn't like deploying a standard web app. Because they are non-deterministic, they require serious defense-in-depth.`,
+        p: `Deploying agents into production isn't like deploying a standard web app. Because they are non-deterministic, they require serious defense-in-depth. Budget for more than token costs: prompt maintenance, retry storms, and observability add operational debt—Gartner notes that a large share of agentic projects fail to reach production due to this overhead, so guardrails and cost awareness are essential.`,
         list: [
           {
             h1: `Sentinel Agents`,
@@ -2301,7 +2304,11 @@ end
           },
           {
             h1: `Circuit Breakers`,
-            p: `Agents are prone to "retry storms." If a downstream API fails, an unsupervised agent might retry the call 100 times in a second, causing a self-inflicted DDoS attack. Always wrap your tools in a Circuit Breaker pattern. If the tool fails 5 times, the circuit "opens" and forces the agent to fail fast or execute a fallback strategy.`,
+            p: `Agents are prone to "retry storms." If a downstream API fails, an unsupervised agent might retry the call 100 times in a second, causing a self-inflicted DDoS attack. Always wrap your tools in a Circuit Breaker pattern. If the tool fails 5 times, the circuit "opens" and forces the agent to fail fast or execute a fallback strategy. Prefer repair agents that fix a specific failure (e.g. re-run a failed step with adjusted input) over blanket retries that re-run the entire workflow.`,
+          },
+          {
+            h1: `Rate Limiting`,
+            p: `Apply rate limits per agent or per tool to prevent runaway usage and cost. Combined with circuit breakers, this keeps failures and spend under control.`,
           },
           {
             h1: `Schema Validation`,
@@ -2310,6 +2317,22 @@ end
           {
             h1: `Data Minimization`,
             p: `Implement automated redaction to strip PII (Personal Identifiable Information) before it ever hits the LLM's context window.`,
+          },
+          {
+            h1: `Idempotency and Replayability`,
+            p: `Design tool calls to be idempotent where possible, and log events so runs can be replayed for debugging. This makes production failures reproducible and easier to fix.`,
+          },
+          {
+            h1: `Human-in-the-Loop (HITL)`,
+            p: `Require explicit human approval for high-risk actions (e.g. destructive database migrations, deploys). Start with HITL on every agent output and relax oversight only as the system proves itself.`,
+          },
+          {
+            h1: `Security: Sandboxing and Data Scoping`,
+            p: `Where agents execute code or shell commands, use sandboxing. Limit what tools return—only minimal, scoped data—to reduce data exfiltration risk. The agent should never have direct access to systems; tools run in your environment and return only what's needed.`,
+          },
+          {
+            h1: `Testing Non-Deterministic Agents`,
+            p: `Mock LLM responses in tests, use snapshot testing for execution trajectories, and run evaluation harnesses for key user journeys. Where the stack allows, use deterministic seeds to make runs reproducible.`,
           },
         ],
       },
@@ -2327,10 +2350,10 @@ end
           },
           {
             h1: `Procedural Memory`,
-            p: `If an agent figures out a complex workaround to a bug, it caches that exact execution trajectory so it doesn't have to waste expensive reasoning tokens figuring it out again next time.`,
+            p: `If an agent figures out a complex workaround to a bug, it caches the exact sequence of steps that worked so it doesn't have to waste expensive reasoning tokens figuring it out again next time.`,
           },
         ],
-        p: `While Vector RAG is great for fuzzy semantic searches, the industry is increasingly moving toward GraphRAG for agentic systems. GraphRAG maps knowledge explicitly via nodes and edges, allowing agents to navigate complex, multi-hop relationships (e.g., "What sequence of events led to this specific outage?") with far greater accuracy.`,
+        p: `While Vector RAG is great for fuzzy semantic searches, the industry is increasingly moving toward Microsoft Research's <a href='https://github.com/microsoft/graphrag' target='_blank' rel='noopener'>GraphRAG</a> for agentic systems. GraphRAG maps knowledge explicitly via nodes and edges, allowing agents to navigate complex, multi-hop relationships (e.g., "What sequence of events led to this specific outage?") with far greater accuracy.`,
       },
       {
         h1: `10. Observability and Debugging`,
