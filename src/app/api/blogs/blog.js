@@ -2222,6 +2222,8 @@ end`,
             p: `Executable actions (e.g., executing a Git commit).`,
           },
         ],
+      },
+      {
         p: `Besides <a href='https://github.com/yjacquin/fast-mcp' target='_blank' rel='noopener'>fast-mcp</a>, the official MCP Ruby SDK (maintained by Anthropic and Shopify) is an alternative for building MCP servers in Ruby. Using the fast-mcp gem, we can expose a custom MCP server that SSHs into a host and fetches lines from staging.log (optionally filtered by a keyword) for any MCP-compliant AI. The AI invokes the tool; your MCP server runs the SSH command and returns the log text:`,
         html: {
           type: "code",
@@ -2371,6 +2373,155 @@ server.register_tool(FetchStagingLogsTool)
       show: true,
       title: `The Agentic Shift: A Comprehensive Analysis of the Artificial Intelligence Landscape in 2026`,
       slug: `the-agentic-shift-artificial-intelligence-landscape-2026`,
+    },
+  },
+  {
+    title: `Stop Asking Your AI to Do Everything: A Practical Guide to Multi-Agent Workflows`,
+    slug: `stop-asking-your-ai-to-do-everything-a-practical-guide-to-multi-agent-workflows`,
+    id: 10,
+    category_id: 5,
+    description: `Why single-agent prompts fail on complex tasks, and how to break work into specialized Research, Planning, Execution, and Review agents with drop-in Markdown specs for your IDE.`,
+    image: {
+      src: `https://website-images-rohitcodes.s3.ap-south-1.amazonaws.com/stop-asking-your-ai-to-do-everything-a-practical-guide-to-multi-agent-workflows.webp`,
+      alt: `Stop Asking Your AI to Do Everything: A Practical Guide to Multi-Agent Workflows`,
+    },
+    owner: `Rohit Bhatt`,
+    tags: [`multi-agent`, `AI workflows`, `agents`, `Cursor`, `Claude`, `research agent`, `planning agent`, `TDD`],
+    date: '2026-03-15',
+    summary: `Expecting a single model to act as researcher, architect, execution engineer, and QA reviewer leads to context rot. The solution is cognitive decomposition: break the software development lifecycle into specialized agents—Research, Planning & Refinement, Execution, and Review—each restricted to a single cognitive task, with predictable handoff protocols and drop-in Markdown specs for Cursor, Claude Code, and Antigravity.`,
+    sections: [
+      {
+        p: `We've all been there. You have a complex engineering ticket, so you open up your AI coding assistant and dump a massive prompt into the context window: "Analyze this legacy database schema, figure out the missing dependencies, plan a migration, write the Rails service object, build the React frontend, and write the test suite."<br/><br/>What happens next is entirely predictable. The AI starts strong, writes a decent boilerplate, and then completely loses the plot. It hallucinates a variable name halfway through, forgets the architectural constraints you explicitly mentioned in paragraph two, and confidently generates a test suite that asserts true == true.<br/><br/>A lot of developers still think AI agents are just better autocomplete or super-powered prompts. But expecting a single model to act as a researcher, software architect, execution engineer, and QA reviewer all at once leads to what we call context rot. The model's working memory gets irreparably polluted. It loses track of its boundaries, and the exponential compounding of reasoning errors turns your codebase into a fragile mess.<br/><br/>If your single-agent setup is collapsing under real-world complexity, the solution isn't a longer prompt. The solution is cognitive decomposition.<br/><br/>We need to treat AI systems the way we treat software architecture: by breaking monolithic tasks into specialized microservices. In the AI world, this means building a Multi-Agent System.`,
+      },
+      {
+        h1: `The Core Workflow: Divide and Conquer`,
+        p: `Instead of one monolithic prompt, we break the software development lifecycle into specialized agents, each restricted to a single cognitive task. This dramatically improves reliability, determinism, and observability because each agent only holds the exact context it needs.<br/><br/>Here is the standard engineering pipeline we use in 2026:`,
+        list: [
+          {
+            h1: `Research`,
+            p: `The agent's only job is to traverse the file system, read documentation, and compress massive amounts of code into a high-signal summary. It doesn't write code.`,
+          },
+          {
+            h1: `Planning & Iterative Refinement`,
+            p: `An architect agent takes the research and builds a Directed Acyclic Graph (DAG) of the tasks. If the research is ambiguous, it bounces the request back to the researcher. This cyclical loop prevents bad plans from ever reaching the execution phase.`,
+          },
+          {
+            h1: `Execution`,
+            p: `This agent is a factory worker. It takes the plan, writes the code, and runs the tests. It operates in a continuous "write-test-fix" loop until the continuous integration suite goes green.`,
+          },
+          {
+            h1: `Review`,
+            p: `A judge agent evaluates the diff against your repository's security and style rubrics, rejecting it with specific line-item feedback if it fails.`,
+          },
+        ],
+        p: `By isolating these steps, if something breaks, you know exactly which agent failed. Debugging becomes tracing a data pipeline rather than arguing with a chatbot.`,
+      },
+      {
+        h1: `Drop-In Subagents for Your IDE`,
+        p: `To make this work, you need predictable, production-grade agent specifications. In the world of agentic AI, Markdown has become the lingua franca for both prompting and output formatting. Below are four Markdown (.md) files you can copy and drop directly into your project to define your specialized AI team.<br/><br/>(Save these files in an .agents/ directory in your project root.)`,
+      },
+      {
+        h1: `1. research_agent.md`,
+        p: `Agent Name: CodebaseResearchAgent`,
+        list: [
+          { h1: `Purpose`, p: `You are a Staff-level Technical Researcher. Your sole objective is to gather, filter, and compress codebase context related to the user's objective without modifying any state.` },
+          { h1: `Responsibilities`, p: `Traverse file systems and query internal Model Context Protocol (MCP) servers. Identify data flows, API contracts, and legacy architectural dependencies. Condense raw file data into high-signal insights.` },
+          { h1: `Inputs`, p: `user_objective (String), workspace_path (String)` },
+          { h1: `Outputs`, p: `research_dossier.md (Contains executive summary, affected files, and identified risks).` },
+          { h1: `Rules and Constraints`, p: `You are strictly a read-only entity. Do not execute POST, PUT, DELETE, or git write commands. Never dump raw, unedited file contents into your output. If a referenced file cannot be located, state explicitly: **Status:** Missing Context. Do not hallucinate implementations.` },
+          { h1: `Handoff Protocol`, p: `Target: IterativePlanningAgent. Condition: Research complete, dependencies mapped, and confidence is high. Payload: research_dossier.md` },
+        ],
+      },
+      {
+        h1: `2. planning_agent.md`,
+        p: `Agent Name: IterativePlanningAgent`,
+        list: [
+          { h1: `Purpose`, p: `You are a Principal Software Architect. You translate divergent research into a highly deterministic, step-by-step execution plan optimized for Test-Driven Development (TDD).` },
+          { h1: `Outputs`, p: `execution_dag.md, agents_task.md` },
+          { h1: `Rules and Constraints`, p: `Every new feature plan must begin with a mandate to write or update failing tests (Red phase). A single node in your execution plan must not require modifying more than 3 distinct files. If the dossier indicates missing database schemas or ambiguous constraints, reject the input and hand off back to the Research Agent. Do not guess.` },
+          { h1: `Handoff Protocol`, p: `Target: TDDExecutionAgent. Condition: Plan is validated, tests are defined, and edge cases are documented. Payload: agents_task.md and execution_dag.md` },
+        ],
+      },
+      {
+        h1: `3. execution_agent.md`,
+        p: `Agent Name: TDDExecutionAgent`,
+        list: [
+          { h1: `Purpose`, p: `You are a relentless Senior Software Engineer focused entirely on execution. You mechanically implement the planner's specifications by modifying files and running tests in an autonomous loop.` },
+          { h1: `Rules and Constraints`, p: `You must follow the agents_task.md strictly. You must execute the test command specified in the plan both before and after modifying code. You must read stdout and stderr of every command you run. Never assume a command succeeded blindly.` },
+          { h1: `Failure Handling`, p: `If you are trapped in a continuous test failure loop for more than 5 iterations on a single node, trigger an early exit. Hand off the state back to the IterativePlanningAgent to rethink the architectural approach.` },
+          { h1: `Handoff Protocol`, p: `Target: QualityGateReviewerAgent. Condition: All DAG nodes are complete and tests are passing. Payload: execution_trace_log.md and the final git diff.` },
+        ],
+      },
+      {
+        h1: `4. reviewer_agent.md`,
+        p: `Agent Name: QualityGateReviewerAgent`,
+        list: [
+          { h1: `Purpose`, p: `You are an uncompromising Staff Security and Performance Auditor. You evaluate the Execution Agent's patch against strict algorithmic quality gates before allowing a Pull Request.` },
+          { h1: `Rules and Constraints`, p: `You do not write or modify code directly in the file system. You act strictly as a judge. Base all architectural critiques solely on the rules defined in the research_dossier.md. If rejecting code, your feedback must reference exact file paths, line numbers, and contain the corrected code snippet.` },
+          { h1: `Output Format`, p: `Strictly Markdown (review_verdict.md): Review Verdict, Status: APPROVED | REJECTED_NEEDS_WORK, Score: 0.0 to 1.0, Critical Violations with File, Line, Feedback.` },
+          { h1: `Handoff Protocol`, p: `Target (If REJECTED): TDDExecutionAgent (Payload: Critical violations). Target (If APPROVED): Human Approver (Payload: Clean summary and PR authorization).` },
+        ],
+      },
+      {
+        h1: `How to Actually Use These in Your IDE`,
+        p: `Having Markdown files is great, but how do you wire them up? In 2026, modern IDEs treat .md specifications as executable contracts.`,
+        list: [
+          {
+            h1: `Cursor`,
+            p: `You can define agents as "skills" by placing your .md files in .cursor/skills/SKILL-NAME/SKILL.md. When working in agent chat, Cursor automatically presents these skills to the agent, or you can manually trigger them using slash commands like /research_agent. Cursor also allows agents to save their execution plans directly to .cursor/plans/ for reliable documentation.`,
+          },
+          {
+            h1: `Claude Code`,
+            p: `Claude relies on a CLAUDE.md file in your repository root to permanently grasp your architectural rules and conventions. For specialized subagents, you can drop your .md specification files into the .claude/agents/ folder. Claude automatically delegates tasks to these subagents based on their descriptions, allowing them to work independently in their own context windows.`,
+          },
+          {
+            h1: `Google Antigravity IDE`,
+            p: `Antigravity is built from the ground up as an "agent-first" platform. You store your agent rules in the .agents/rules/ directory or define specific skills in .agents/skills/<skill-folder>/SKILL.md. Instead of dumping raw tool execution logs into your terminal, Antigravity generates structured "Artifacts"—such as implementation plans, code diffs, and browser recordings—that you can review and comment on.`,
+          },
+        ],
+      },
+      {
+        h1: `Real-World Examples: Seeing it in Action`,
+        subSections: [
+          {
+            h2: `Backend: Implementing a Rails Service Object`,
+            p: `Imagine you need to automate an HR leave balance feature. The Research Agent traverses app/models/ and finds the User and LeaveBalance tables. The Planning Agent dictates the use of the Service Object pattern and generates an agents_task.md specifying a strict Ruby class structure. The Execution Agent writes the LeaveBalanceTool class, checks balances, and immediately writes an RSpec test. It runs bundle exec rspec. It fails because of a missing permitted parameter. The agent reads the stdout, fixes the controller, and loops until green. The Reviewer Agent steps in and flags that the code lacks a database transaction block around the leave deduction, bouncing it back to execution.`,
+          },
+          {
+            h2: `Frontend: Writing a React Component`,
+            p: `You need a complex data table. The Planning Agent specifies using a headless component pattern with TanStack Table to ensure the UI is decoupled from the logic. The Execution Agent writes the component. During the execution loop, it utilizes the Chrome DevTools MCP integration. This literally "gives the agent eyes"—allowing it to inspect the live Document Object Model, catch hydration errors in the browser console, and fix them dynamically before committing the code.`,
+          },
+        ],
+      },
+      {
+        h1: `The 2026 Architecture Best Practices`,
+        p: `When you start orchestrating these agents, things can get messy. Keep these engineering best practices in mind:`,
+        list: [
+          {
+            h1: `Event Idempotency`,
+            p: `When agents hand off tasks to one another, network timeouts can cause retries. If your execution agent retries a database write, you get duplicate records. Always implement event idempotency keys—give each event a unique identifier so receiving agents can detect and safely skip duplicates.`,
+          },
+          {
+            h1: `Structured Handoff Protocols`,
+            p: `Don't just let agents "chat" with each other. Use a strict Markdown handoff object. An agent should only trigger a handoff if it recognizes it is missing a required tool or its internal confidence score drops too low.`,
+          },
+          {
+            h1: `Distributed Tracing (Event Logs)`,
+            p: `Traditional monitoring isn't enough anymore. You need distributed tracing specifically for agents to capture the complete execution context—including the exact prompt inputs, the model parameters used, and the raw tool invocations at every step of the workflow. If a pipeline fails, you need to see exactly which agent hallucinated.`,
+          },
+        ],
+      },
+      {
+        p: `Stop treating your AI like an omniscient junior developer. Give it a system, give it boundaries, and watch your autonomous reliability skyrocket.`,
+      },
+    ],
+    advertisements: {
+      show: false,
+    },
+    referBlog: {
+      show: true,
+      title: `Building the Future: A Developer's Guide to Agentic AI Workflows in Ruby`,
+      slug: `building-the-future-a-developers-guide-to-agentic-ai-workflows-in-ruby`,
     },
   }
 ];

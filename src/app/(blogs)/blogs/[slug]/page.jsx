@@ -89,7 +89,9 @@ export default async function page({ params }) {
           <section className="flex flex-col w-full gap-5 justify-center md:w-8/12 overflow-x-hidden break-words">
             <div className="flex flex-col justify-center w-full border-y-2 border-stone-200/5  py-2 flex-1 gap-2 md:gap-5">
               <span className='text-left text-base text-white'>
-                <Link href={`/blogs`}>Blogs</Link> / <Link href={`/categories/${data.category.slug}`}>{data.category.name}</Link> / <Link href={`/blogs/${data.blog.slug}`}>{data.blog.title}</Link>
+                <Link href={`/blogs`}>Blogs</Link>
+                {data.category && <> / <Link href={`/categories/${data.category.slug}`}>{data.category.name}</Link></>}
+                {' / '}<Link href={`/blogs/${data.blog.slug}`}>{data.blog.title}</Link>
               </span>
             </div>
             <div className="flex flex-col justify-center flex-1 gap-2">
@@ -107,7 +109,7 @@ export default async function page({ params }) {
                 </div>}
               <section className="sectionAnchor flex flex-col justify-center flex-1 gap-7 rounded-lg  p-4">
                 {
-                  data.blog.sections.map((section, index) => (
+                  (data.blog.sections ?? []).map((section, index) => (
                     <div key={index} className="flex flex-col justify-center flex-1 gap-1">
                       {
                         section.h1 && <h2 className="text-lg md:text-xl font-bold text-left anchor-tag text-blue-400">{parse(section.h1)}</h2>
@@ -128,7 +130,7 @@ export default async function page({ params }) {
                                   {
                                     listItem.h1 && <span className='text-blue-400 font-semibold'>{parse(listItem.h1)}: </span>
                                   }
-                                  {parse(listItem.p)}</span>
+                                  {listItem.p ? parse(listItem.p) : null}</span>
                               </li>
                             ))
                           }
@@ -168,7 +170,7 @@ export default async function page({ params }) {
                                     subSection.p && <p className="text-base md:text-lg font-light text-left anchor-tag text-white">{parse(subSection.p)}</p>
                                   }
                                   {
-                                    subSection.list && <ul className={`text-base md:text-lg flex flex-col gap-2 font-light text-left anchor-tag ${section.p ? 'pt-5' : ''}`}>
+                                    subSection.list && <ul className={`text-base md:text-lg flex flex-col gap-2 font-light text-left anchor-tag ${subSection.p ? 'pt-5' : ''}`}>
                                       {
                                         subSection.list.map((listItem, index3) => (
                                           <li key={index3} className='text-white flex flex-row gap-2'>
@@ -237,20 +239,20 @@ export default async function page({ params }) {
               </div>
             </div>
             {
-              data.blog.advertisements.show && (
+              data.blog.advertisements?.show && (
                 <div className="flex flex-col md:flex-row justify-center flex-1 gap-2 border-b-2 border-neutral-500 py-5">
-                  {data.blog.advertisements.image &&
+                  {data.blog.advertisements?.image?.src && (
                     <div className="flex flex-col justify-center self-center gap-2 rounded-lg w-full p-4">
-                      <Link href={data.blog.advertisements.image.link} target="_blank" rel="noopener noreferrer">
-                        <img src={data.blog.advertisements.image.src} alt={data.blog.advertisements.image.alt} className="w-full rounded-lg h-auto" draggable={false} />
+                      <Link href={data.blog.advertisements.image.link ?? '#'} target="_blank" rel="noopener noreferrer">
+                        <img src={data.blog.advertisements.image.src} alt={data.blog.advertisements.image.alt ?? ''} className="w-full rounded-lg h-auto" draggable={false} />
                       </Link>
                     </div>
-                  }
+                  )}
                 </div>
               )
             }
             {
-              data.blog.referBlog.show && (
+              data.blog.referBlog?.show && data.blog.referBlog?.slug && data.blog.referBlog?.title && (
                 <div className="flex flex-col justify-center flex-1 gap-2 rounded-lg bg-neutral-300/5 p-4">
                   <p className="text-base md:text-lg text-left font-bold text-white"> Also Read : <Link href={`/blogs/${data.blog.referBlog.slug}`} className='font-light hover:underline text-blue-400'>{data.blog.referBlog.title}</Link>
                   </p>
