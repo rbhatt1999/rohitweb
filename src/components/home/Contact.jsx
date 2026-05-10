@@ -87,7 +87,6 @@ export default function Contact() {
                   target="_blank"
                   rel="noreferrer"
                   className="social-link"
-                  style={{ color: '#d4d4d8', textDecoration: 'none', transition: 'color 0.2s' }}
                 >
                   <span style={{ color: '#a3e635', opacity: 0.85 }}>▸ </span>
                   {label}
@@ -96,10 +95,6 @@ export default function Contact() {
             </div>
           </motion.div>
         </div>
-
-        <style>{`
-          .social-link:hover { color: #a3e635 !important; }
-        `}</style>
       </section>
     </>
   )

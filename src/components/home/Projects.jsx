@@ -151,37 +151,13 @@ function FeaturedCard({ proj, inView, delay }) {
 
 function MoreRow({ name, desc, github, tree }) {
   return (
-    <a
-      href={github}
-      target="_blank"
-      rel="noreferrer"
-      className="more-row"
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        padding: '4px 10px',
-        marginLeft: '-10px',
-        borderRadius: '4px',
-        textDecoration: 'none',
-        color: '#a1a1aa',
-        lineHeight: 2.1,
-        transition: 'background 0.25s, color 0.2s',
-        flexWrap: 'wrap',
-      }}
-    >
+    <a href={github} target="_blank" rel="noreferrer" className="more-row">
       <span style={{ color: '#52525b', marginRight: '12px' }}>{tree}</span>
       <span style={{ color: '#d4d4d8' }}>{name}</span>
       <span style={{ color: '#71717a', margin: '0 12px' }}>{desc}</span>
-      <span style={{ marginLeft: 'auto', fontSize: '12px', color: '#71717a' }}>[ github ↗ ]</span>
-
-      <style>{`
-        .more-row:hover {
-          background: linear-gradient(90deg, rgba(163,230,53,0.12), transparent);
-        }
-        .more-row:hover > span:last-child {
-          color: #a3e635 !important;
-        }
-      `}</style>
+      <span className="gh-link" style={{ marginLeft: 'auto', fontSize: '12px', color: '#71717a' }}>
+        [ github ↗ ]
+      </span>
     </a>
   )
 }

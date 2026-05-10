@@ -40,24 +40,6 @@ export default function NavigationBar() {
           <NavigationBarMobile />
         </div>
       </nav>
-
-      <style>{`
-        .nav-desktop { display: flex; }
-        .nav-mobile  { display: none; }
-        .nav-blogs {
-          color: #a3e635 !important;
-          border: 1px solid rgba(163,230,53,0.45);
-          padding: 5px 14px; border-radius: 4px;
-          background: rgba(163,230,53,0.07);
-          font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase;
-          transition: background 0.2s;
-        }
-        .nav-blogs:hover { background: rgba(163,230,53,0.15) !important; }
-        @media (max-width: 768px) {
-          .nav-desktop { display: none !important; }
-          .nav-mobile  { display: block !important; }
-        }
-      `}</style>
     </header>
   )
 }

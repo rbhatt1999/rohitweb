@@ -108,21 +108,41 @@ body {
   animation: glitch 0.4s steps(2) 1;
 }
 
-/* Nav link hover */
+/* Nav */
 .nav-link {
-  color: #71717a;
+  color: #a1a1aa;
   text-decoration: none;
   transition: color 0.2s;
 }
 .nav-link:hover { color: #a3e635; }
 
-/* Subtle dot grid that shows through under hero (above 3D canvas) */
+.nav-blogs {
+  color: #a3e635 !important;
+  border: 1px solid rgba(163, 230, 53, 0.45);
+  padding: 5px 14px;
+  border-radius: 4px;
+  background: rgba(163, 230, 53, 0.07);
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  transition: background 0.2s;
+}
+.nav-blogs:hover { background: rgba(163, 230, 53, 0.15) !important; }
+
+.nav-desktop { display: flex; }
+.nav-mobile  { display: none; }
+@media (max-width: 768px) {
+  .nav-desktop { display: none; }
+  .nav-mobile  { display: block; }
+}
+
+/* Hero dot grid */
 .hero-dotgrid {
   background-image: radial-gradient(rgba(163, 230, 53, 0.07) 1px, transparent 1px);
   background-size: 22px 22px;
 }
 
-/* Section helpers */
+/* Section + dividers */
 .section {
   background: var(--bg);
   position: relative;
@@ -151,12 +171,57 @@ body {
   border-radius: 6px;
   transition: border-color 0.2s, box-shadow 0.3s, transform 0.3s;
 }
-.work-card.featured { border-color: rgba(163, 230, 53, 0.4); box-shadow: 0 0 36px -10px rgba(163, 230, 53, 0.15); }
+.work-card.featured {
+  border-color: rgba(163, 230, 53, 0.4);
+  box-shadow: 0 0 36px -10px rgba(163, 230, 53, 0.15);
+}
 .work-card:hover {
   border-color: var(--accent);
   box-shadow: 0 0 1px rgba(163, 230, 53, 0.22), 0 18px 48px -12px rgba(163, 230, 53, 0.22);
   transform: translateY(-2px);
 }
+
+/* more/ row */
+.more-row {
+  display: flex;
+  align-items: center;
+  padding: 4px 10px;
+  margin-left: -10px;
+  border-radius: 4px;
+  text-decoration: none;
+  color: #a1a1aa;
+  line-height: 2.1;
+  transition: background 0.25s, color 0.2s;
+  flex-wrap: wrap;
+}
+.more-row:hover {
+  background: linear-gradient(90deg, rgba(163, 230, 53, 0.12), transparent);
+}
+.more-row:hover .gh-link { color: #a3e635; }
+
+/* post-row in writing */
+.post-row {
+  display: flex;
+  align-items: baseline;
+  gap: 16px;
+  padding: 16px 10px;
+  border-bottom: 1px dashed #1c1c20;
+  font-family: var(--font-jetbrains), ui-monospace, monospace;
+  font-size: 13.5px;
+  color: #a1a1aa;
+  text-decoration: none;
+  transition: background 0.2s;
+  flex-wrap: wrap;
+}
+.post-row:hover { background: rgba(163, 230, 53, 0.05); }
+
+/* Social link */
+.social-link {
+  color: #d4d4d8;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+.social-link:hover { color: #a3e635; }
 
 /* Blog system — keep existing */
 .blog-section br {

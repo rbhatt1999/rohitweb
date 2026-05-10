@@ -36,19 +36,6 @@ export default function Writing() {
                 key={post.id}
                 href={`/blogs/${post.slug}`}
                 className="post-row"
-                style={{
-                  display: 'flex',
-                  alignItems: 'baseline',
-                  gap: '16px',
-                  padding: '16px 10px',
-                  borderBottom: '1px dashed #1c1c20',
-                  fontFamily: 'var(--font-jetbrains), ui-monospace, monospace',
-                  fontSize: '13.5px',
-                  color: '#a1a1aa',
-                  textDecoration: 'none',
-                  transition: 'background 0.2s',
-                  flexWrap: 'wrap',
-                }}
               >
                 <span style={{ color: '#a3e635' }}>▸</span>
                 <span className="post-title-hover" style={{ color: '#fafafa', flex: 1, minWidth: '200px' }}>
@@ -59,10 +46,6 @@ export default function Writing() {
               </Link>
             ))}
           </div>
-
-          <style>{`
-            .post-row:hover { background: rgba(163,230,53,0.05); }
-          `}</style>
         </div>
       </section>
     </>
