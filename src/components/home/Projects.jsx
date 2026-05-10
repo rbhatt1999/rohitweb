@@ -1,4 +1,5 @@
 'use client'
+import React from 'react'
 import { motion } from 'framer-motion'
 import { useInView } from 'react-intersection-observer'
 import { SectionLabel, sectionStyle, containerStyle } from './About'
@@ -78,7 +79,7 @@ function FeaturedCard({ proj, inView, delay }) {
       animate={inView ? { opacity: 1, y: 0 } : {}}
       transition={{ duration: 0.6, delay }}
       className={`work-card ${tag ? 'featured' : ''}`}
-      style={{ padding: '32px 34px', marginBottom: '20px' }}
+      style={{ marginBottom: '20px' }}
     >
       {tag && (
         <span
@@ -99,7 +100,7 @@ function FeaturedCard({ proj, inView, delay }) {
         </span>
       )}
       <div style={{ display: 'flex', alignItems: 'flex-start', gap: '24px', flexWrap: 'wrap' }}>
-        <div style={{ flex: 1, minWidth: '240px' }}>
+        <div style={{ flex: 1, minWidth: 0 }}>
           <h3
             style={{
               fontFamily: 'var(--font-jetbrains), ui-monospace, monospace',
@@ -107,6 +108,7 @@ function FeaturedCard({ proj, inView, delay }) {
               color: '#fafafa',
               margin: '0 0 10px',
               fontWeight: 500,
+              wordBreak: 'break-word',
             }}
           >
             {title}
@@ -129,13 +131,18 @@ function FeaturedCard({ proj, inView, delay }) {
               fontFamily: 'var(--font-jetbrains), ui-monospace, monospace',
               fontSize: '12.5px',
               color: '#a1a1aa',
+              display: 'flex',
+              flexWrap: 'wrap',
+              alignItems: 'center',
+              rowGap: '4px',
+              columnGap: '10px',
             }}
           >
             {stack.split(' · ').map((s, i, arr) => (
-              <span key={s}>
-                {s}
-                {i < arr.length - 1 && <span style={{ color: '#52525b', margin: '0 8px' }}>·</span>}
-              </span>
+              <React.Fragment key={s}>
+                <span>{s}</span>
+                {i < arr.length - 1 && <span style={{ color: '#52525b' }}>·</span>}
+              </React.Fragment>
             ))}
           </div>
         </div>
