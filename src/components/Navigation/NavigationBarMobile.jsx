@@ -1,10 +1,31 @@
 'use client'
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
+import { createPortal } from 'react-dom'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
 
+const MENU_ITEMS = [
+  { label: '// work',    href: '/#work' },
+  { label: '// writing', href: '/#writing' },
+  { label: '// about',   href: '/#about' },
+  { label: '// contact', href: '/#contact' },
+  { label: '/blogs ↗',   href: '/blogs' },
+]
+
 export default function NavigationBarMobile() {
   const [open, setOpen] = useState(false)
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => setMounted(true), [])
+
+  // Lock body scroll while overlay is open
+  useEffect(() => {
+    if (!open) return
+    const prev = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    return () => { document.body.style.overflow = prev }
+  }, [open])
+
   const close = () => setOpen(false)
 
   return (
@@ -13,70 +34,46 @@ export default function NavigationBarMobile() {
       <button
         onClick={() => setOpen(o => !o)}
         aria-label="Toggle menu"
-        style={{
-          background: 'none', border: 'none', cursor: 'pointer',
-          display: 'flex', flexDirection: 'column', gap: '5px', padding: '4px',
-        }}
+        aria-expanded={open}
+        className="hamburger-btn"
       >
         {[0, 1, 2].map(i => (
-          <span key={i} style={{
-            display: 'block', width: '22px', height: '2px',
-            background: open ? '#a3e635' : '#e4e4e7',
-            borderRadius: '2px', transition: 'background 0.2s',
-          }} />
+          <span key={i} className="hamburger-bar" style={{ background: open ? '#a3e635' : '#e4e4e7' }} />
         ))}
       </button>
 
-      {/* Overlay */}
-      <AnimatePresence>
-        {open && (
-          <motion.div
-            initial={{ opacity: 0, y: -16 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -16 }}
-            transition={{ duration: 0.25 }}
-            style={{
-              position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
-              zIndex: 40,
-              background: 'rgba(6,7,10,0.97)',
-              backdropFilter: 'blur(16px)',
-              display: 'flex', flexDirection: 'column',
-              alignItems: 'center', justifyContent: 'center',
-              gap: '32px',
-              fontFamily: 'var(--font-jetbrains), ui-monospace, monospace',
-              fontSize: '22px',
-            }}
-          >
-            <button
-              onClick={close}
-              style={{
-                position: 'absolute', top: '20px', right: '24px',
-                background: 'none', border: 'none', cursor: 'pointer',
-                color: '#71717a', fontSize: '20px', fontFamily: 'inherit',
-              }}
+      {/* Overlay rendered in a portal so it can't be affected by header's stacking context */}
+      {mounted && createPortal(
+        <AnimatePresence>
+          {open && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              className="mobile-menu-overlay"
             >
-              [ esc ]
-            </button>
+              <button onClick={close} className="mobile-menu-close" aria-label="Close menu">
+                [ esc ]
+              </button>
 
-            {[
-              { label: '// work', href: '/#work' },
-              { label: '// writing', href: '/#writing' },
-              { label: '// about', href: '/#about' },
-              { label: '// contact', href: '/#contact' },
-              { label: '/blogs ↗', href: '/blogs' },
-            ].map(({ label, href }) => (
-              <Link
-                key={href}
-                href={href}
-                onClick={close}
-                style={{ color: '#e4e4e7', textDecoration: 'none' }}
-              >
-                <span style={{ color: '#a3e635' }}>▸ </span>{label}
-              </Link>
-            ))}
-          </motion.div>
-        )}
-      </AnimatePresence>
+              <nav className="mobile-menu-list">
+                {MENU_ITEMS.map(({ label, href }) => (
+                  <Link
+                    key={href}
+                    href={href}
+                    onClick={close}
+                    className="mobile-menu-link"
+                  >
+                    <span style={{ color: '#a3e635' }}>▸ </span>{label}
+                  </Link>
+                ))}
+              </nav>
+            </motion.div>
+          )}
+        </AnimatePresence>,
+        document.body
+      )}
     </>
   )
 }
