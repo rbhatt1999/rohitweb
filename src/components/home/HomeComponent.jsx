@@ -1,45 +1,195 @@
 'use client'
-import { Typewriter } from 'react-simple-typewriter'
-import Link from 'next/link'
-import { Link as Link2 } from 'react-scroll'
-import pic from '@/assets/images/homepageimage.png'
+import dynamic from 'next/dynamic'
 import { motion } from 'framer-motion'
-import { AiFillGithub, AiFillLinkedin, AiOutlineTwitter, AiFillMediumSquare } from 'react-icons/ai'
-import Image from 'next/image'
-import { sora, crete_round } from '@/lib/fonts'
-import { useInView } from 'react-intersection-observer'
+
+const CorridorCanvas = dynamic(() => import('@/components/three/CorridorCanvas'), { ssr: false })
 
 export default function HomeComponent() {
-  const state = ['Frontend Developer', 'Backend Developer', 'Full Stack Developer', 'Software Developer'];
-  const { ref, inView } = useInView();
   return (
-    <div ref={ref} id="home" className="flex flex-col lg:flex-row items-center text-white justify-between px-5 md:px-10 lg:px-14 py-10 md:py-16 gap-10 w-full h-full overflow-hidden flex-1">
-      <motion.div
-        initial={{ x: '-100%', opacity: 0 }}
-        animate={inView ? { x: 0, opacity: 1 } : { x: '-100%', opacity: 0 }}
-        transition={{ type: 'spring', stiffness: 30, duration: 1 }}
-        className={`flex flex-col flex-1 gap-3 md:gap-5 order-2 md:order-1`}>
-        <h1 className={`${crete_round.className} text-2xl md:text-6xl font-semibold`}>Hey There. I&apos;m Rohit</h1>
-        <h2 className="text-xl md:text-4xl text-white">I&apos;m a <span className='text-blue-500'><Typewriter words={state} loop={false} cursor typeSpeed={90} /></span></h2>
-        <p className='text-base md:text-xl font-normal'>Ready to turn your digital dreams into reality? With a proven track record in building impressive products, features, and websites, I&apos;ll bring your vision to life. Don&apos;t wait &ndash; contact me today and let&apos;s create something extraordinary together!</p>
-        <div className="flex flex-row gap-4 md:gap-8">
-          <Link2 to="about" smooth={true} duration={1000} className="text-base md:text-lg bg-white/30 rounded-lg border-2 border-blue-500/30 p-2 px-5 hover:bg-blue-500/30 hover:scale-105 hover:border-blue-500 transition-all cursor-pointer duration-150">Know More</Link2> 
-          <Link2 to="contact" smooth={true} duration={1000} className="text-base md:text-lg bg-white/30 rounded-lg border-2 border-blue-500/30 p-2 px-5 hover:bg-blue-500/30 hover:scale-105 hover:border-blue-500 transition-all cursor-pointer duration-150">Contact Me</Link2>
+    <section
+      id="home"
+      style={{
+        position: 'relative',
+        minHeight: '100vh',
+        overflow: 'hidden',
+        background: '#06070a',
+      }}
+    >
+      {/* 3D corridor — absolutely positioned inside the hero only */}
+      <CorridorCanvas />
+
+      {/* Soft scrim so text always sits comfortably above the 3D scene */}
+      <div
+        aria-hidden
+        style={{
+          position: 'absolute',
+          inset: 0,
+          zIndex: 1,
+          background:
+            'radial-gradient(ellipse 90% 80% at 30% 50%, rgba(6,7,10,0.85) 0%, rgba(6,7,10,0.45) 55%, rgba(6,7,10,0.15) 100%)',
+          pointerEvents: 'none',
+        }}
+      />
+      <div
+        className="hero-dotgrid"
+        aria-hidden
+        style={{ position: 'absolute', inset: 0, zIndex: 1, pointerEvents: 'none', opacity: 0.7 }}
+      />
+
+      {/* Content */}
+      <div
+        style={{
+          position: 'relative',
+          zIndex: 5,
+          minHeight: '100vh',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          padding: 'clamp(96px, 14vw, 140px) clamp(24px, 6vw, 80px) 96px',
+          maxWidth: '1280px',
+          margin: '0 auto',
+        }}
+      >
+        <div style={{ maxWidth: '680px' }}>
+          {/* Terminal prompt */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.1 }}
+            style={{
+              fontFamily: 'var(--font-jetbrains), ui-monospace, monospace',
+              color: '#a1a1aa',
+              fontSize: '13px',
+              letterSpacing: '0.04em',
+              marginBottom: '20px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+            }}
+          >
+            <span style={{ color: '#a3e635', textShadow: '0 0 8px #a3e635' }}>$</span>
+            whoami
+            <span className="cursor-blink" />
+          </motion.div>
+
+          {/* Name */}
+          <h1
+            className="hero-title"
+            style={{
+              fontFamily: 'var(--font-jetbrains), ui-monospace, monospace',
+              fontWeight: 600,
+              fontSize: 'clamp(40px, 8vw, 84px)',
+              lineHeight: 0.95,
+              letterSpacing: '-0.02em',
+              margin: '0 0 18px',
+              color: '#fafafa',
+              textShadow: '0 2px 24px rgba(0,0,0,0.6)',
+            }}
+          >
+            ROHIT BHATT
+          </h1>
+
+          {/* Rule */}
+          <div style={{ height: '1px', width: '120px', background: '#3f3f46', margin: '0 0 24px' }} />
+
+          {/* Lead */}
+          <motion.p
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 1.9, duration: 0.6 }}
+            style={{
+              color: '#e4e4e7',
+              fontSize: 'clamp(16px, 1.5vw, 19px)',
+              lineHeight: 1.6,
+              maxWidth: '560px',
+              margin: '0 0 18px',
+              fontWeight: 400,
+              fontFamily: 'var(--font-inter), ui-sans-serif, sans-serif',
+              textShadow: '0 1px 8px rgba(0,0,0,0.5)',
+            }}
+          >
+            Full-stack engineer building thoughtful web software with Ruby on Rails, React &amp; AI integrations.
+          </motion.p>
+
+          {/* Meta */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 2.1 }}
+            style={{
+              fontFamily: 'var(--font-jetbrains), ui-monospace, monospace',
+              fontSize: '13px',
+              color: '#a1a1aa',
+              marginBottom: '36px',
+            }}
+          >
+            ── 2+ years &nbsp;·&nbsp; remote &nbsp;·&nbsp;{' '}
+            <span style={{ color: '#a3e635', fontWeight: 500 }}>open to work</span>
+          </motion.div>
+
+          {/* CTAs */}
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 2.3 }}
+            style={{ display: 'flex', gap: '14px', flexWrap: 'wrap' }}
+          >
+            <Btn href="#work">[ view work → ]</Btn>
+            <Btn href="#contact" ghost>[ get in touch ]</Btn>
+          </motion.div>
         </div>
-        <div className="flex flex-row gap-4 justify-center md:justify-start">
-          <Link href='https://github.com/rbhatt1999' target='_blank' rel="noreferrer"><AiFillGithub className="hover:scale-105 cursor-pointer w-8 h-8" /></Link>
-          <Link href='https://www.linkedin.com/in/rohitbhatt-dev/' target='_blank' rel="noreferrer"><AiFillLinkedin className="hover:scale-105 cursor-pointer w-8 h-8" /></Link>
-          <Link href='https://twitter.com/Rohit_Bhatt_' target='_blank' rel="noreferrer"><AiOutlineTwitter className="hover:scale-105 cursor-pointer w-8 h-8" /></Link>
-          <Link href='https://medium.com/@rbhatt199924' target='_blank' rel="noreferrer"><AiFillMediumSquare className="hover:scale-105 cursor-pointer w-8 h-8" /></Link>
-        </div>
-      </motion.div>
-      <motion.div
-        initial={{ x: '100%', opacity: 0 }}
-        animate={inView ? { x: 0, opacity: 1 } : { x: '100%', opacity: 0 }}
-        transition={{ type: 'spring', stiffness: 30, duration: 1 }}
-        className={`flex flex-col flex-1 items-center lg:items-end order-1 md:order-2`}>
-        <Image src={pic} alt="Rohit Bhatt" width={1000} height={1000} className="w-6/12 md:w-8/12 lg:w-10/12 h-auto" />
-      </motion.div>
-    </div>
+
+        {/* Scroll hint */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 3 }}
+          style={{
+            position: 'absolute',
+            bottom: '32px',
+            left: 'clamp(24px, 6vw, 80px)',
+            fontFamily: 'var(--font-jetbrains), ui-monospace, monospace',
+            fontSize: '11px',
+            color: '#52525b',
+            letterSpacing: '0.1em',
+          }}
+        >
+          ↓ scroll
+        </motion.div>
+      </div>
+    </section>
+  )
+}
+
+function Btn({ href, ghost, children }) {
+  const base = {
+    fontFamily: 'var(--font-jetbrains), ui-monospace, monospace',
+    fontSize: '13px',
+    padding: '12px 22px',
+    border: '1px solid',
+    textDecoration: 'none',
+    display: 'inline-block',
+    transition: 'transform 0.2s, background 0.2s, box-shadow 0.2s',
+    cursor: 'pointer',
+  }
+  const style = ghost
+    ? { ...base, borderColor: '#3f3f46', color: '#e4e4e7', background: 'rgba(6,7,10,0.65)' }
+    : { ...base, borderColor: '#a3e635', color: '#a3e635', background: 'rgba(163,230,53,0.08)' }
+
+  return (
+    <a
+      href={href}
+      style={style}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.transform = 'translateY(-2px)'
+        if (!ghost) e.currentTarget.style.boxShadow = '0 0 24px rgba(163,230,53,0.25)'
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.transform = 'translateY(0)'
+        e.currentTarget.style.boxShadow = 'none'
+      }}
+    >
+      {children}
+    </a>
   )
 }

@@ -7,35 +7,19 @@ module.exports = {
   ],
   theme: {
     extend: {
+      colors: {
+        accent: '#a3e635',
+        'accent-dim': '#65a30d',
+        zinc: {
+          950: '#06070a',
+        },
+      },
+      fontFamily: {
+        mono: ['var(--font-jetbrains)', 'ui-monospace', 'SFMono-Regular', 'monospace'],
+        sans: ['var(--font-inter)', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+      },
       backgroundImage: {
         'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
-        'gradient-conic':
-          'conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))',
-      },
-      scale: {
-        '-100': '-1',
-      },
-      backgroundSize: {
-        'size-200': '200% 200%',
-      },
-      backgroundPosition: {
-        'pos-0': '0% 0%',
-        'pos-100': '100% 100%',
-      },
-      animation: {
-        text: 'text 5s ease infinite',
-      },
-      keyframes: {
-        text: {
-          '0%, 100%': {
-            'background-size': '200% 200%',
-            'background-position': 'left center',
-          },
-          '50%': {
-            'background-size': '200% 200%',
-            'background-position': 'right center',
-          },
-        },
       },
     },
   },
