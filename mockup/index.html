@@ -3,13 +3,16 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>rohitweb · redesign mockup v2</title>
+<title>rohitweb · redesign mockup v3 (real three.js)</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script type="importmap">
+{ "imports": { "three": "https://esm.sh/three@0.160.0" } }
+</script>
 <style>
   :root{
-    --bg:#09090b;
-    --surface:rgba(24,24,27,.55);
-    --border:#27272a;
+    --bg:#06070a;
+    --surface:rgba(10,12,16,.55);
+    --border:#1f2128;
     --text:#e4e4e7;
     --muted:#71717a;
     --accent:#a3e635;
@@ -30,9 +33,10 @@
   .preview-header{max-width:1700px;margin:0 auto 32px;padding:0 8px;font-family:var(--mono)}
   .preview-header .crumb{color:var(--muted);font-size:12px;letter-spacing:.05em}
   .preview-header h1{margin:6px 0 4px;color:var(--text);font-size:18px;font-weight:500}
-  .preview-header .sub{color:var(--muted);font-size:13px;line-height:1.55;max-width:780px}
+  .preview-header .sub{color:var(--muted);font-size:13px;line-height:1.55;max-width:820px}
   .preview-header .sub b{color:var(--accent)}
   .preview-header .tip{margin-top:10px;color:var(--accent);font-size:12px}
+  .preview-header .refs{margin-top:6px;color:#52525b;font-size:11px}
 
   .frames{max-width:1700px;margin:0 auto;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:32px;align-items:start}
   @media (max-width:1100px){ .frames{grid-template-columns:1fr} }
@@ -41,47 +45,46 @@
   .frame-label .dim{opacity:.6}
 
   .device{background:var(--bg);border:1px solid var(--border);border-radius:14px;overflow:hidden;box-shadow:0 30px 80px -20px rgba(0,0,0,.6),0 0 0 1px rgba(255,255,255,.02) inset;position:relative}
-  .device-bar{display:flex;align-items:center;gap:8px;padding:10px 14px;background:#111114;border-bottom:1px solid var(--border);font-family:var(--mono);font-size:11px;color:var(--muted)}
+  .device-bar{display:flex;align-items:center;gap:8px;padding:10px 14px;background:#0a0b0e;border-bottom:1px solid var(--border);font-family:var(--mono);font-size:11px;color:var(--muted)}
   .device-bar .dot{width:10px;height:10px;border-radius:50%;background:#3f3f46}
   .device-bar .dot.r{background:#52525b}
   .device-bar .url{margin-left:auto;color:#52525b}
 
-  .desktop{aspect-ratio:16/10;min-height:860px}
+  .desktop{aspect-ratio:16/10;min-height:880px}
   .mobile{width:380px;height:780px}
   @media (max-width:1100px){ .mobile{margin:0 auto;width:min(380px,92vw)} }
 
-  /* Site container */
+  /* Site container with smooth scroll */
   .site{
     height:100%;overflow-y:auto;overflow-x:hidden;
     background:var(--bg);color:var(--text);font-family:var(--sans);
     position:relative;
     scrollbar-width:thin;scrollbar-color:#27272a transparent;
-    perspective: 1400px;
-    perspective-origin: 50% 30%;
+    perspective:1400px;perspective-origin:50% 30%;
+    scroll-behavior:smooth;
   }
   .site::-webkit-scrollbar{width:8px}
   .site::-webkit-scrollbar-thumb{background:#27272a;border-radius:4px}
   .site::-webkit-scrollbar-thumb:hover{background:var(--accent-dim)}
 
-  /* 3D background canvas — fixed within site, full bleed */
-  .bg-canvas{position:sticky;top:0;left:0;width:100%;height:100vh;display:block;margin-bottom:-100vh;z-index:0;pointer-events:none}
-  .desktop .bg-canvas{height:100%}
-  /* dot grid overlay */
-  .dot-grid{position:absolute;inset:0;z-index:1;pointer-events:none;background-image:radial-gradient(rgba(228,228,231,.05) 1px, transparent 1px);background-size:22px 22px;mask-image:radial-gradient(ellipse at center, black 30%, transparent 80%)}
+  /* WebGL canvas — pinned to viewport inside the device, content scrolls over it */
+  .stage{position:sticky;top:0;left:0;width:100%;height:100vh;display:block;margin-bottom:-100vh;z-index:0;pointer-events:none}
+  .desktop .stage{height:100%}
+  /* Loading hint */
+  .stage-loading{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:var(--accent);font-family:var(--mono);font-size:12px;opacity:.6;pointer-events:none;z-index:1}
+  .stage-loading.hide{display:none}
 
-  /* Vignette + scanline overlays for terminal feel */
+  /* Vignette + scanline */
   .vignette{position:sticky;top:0;left:0;width:100%;height:100vh;display:block;margin-bottom:-100vh;z-index:2;pointer-events:none;
-    background:
-      radial-gradient(ellipse at center, transparent 50%, rgba(9,9,11,.65) 100%),
-      repeating-linear-gradient(0deg, rgba(255,255,255,.012) 0 1px, transparent 1px 3px);
-  }
+    background:radial-gradient(ellipse at center, transparent 45%, rgba(6,7,10,.78) 100%),
+               repeating-linear-gradient(0deg, rgba(255,255,255,.012) 0 1px, transparent 1px 3px)}
   .desktop .vignette{height:100%}
 
   /* Nav */
-  .nav{position:sticky;top:0;z-index:30;backdrop-filter:blur(10px);background:rgba(9,9,11,.75);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:12px 28px;font-family:var(--mono);font-size:13px}
+  .nav{position:sticky;top:0;z-index:30;backdrop-filter:blur(12px);background:rgba(6,7,10,.7);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:12px 28px;font-family:var(--mono);font-size:13px}
   .mobile .nav{padding:12px 18px;font-size:12px}
   .nav .brand{color:var(--text)}
-  .nav .brand .arrow{color:var(--accent);margin-right:6px}
+  .nav .brand .arrow{color:var(--accent);margin-right:6px;text-shadow:0 0 12px var(--accent)}
   .nav .links{display:flex;gap:22px;margin-left:auto;color:var(--muted)}
   .nav .links a{color:var(--muted);text-decoration:none;transition:color .2s;cursor:pointer}
   .nav .links a:hover{color:var(--accent)}
@@ -90,10 +93,10 @@
   .nav .burger{margin-left:auto;color:var(--text);font-size:18px;display:none}
   .mobile .nav .burger{display:block}
 
-  /* Scroll-progress rail (desktop only) */
-  .rail{position:absolute;left:8px;top:80px;bottom:80px;width:14px;z-index:6;font-family:var(--mono);font-size:9px;color:var(--muted);letter-spacing:1px;display:flex;flex-direction:column;align-items:center;gap:2px;opacity:.6}
+  /* Scroll-progress rail */
+  .rail{position:absolute;left:8px;top:80px;bottom:80px;width:14px;z-index:6;font-family:var(--mono);font-size:9px;color:var(--muted);letter-spacing:1px;display:flex;flex-direction:column;align-items:center;gap:2px;opacity:.65}
   .mobile .rail{display:none}
-  .rail b{color:var(--accent);font-weight:400}
+  .rail b{color:var(--accent);font-weight:400;text-shadow:0 0 6px var(--accent)}
 
   /* Content */
   .container{position:relative;z-index:5;padding:0 36px;transform-style:preserve-3d}
@@ -104,9 +107,9 @@
   .mobile .hero{padding:48px 0 64px;min-height:auto}
   .prompt{font-family:var(--mono);color:var(--muted);font-size:13px;letter-spacing:.04em;margin-bottom:20px}
   .prompt .dollar{color:var(--accent);margin-right:8px}
-  .prompt .cursor{display:inline-block;width:8px;height:14px;background:var(--accent);margin-left:2px;vertical-align:middle;animation:blink 1s steps(2) infinite;box-shadow:0 0 8px var(--accent)}
+  .prompt .cursor{display:inline-block;width:8px;height:14px;background:var(--accent);margin-left:2px;vertical-align:middle;animation:blink 1s steps(2) infinite;box-shadow:0 0 10px var(--accent)}
   @keyframes blink{50%{opacity:0}}
-  .hero h1{font-family:var(--mono);font-weight:600;font-size:78px;line-height:.95;letter-spacing:-.02em;margin:0 0 16px;color:var(--text);overflow:hidden;white-space:nowrap;animation:type 1.6s steps(11,end) .3s both;text-shadow:0 0 30px rgba(228,228,231,.08)}
+  .hero h1{font-family:var(--mono);font-weight:600;font-size:78px;line-height:.95;letter-spacing:-.02em;margin:0 0 16px;color:var(--text);overflow:hidden;white-space:nowrap;animation:type 1.6s steps(11,end) .3s both;text-shadow:0 0 30px rgba(228,228,231,.1)}
   .mobile .hero h1{font-size:44px;white-space:normal;animation:none}
   @keyframes type{from{width:0}to{width:11ch}}
   .hero .rule{height:1px;width:120px;background:var(--border);margin:0 0 24px}
@@ -115,15 +118,11 @@
   .hero .meta{font-family:var(--mono);font-size:13px;color:var(--muted);margin-bottom:36px}
   .hero .meta b{color:var(--accent);font-weight:400}
   .ctas{display:flex;gap:14px;flex-wrap:wrap}
-  .btn{font-family:var(--mono);font-size:13px;border:1px solid var(--accent);color:var(--accent);padding:12px 22px;background:transparent;cursor:pointer;transition:transform .25s ease, background .2s, box-shadow .25s;text-decoration:none;display:inline-block}
-  .btn:hover{background:rgba(163,230,53,.08);box-shadow:0 0 24px rgba(163,230,53,.18);transform:translateY(-2px)}
-  .btn.ghost{border-color:var(--border);color:var(--text)}
-  .btn.ghost:hover{border-color:var(--text);background:rgba(255,255,255,.03)}
+  .btn{font-family:var(--mono);font-size:13px;border:1px solid var(--accent);color:var(--accent);padding:12px 22px;background:rgba(163,230,53,.04);cursor:pointer;transition:transform .25s ease, background .2s, box-shadow .25s;text-decoration:none;display:inline-block}
+  .btn:hover{background:rgba(163,230,53,.12);box-shadow:0 0 28px rgba(163,230,53,.25);transform:translateY(-2px)}
+  .btn.ghost{border-color:var(--border);color:var(--text);background:transparent}
+  .btn.ghost:hover{border-color:var(--text);background:rgba(255,255,255,.04)}
   .mobile .ctas .btn{flex:1;text-align:center}
-
-  /* 3D hero glyph canvas (real wireframe arrow) */
-  .glyph-3d{position:absolute;right:36px;top:80px;width:280px;height:280px;pointer-events:none;will-change:transform}
-  .mobile .glyph-3d{display:none}
 
   /* Sections */
   section{padding:80px 0;position:relative;will-change:transform,opacity;transform-style:preserve-3d}
@@ -137,14 +136,13 @@
   .label-rule::after{content:'';position:absolute;left:-100%;top:0;height:100%;width:60%;background:linear-gradient(90deg,transparent,var(--accent),transparent);animation:slide 3s ease-in-out infinite}
   @keyframes slide{0%,100%{left:-100%}50%{left:140%}}
 
-  /* Reveal w/ 3D enter */
-  .reveal{opacity:0;transform:rotateX(18deg) translateY(60px) translateZ(-120px);transition:opacity .9s ease, transform 1s cubic-bezier(.2,.8,.2,1)}
+  .reveal{opacity:0;transform:rotateX(20deg) translateY(70px) translateZ(-150px);transition:opacity .9s ease, transform 1s cubic-bezier(.2,.8,.2,1)}
   .reveal.in{opacity:1;transform:rotateX(0) translateY(0) translateZ(0)}
 
   /* About */
   .about-grid{display:grid;grid-template-columns:1.2fr 1fr;gap:36px;align-items:start}
   .mobile .about-grid{grid-template-columns:1fr;gap:24px}
-  .card{background:var(--surface);border:1px solid var(--border);padding:24px 26px;border-radius:6px;transition:border-color .2s, box-shadow .25s, transform .3s;backdrop-filter:blur(8px)}
+  .card{background:var(--surface);border:1px solid var(--border);padding:24px 26px;border-radius:6px;transition:border-color .2s, box-shadow .25s, transform .3s;backdrop-filter:blur(10px)}
   .card:hover{border-color:#3f3f46}
   .about p{color:#d4d4d8;line-height:1.7;margin:0 0 14px;font-size:15px;font-weight:300}
   .stack{font-family:var(--mono);font-size:13.5px;color:var(--muted);line-height:1.85}
@@ -156,37 +154,35 @@
   .stack .badge{margin-left:auto;color:var(--accent);font-size:11px}
 
   /* Featured work */
-  .work-card{background:var(--surface);border:1px solid var(--border);padding:30px 32px;border-radius:6px;margin-bottom:18px;position:relative;overflow:hidden;transition:transform .35s ease, border-color .25s, box-shadow .35s;backdrop-filter:blur(8px);transform-style:preserve-3d}
-  .work-card.featured-1{border-color:rgba(163,230,53,.35);box-shadow:0 0 0 1px rgba(163,230,53,.06)}
-  .work-card:hover{border-color:var(--accent);box-shadow:0 0 0 1px rgba(163,230,53,.18), 0 18px 48px -12px rgba(163,230,53,.22);transform:translateY(-2px)}
+  .work-card{background:var(--surface);border:1px solid var(--border);padding:30px 32px;border-radius:6px;margin-bottom:18px;position:relative;overflow:hidden;transition:transform .35s ease, border-color .25s, box-shadow .35s;backdrop-filter:blur(10px);transform-style:preserve-3d}
+  .work-card.featured-1{border-color:rgba(163,230,53,.4);box-shadow:0 0 0 1px rgba(163,230,53,.07), 0 0 40px -10px rgba(163,230,53,.15)}
+  .work-card:hover{border-color:var(--accent);box-shadow:0 0 0 1px rgba(163,230,53,.22), 0 18px 56px -12px rgba(163,230,53,.28);transform:translateY(-2px)}
   .work-head{display:flex;align-items:flex-start;gap:20px}
   .work-title{font-family:var(--mono);font-size:24px;color:var(--text);margin:0;font-weight:500}
   .mobile .work-title{font-size:18px}
-  .work-tag{display:inline-block;font-family:var(--mono);font-size:10px;color:var(--accent);border:1px solid rgba(163,230,53,.4);padding:2px 8px;border-radius:3px;margin-bottom:8px;letter-spacing:.05em}
+  .work-tag{display:inline-block;font-family:var(--mono);font-size:10px;color:var(--accent);border:1px solid rgba(163,230,53,.4);padding:2px 8px;border-radius:3px;margin-bottom:8px;letter-spacing:.05em;text-shadow:0 0 8px rgba(163,230,53,.5)}
   .work-rule{height:1px;width:80px;background:var(--accent);opacity:.5;margin:8px 0 14px}
   .work-card p{color:#d4d4d8;line-height:1.65;margin:0 0 16px;font-weight:300;font-size:14.5px}
   .stack-line{font-family:var(--mono);font-size:12.5px;color:var(--muted)}
   .stack-line span{color:#52525b;margin:0 6px}
   .live{margin-left:auto;font-family:var(--mono);font-size:12px;color:var(--accent);text-decoration:none;border:1px solid var(--accent);padding:6px 12px;border-radius:4px;white-space:nowrap;transition:background .2s;cursor:pointer}
-  .live:hover{background:rgba(163,230,53,.1)}
+  .live:hover{background:rgba(163,230,53,.12)}
 
-  .mini3d{width:160px;height:110px;flex-shrink:0;border:1px solid var(--border);border-radius:4px;background:radial-gradient(circle at 50% 60%, rgba(163,230,53,.18), transparent 70%), #0a0a0c;position:relative;overflow:hidden}
+  .mini3d{width:160px;height:110px;flex-shrink:0;border:1px solid var(--border);border-radius:4px;background:radial-gradient(circle at 50% 60%, rgba(163,230,53,.18), transparent 70%), #06070a;position:relative;overflow:hidden}
   .mobile .mini3d{width:100%;height:140px;margin-bottom:14px}
   .mini3d canvas{width:100%;height:100%;display:block}
   .mobile .work-head{flex-direction:column}
   .mobile .work-head .live{margin-left:0;margin-top:10px;align-self:flex-start}
 
-  /* More projects ASCII list */
   .more{margin-top:28px;font-family:var(--mono);font-size:13px;color:var(--muted);line-height:2.1}
   .more .head{color:var(--text);margin-bottom:6px;display:block}
-  .more .row{display:flex;align-items:center;padding:2px 8px;margin-left:-8px;border-radius:4px;cursor:default;transition:background .25s, color .2s;position:relative}
-  .more .row:hover{background:linear-gradient(90deg, rgba(163,230,53,.12), transparent);color:var(--text)}
+  .more .row{display:flex;align-items:center;padding:2px 8px;margin-left:-8px;border-radius:4px;cursor:default;transition:background .25s, color .2s}
+  .more .row:hover{background:linear-gradient(90deg, rgba(163,230,53,.14), transparent);color:var(--text)}
   .more .row .tree{color:#3f3f46;margin-right:10px}
   .more .row .desc{color:#52525b;margin:0 12px}
   .more .row .gh{margin-left:auto;color:var(--muted);text-decoration:none;font-size:12px;cursor:pointer}
   .more .row:hover .gh{color:var(--accent)}
 
-  /* Writing */
   .post{display:flex;align-items:baseline;gap:14px;padding:14px 8px;border-bottom:1px dashed #1c1c20;font-family:var(--mono);font-size:13.5px;color:var(--muted);text-decoration:none;transition:background .2s;cursor:pointer}
   .post:hover{background:rgba(163,230,53,.05)}
   .post .marker{color:var(--accent)}
@@ -199,13 +195,12 @@
   .mobile .post{flex-wrap:wrap;font-size:12.5px}
   .mobile .post .date{flex-basis:100%;margin-left:24px;font-size:11px}
 
-  /* Contact */
   .contact-wrap{display:grid;grid-template-columns:1fr auto;gap:36px;align-items:center}
   .mobile .contact-wrap{grid-template-columns:1fr;gap:24px}
   .echo{font-family:var(--mono);font-size:14px;color:var(--muted);margin-bottom:20px}
   .echo .dollar{color:var(--accent)}
   .email{font-family:var(--mono);font-size:22px;color:var(--text);text-decoration:none;border-bottom:1px solid var(--border);padding-bottom:6px;display:inline-block;transition:border-color .2s,color .2s;cursor:pointer}
-  .email:hover{color:var(--accent);border-color:var(--accent)}
+  .email:hover{color:var(--accent);border-color:var(--accent);text-shadow:0 0 12px var(--accent)}
   .mobile .email{font-size:15px;word-break:break-all}
   .socials{margin-top:22px;font-family:var(--mono);font-size:13px;display:flex;flex-wrap:wrap;gap:18px}
   .socials a{color:var(--muted);text-decoration:none;transition:color .2s;cursor:pointer}
@@ -215,29 +210,28 @@
   .orbit-canvas{width:240px;height:240px}
   .mobile .orbit-canvas{display:none}
 
-  /* Footer */
-  footer{border-top:1px solid var(--border);padding:24px 36px;font-family:var(--mono);font-size:12px;color:var(--muted);display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;position:relative;z-index:5}
+  footer{border-top:1px solid var(--border);padding:24px 36px;font-family:var(--mono);font-size:12px;color:var(--muted);display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;position:relative;z-index:5;background:rgba(6,7,10,.6);backdrop-filter:blur(8px)}
   .mobile footer{padding:20px;flex-direction:column}
-  footer .pulse{display:inline-block;width:8px;height:8px;background:var(--accent);border-radius:50%;margin-left:8px;animation:pulse 2s ease-in-out infinite}
-  @keyframes pulse{50%{opacity:.3;box-shadow:0 0 12px var(--accent)}}
+  footer .pulse{display:inline-block;width:8px;height:8px;background:var(--accent);border-radius:50%;margin-left:8px;animation:pulse 2s ease-in-out infinite;box-shadow:0 0 10px var(--accent)}
+  @keyframes pulse{50%{opacity:.3;box-shadow:0 0 16px var(--accent)}}
 
-  .disclaimer{max-width:1700px;margin:36px auto 0;padding:16px 8px;font-family:var(--mono);font-size:11px;color:#52525b;line-height:1.6}
+  .disclaimer{max-width:1700px;margin:36px auto 0;padding:16px 8px;font-family:var(--mono);font-size:11px;color:#52525b;line-height:1.7}
   .disclaimer b{color:var(--accent);font-weight:400}
+  .disclaimer a{color:#71717a;text-decoration:underline;text-decoration-color:#3f3f46}
 </style>
 </head>
 <body>
 
 <div class="preview-header">
-  <div class="crumb">// rohitweb / redesign / preview · v2 (3d + scroll motion)</div>
-  <h1>Terminal/dev redesign — perspective-projected 3D, scroll-driven</h1>
+  <div class="crumb">// rohitweb / redesign / preview · v3 (real three.js + scroll-driven camera)</div>
+  <h1>Code-corridor 3D — camera flies forward as you scroll</h1>
   <div class="sub">
-    <b>Real perspective 3D</b> wireframe terrain, hero arrow, and project meshes — all projected through a virtual camera that
-    <b>dollies forward as you scroll</b>. Sections enter with 3D rotateX + translateZ tied to scroll. Each project card carries a
-    rotating 3D mesh (icosahedron for Sadhak AI, house for Stay-a-While). The contact orbit is a real 3D ring.
-    Production build will swap canvas-2D for <b>React Three Fiber</b> + <b>GSAP ScrollTrigger</b>; this preview is faithful to the
-    motion language.
+    Real <b>WebGL via Three.js</b>. Each device frame runs an independent 3D scene: a long corridor of floating wireframe code-blocks, drifting glyph-particles,
+    fog-graded depth, and a hero <b>▸</b> arrow extruded in 3D. The camera's <b>z-position is locked to your scroll</b> — scroll, and you literally fly through the corridor.
+    Pattern lifted from how Sébastien Lempens, Bilal Elmossaoui, and Samsy build their portfolios in 2026.
   </div>
-  <div class="tip">▸ scroll inside either device frame — the camera flies forward and sections rotate into view.</div>
+  <div class="tip">▸ scroll inside either device — the world moves past you. Mouse-move adds parallax on desktop.</div>
+  <div class="refs">refs: <a>sébastien lempens</a> · <a>bilal elmossaoui</a> · <a>samsy</a> · <a>jordan breton</a> · <a>aimee's papercraft</a> — see notes at bottom.</div>
 </div>
 
 <div class="frames">
@@ -248,9 +242,9 @@
     <div class="device desktop">
       <div class="device-bar"><div class="dot"></div><div class="dot r"></div><div class="dot r"></div><span class="url">rohitweb.me</span></div>
       <div class="site" id="site-desktop" data-mode="desktop">
-        <canvas class="bg-canvas" data-bg="terrain"></canvas>
+        <canvas class="stage" data-stage></canvas>
+        <div class="stage-loading">▸ initialising webgl scene…</div>
         <div class="vignette"></div>
-        <div class="dot-grid"></div>
 
         <div class="rail" data-rail>
           <span data-rail-cell>▯</span><span data-rail-cell>▯</span><span data-rail-cell>▯</span><span data-rail-cell>▯</span><span data-rail-cell>▯</span><span data-rail-cell>▯</span><span data-rail-cell>▯</span><span data-rail-cell>▯</span>
@@ -264,7 +258,6 @@
 
         <div class="container">
           <section class="hero" data-hero>
-            <canvas class="glyph-3d" data-glyph="arrow"></canvas>
             <div class="prompt"><span class="dollar">$</span>whoami<span class="cursor"></span></div>
             <h1>ROHIT BHATT</h1>
             <div class="rule"></div>
@@ -310,7 +303,7 @@
                   <p>Privacy-focused chat with Google's Gemini. Google OAuth login, per-user persisted threads in Postgres, and assistant responses streamed via Server-Sent Events. Rolling-summary context management for long conversations.</p>
                   <div class="stack-line">flask <span>·</span> langchain <span>·</span> gemini <span>·</span> postgres <span>·</span> oauth</div>
                 </div>
-                <div class="mini3d"><canvas data-shape="icosa"></canvas></div>
+                <div class="mini3d"><canvas data-mini="icosa"></canvas></div>
                 <a class="live">[ github ↗ ]</a>
               </div>
             </div>
@@ -323,7 +316,7 @@
                   <p>Home-stay reservation app — booking flow, host dashboards, payments UI.</p>
                   <div class="stack-line">rails <span>·</span> react <span>·</span> redux <span>·</span> postgres</div>
                 </div>
-                <div class="mini3d"><canvas data-shape="house"></canvas></div>
+                <div class="mini3d"><canvas data-mini="house"></canvas></div>
                 <a class="live">[ live ↗ ]</a>
               </div>
             </div>
@@ -377,9 +370,9 @@
     <div class="device mobile">
       <div class="device-bar"><div class="dot"></div><div class="dot r"></div><div class="dot r"></div><span class="url">rohitweb.me</span></div>
       <div class="site mobile" id="site-mobile" data-mode="mobile">
-        <canvas class="bg-canvas" data-bg="terrain"></canvas>
+        <canvas class="stage" data-stage></canvas>
+        <div class="stage-loading">▸ webgl…</div>
         <div class="vignette"></div>
-        <div class="dot-grid"></div>
 
         <nav class="nav">
           <span class="brand"><span class="arrow">▸</span>rohit.bhatt</span>
@@ -425,7 +418,7 @@
             <div class="work-card featured-1">
               <div class="work-head">
                 <div style="flex:1;width:100%">
-                  <div class="mini3d"><canvas data-shape="icosa"></canvas></div>
+                  <div class="mini3d"><canvas data-mini="icosa"></canvas></div>
                   <span class="work-tag">latest · ai</span>
                   <h3 class="work-title">sadhak_ai/</h3>
                   <div class="work-rule"></div>
@@ -439,7 +432,7 @@
             <div class="work-card">
               <div class="work-head">
                 <div style="flex:1;width:100%">
-                  <div class="mini3d"><canvas data-shape="house"></canvas></div>
+                  <div class="mini3d"><canvas data-mini="house"></canvas></div>
                   <h3 class="work-title">stay_a_while/</h3>
                   <div class="work-rule"></div>
                   <p>Home-stay reservation app — booking flow, host dashboards.</p>
@@ -491,407 +484,450 @@
 </div>
 
 <div class="disclaimer">
-  // v2 — adds true perspective-projected 3D (terrain + arrow glyph + meshes + orbit), scroll-driven camera dolly,
-  3D rotateX section reveals, parallax title, and Sadhak AI as featured project. Email updated to <b>rohit.bhatt.dev@gmail.com</b>.
-  Production build replaces canvas-2D with <b>R3F + drei + postprocessing (bloom)</b> and <b>GSAP ScrollTrigger</b>.
+  // v3 — real <b>three.js WebGL</b> code-corridor scene; camera dolly tied to scroll position, mouse parallax, fog-graded
+  depth, drifting glyph particles, extruded ▸ hero glyph, and per-card meshes (icosahedron / house) all rendered in WebGL.
+  Inspired by how 2026 dev portfolios use scroll-driven camera paths
+  (<a>Sébastien Lempens</a>, <a>Bilal Elmossaoui</a>, <a>Samsy</a>, <a>Jordan Breton's flying island</a>).
+  Production build will use <b>React Three Fiber + drei + postprocessing (UnrealBloom)</b> + <b>GSAP ScrollTrigger</b> for choreographed
+  scroll sequences and <b>Lenis</b> for smooth inertial scroll. Email: <b>rohit.bhatt.dev@gmail.com</b>. Featured project: <b>sadhak_ai</b>.
 </div>
 
-<script>
-/* ═══════════════════════════════════════════════════════════════════════
-   Tiny perspective projection helper.
-   World coords: +x right, +y up, -z into screen.
-   Camera at (0, camY, camZ) looking down -Z.
-   ═══════════════════════════════════════════════════════════════════════ */
-function makeCamera(opts){
-  return Object.assign({ x:0, y:2, z:0, fov:65, ...opts });
-}
-function project(px, py, pz, cam, w, h){
-  // rotate around X (camera pitch)
-  const cx = cam.pitch || 0;
-  const cosP = Math.cos(cx), sinP = Math.sin(cx);
-  // translate to camera space
-  const tx = px - cam.x;
-  const ty = py - cam.y;
-  const tz = pz - cam.z;
-  // pitch: y' = y*cosP - z*sinP; z' = y*sinP + z*cosP
-  const ry = ty*cosP - tz*sinP;
-  const rz = ty*sinP + tz*cosP;
-  // forward axis is -Z; require rz < 0 for in-front
-  if(rz >= -0.05) return null;
-  const f = 1 / Math.tan(cam.fov/2 * Math.PI/180);
-  const sx = (tx * f / -rz);
-  const sy = (ry * f / -rz);
-  return { x: w/2 + sx*w*0.5, y: h/2 - sy*w*0.5, depth: -rz };
-}
+<script type="module">
+import * as THREE from 'three';
 
 /* ═══════════════════════════════════════════════════════════════════════
-   Background: perspective-projected wireframe terrain.
-   Terrain noise scrolls toward camera proportional to time + scrollProgress.
+   Code-corridor scene. Camera Z is bound to scroll progress so the world
+   physically flies past you as you scroll. Each side has a procedurally
+   generated wall of wireframe "code blocks" (random rectangles) and a
+   floor/ceiling grid. Particles drift forward, glyph sprites float along
+   the path, and a hero ▸ extruded mesh sits ahead of camera at start.
    ═══════════════════════════════════════════════════════════════════════ */
-function startTerrain(canvas, getScroll){
-  const ctx = canvas.getContext('2d');
-  const cam = makeCamera({ y: 1.6, z: 1, pitch: -0.18, fov: 70 });
-  let w=0, h=0, dpr=1;
-  function resize(){
-    const r = canvas.getBoundingClientRect();
-    dpr = Math.min(window.devicePixelRatio||1, 2);
-    canvas.width = r.width*dpr; canvas.height = r.height*dpr;
-    ctx.setTransform(dpr,0,0,dpr,0,0);
-    w = r.width; h = r.height;
-  }
-  resize();
-  new ResizeObserver(resize).observe(canvas);
-  // grid
-  const cols = 41;     // x: -20..20
-  const rows = 36;     // z: -36..0
-  const spacing = 1.2;
-  function noise(x, z){
-    return Math.sin(x*0.55 + z*0.7)*0.25
-         + Math.cos(x*0.31 - z*0.43)*0.18
-         + Math.sin((x+z)*0.22)*0.12;
-  }
-  let t=0, lastTs=0;
-  function frame(ts){
-    const dt = Math.min(0.05,(ts-lastTs)/1000 || 0.016); lastTs=ts;
-    const scroll = getScroll(); // 0..1
-    t += dt * (1 + scroll*4);   // accelerate with scroll
-    ctx.clearRect(0,0,w,h);
-    // particles in sky
-    ctx.fillStyle = 'rgba(163,230,53,0.45)';
-    ctx.font = '11px JetBrains Mono, monospace';
-    const glyphs = ['>','_','{','}',';','/','·','#','$','▸'];
-    for(let k=0;k<28;k++){
-      const seed = k*131.7;
-      const gx = ((seed + t*60) % (w+80)) - 40;
-      const gy = (((seed*0.7) - t*40) % (h*0.55) + h*0.55) - 40;
-      const a = 0.18 + 0.4*Math.abs(Math.sin(seed + t));
-      ctx.globalAlpha = a;
-      ctx.fillText(glyphs[k % glyphs.length], gx, gy);
-    }
-    ctx.globalAlpha = 1;
-    // project terrain
-    const offset = -t * 2.4;  // scroll terrain toward camera
-    const pts = [];
-    for(let j=0;j<rows;j++){
-      const row = [];
-      for(let i=0;i<cols;i++){
-        const wx = (i - (cols-1)/2) * spacing;
-        const baseZ = (j - (rows-1)) * spacing; // 0..-(rows-1)*spacing
-        const wz = baseZ + (offset % spacing);  // smooth scroll
-        const wy = noise(wx, wz - offset) * 0.9 - 1.2;
-        row.push(project(wx, wy, wz, cam, w, h));
-      }
-      pts.push(row);
-    }
-    // draw lines
-    ctx.lineWidth = 1;
-    for(let j=0;j<rows;j++){
-      for(let i=0;i<cols;i++){
-        const p = pts[j][i]; if(!p) continue;
-        const fade = Math.max(0, 1 - p.depth/40);
-        const horiz = (i<cols-1) ? pts[j][i+1] : null;
-        const vert  = (j<rows-1) ? pts[j+1][i] : null;
-        if(horiz){
-          const fade2 = Math.max(0, 1 - horiz.depth/40);
-          const a = (fade+fade2)*0.5;
-          ctx.strokeStyle = `rgba(163,230,53,${0.05 + a*0.45})`;
-          ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(horiz.x, horiz.y); ctx.stroke();
-        }
-        if(vert){
-          const fade2 = Math.max(0, 1 - vert.depth/40);
-          const a = (fade+fade2)*0.5;
-          ctx.strokeStyle = `rgba(163,230,53,${0.04 + a*0.32})`;
-          ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(vert.x, vert.y); ctx.stroke();
-        }
-      }
-    }
-    requestAnimationFrame(frame);
-  }
-  requestAnimationFrame(frame);
-}
+class Corridor {
+  constructor(canvas, site, { lowFi = false } = {}){
+    this.canvas = canvas; this.site = site; this.lowFi = lowFi;
+    this.scrollT = 0;       // 0..1
+    this.smoothScrollT = 0; // smoothed
+    this.mouse = { x:0, y:0 };
+    this.mouseTarget = { x:0, y:0 };
+    this.disposed = false;
+    this.length = 220;      // world Z length
 
-/* ═══════════════════════════════════════════════════════════════════════
-   Hero glyph: 3D extruded ▸ arrow, rotates with scroll.
-   ═══════════════════════════════════════════════════════════════════════ */
-function startGlyph(canvas, getScroll){
-  const ctx = canvas.getContext('2d');
-  let w=0,h=0;
-  function resize(){
-    const r = canvas.getBoundingClientRect();
-    const dpr = Math.min(window.devicePixelRatio||1, 2);
-    canvas.width = r.width*dpr; canvas.height = r.height*dpr;
-    ctx.setTransform(dpr,0,0,dpr,0,0);
-    w = r.width; h = r.height;
+    this.renderer = new THREE.WebGLRenderer({ canvas, antialias:!lowFi, alpha:true, powerPreference:'high-performance' });
+    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio||1, lowFi?1.25:2));
+    this.renderer.setClearColor(0x06070a, 1);
+
+    this.scene = new THREE.Scene();
+    this.scene.fog = new THREE.Fog(0x06070a, 6, lowFi?55:90);
+
+    this.camera = new THREE.PerspectiveCamera(72, 1, 0.05, 300);
+    this.camera.position.set(0, 0.4, 4);
+
+    this._buildWalls();
+    this._buildFloorCeil();
+    this._buildHero();
+    this._buildParticles();
+    this._buildGlyphTokens();
+    this._buildCheckpoints();
+
+    this._resize();
+    this._ro = new ResizeObserver(()=>this._resize());
+    this._ro.observe(canvas);
+
+    this._onScroll = ()=>{
+      const sh = site.scrollHeight - site.clientHeight;
+      this.scrollT = sh>0 ? Math.min(1, Math.max(0, site.scrollTop/sh)) : 0;
+    };
+    site.addEventListener('scroll', this._onScroll, { passive:true });
+    this._onScroll();
+
+    if(!lowFi){
+      this._onMove = (e)=>{
+        const r = canvas.getBoundingClientRect();
+        this.mouseTarget.x = ((e.clientX - r.left)/r.width - 0.5) * 2;
+        this.mouseTarget.y = ((e.clientY - r.top)/r.height - 0.5) * 2;
+      };
+      canvas.parentElement.addEventListener('mousemove', this._onMove);
+    }
+
+    this._tick = this._tick.bind(this);
+    this._lastTs = 0;
+    this._raf = requestAnimationFrame(this._tick);
   }
-  resize();
-  new ResizeObserver(resize).observe(canvas);
-  // arrow ▸ : an extruded triangular prism
-  const front = [[-0.6,-0.7,0.3],[0.7,0,0.3],[-0.6,0.7,0.3]];
-  const back  = [[-0.6,-0.7,-0.3],[0.7,0,-0.3],[-0.6,0.7,-0.3]];
-  const verts = [...front, ...back];
-  const edges = [
-    [0,1],[1,2],[2,0],          // front
-    [3,4],[4,5],[5,3],          // back
-    [0,3],[1,4],[2,5]           // sides
-  ];
-  let t=0;
-  function loop(){
-    t += 0.012;
-    const s = getScroll();
-    ctx.clearRect(0,0,w,h);
-    const cx = w/2, cy = h/2;
-    const scale = Math.min(w,h)*0.42;
-    const ry = t*0.6 + s*Math.PI*3;     // scroll spins it
-    const rx = Math.sin(t*0.4)*0.3 + s*0.6;
-    const cosY=Math.cos(ry), sinY=Math.sin(ry);
-    const cosX=Math.cos(rx), sinX=Math.sin(rx);
-    const proj = verts.map(([x,y,z])=>{
-      let xr = x*cosY - z*sinY;
-      let zr = x*sinY + z*cosY;
-      let yr = y*cosX - zr*sinX;
-      zr   = y*sinX + zr*cosX;
-      const persp = 2.6 / (3 - zr);
-      return [cx + xr*scale*persp, cy + yr*scale*persp, zr];
+
+  _resize(){
+    const r = this.canvas.getBoundingClientRect();
+    if(!r.width||!r.height) return;
+    this.renderer.setSize(r.width, r.height, false);
+    this.camera.aspect = r.width / r.height;
+    this.camera.updateProjectionMatrix();
+  }
+
+  _buildWalls(){
+    const blocks = this.lowFi ? 70 : 140;
+    const group = new THREE.Group();
+    const matBright = new THREE.LineBasicMaterial({ color: 0xa3e635, transparent:true, opacity:0.55 });
+    const matDim = new THREE.LineBasicMaterial({ color: 0x65a30d, transparent:true, opacity:0.32 });
+    for(let i=0;i<blocks;i++){
+      const sideLeft = i % 2 === 0;
+      const z = -2 - (i / blocks) * this.length;
+      const w = 0.3 + Math.random()*1.6;
+      const h = 0.25 + Math.random()*1.3;
+      const d = 0.15 + Math.random()*0.4;
+      const geo = new THREE.BoxGeometry(d, h, w);
+      const edges = new THREE.EdgesGeometry(geo);
+      const mat = (i % 7 === 0) ? matBright : matDim;
+      const block = new THREE.LineSegments(edges, mat);
+      const xBase = sideLeft ? -2.6 : 2.6;
+      block.position.set(
+        xBase + (Math.random()-0.5)*1.4,
+        (Math.random()-0.5)*2.6,
+        z + (Math.random()-0.5)*1.2
+      );
+      block.rotation.y = (Math.random()-0.5)*0.4;
+      block.userData.bobAmp = 0.08 + Math.random()*0.18;
+      block.userData.bobPhase = Math.random()*Math.PI*2;
+      group.add(block);
+    }
+    this.walls = group;
+    this.scene.add(group);
+  }
+
+  _buildFloorCeil(){
+    const segX = 14, segZ = this.lowFi ? 50 : 90;
+    const planeGeo = new THREE.PlaneGeometry(14, this.length, segX, segZ);
+    const wireGeo = new THREE.WireframeGeometry(planeGeo);
+    const mat = new THREE.LineBasicMaterial({ color: 0x65a30d, transparent:true, opacity:0.18 });
+    const floor = new THREE.LineSegments(wireGeo, mat);
+    floor.rotation.x = -Math.PI/2;
+    floor.position.set(0, -2.2, -this.length/2 + 2);
+    this.scene.add(floor);
+    const ceil = floor.clone();
+    ceil.position.y = 2.4;
+    ceil.rotation.x = Math.PI/2;
+    this.scene.add(ceil);
+    this.floor = floor; this.ceil = ceil;
+  }
+
+  _buildHero(){
+    // Extruded ▸ arrow
+    const sh = new THREE.Shape();
+    sh.moveTo(-0.6, -0.7);
+    sh.lineTo(0.7, 0);
+    sh.lineTo(-0.6, 0.7);
+    sh.lineTo(-0.6, -0.7);
+    const geo = new THREE.ExtrudeGeometry(sh, { depth: 0.32, bevelEnabled:false });
+    geo.translate(-0.05, 0, -0.16);
+    const wireGeo = new THREE.EdgesGeometry(geo);
+    const mat = new THREE.LineBasicMaterial({ color: 0xa3e635 });
+    this.hero = new THREE.LineSegments(wireGeo, mat);
+    this.hero.position.set(1.5, 0.4, -1.5);
+    this.scene.add(this.hero);
+
+    // Solid wireframe overlay for double-glow effect
+    const inner = new THREE.Mesh(geo, new THREE.MeshBasicMaterial({ color: 0xa3e635, wireframe:true, transparent:true, opacity:0.35 }));
+    this.hero.add(inner);
+  }
+
+  _buildParticles(){
+    const N = this.lowFi ? 200 : 500;
+    const positions = new Float32Array(N*3);
+    const speeds = new Float32Array(N);
+    for(let i=0;i<N;i++){
+      positions[i*3]   = (Math.random()-0.5) * 9;
+      positions[i*3+1] = (Math.random()-0.5) * 4.5;
+      positions[i*3+2] = -Math.random() * this.length;
+      speeds[i] = 0.6 + Math.random()*1.6;
+    }
+    const geo = new THREE.BufferGeometry();
+    geo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+    const mat = new THREE.PointsMaterial({
+      color: 0xa3e635, size: this.lowFi?0.05:0.045, transparent:true, opacity:0.85,
+      blending: THREE.AdditiveBlending, depthWrite:false
     });
-    // glow halo
-    const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, scale*1.4);
-    grad.addColorStop(0,'rgba(163,230,53,0.35)');
-    grad.addColorStop(1,'rgba(163,230,53,0)');
-    ctx.fillStyle = grad;
-    ctx.fillRect(0,0,w,h);
-    // edges
-    ctx.strokeStyle = 'rgba(163,230,53,0.95)';
-    ctx.lineWidth = 1.6;
-    ctx.beginPath();
-    for(const [a,b] of edges){
-      const pa=proj[a], pb=proj[b];
-      ctx.moveTo(pa[0],pa[1]); ctx.lineTo(pb[0],pb[1]);
-    }
-    ctx.stroke();
-    // vertex glow
-    ctx.fillStyle = 'rgba(163,230,53,1)';
-    for(const p of proj){
-      ctx.beginPath(); ctx.arc(p[0],p[1],1.8,0,Math.PI*2); ctx.fill();
-    }
-    requestAnimationFrame(loop);
+    this.particles = new THREE.Points(geo, mat);
+    this.particles.userData.speeds = speeds;
+    this.scene.add(this.particles);
   }
-  loop();
-}
 
-/* ═══════════════════════════════════════════════════════════════════════
-   Per-card mini 3D meshes.
-   ═══════════════════════════════════════════════════════════════════════ */
-function buildIcosa(){
-  const phi = (1+Math.sqrt(5))/2;
-  const v = [
-    [-1, phi, 0],[ 1, phi, 0],[-1,-phi, 0],[ 1,-phi, 0],
-    [0,-1, phi],[0, 1, phi],[0,-1,-phi],[0, 1,-phi],
-    [ phi, 0,-1],[ phi, 0, 1],[-phi, 0,-1],[-phi, 0, 1]
-  ].map(p=>p.map(c=>c*0.6));
-  const e = [
-    [0,1],[0,5],[0,7],[0,10],[0,11],
-    [1,5],[1,7],[1,8],[1,9],
-    [2,3],[2,4],[2,6],[2,10],[2,11],
-    [3,4],[3,6],[3,8],[3,9],
-    [4,5],[4,9],[4,11],
-    [5,9],[5,11],
-    [6,7],[6,8],[6,10],
-    [7,8],[7,10],
-    [8,9],[10,11]
-  ];
-  return {v,e};
-}
-const SHAPES = {
-  icosa: buildIcosa(),
-  house: {
-    v: [[-1,-1, 1],[1,-1, 1],[1, 1, 1],[-1, 1, 1],[-1,-1,-1],[1,-1,-1],[1, 1,-1],[-1, 1,-1],[-1, 1, 1],[0, 1.8, 1],[1, 1, 1],[-1, 1,-1],[0, 1.8,-1],[1, 1,-1]],
-    e: [[0,1],[1,2],[2,3],[3,0],[4,5],[5,6],[6,7],[7,4],[0,4],[1,5],[2,6],[3,7],[8,9],[9,10],[11,12],[12,13],[9,12]]
-  }
-};
-function startMini(canvas){
-  const ctx = canvas.getContext('2d');
-  const shape = SHAPES[canvas.dataset.shape] || SHAPES.house;
-  let w,h;
-  function resize(){
-    const r = canvas.getBoundingClientRect();
-    const dpr = Math.min(window.devicePixelRatio||1, 2);
-    canvas.width = r.width*dpr; canvas.height = r.height*dpr;
-    ctx.setTransform(dpr,0,0,dpr,0,0);
-    w = r.width; h = r.height;
-  }
-  resize();
-  new ResizeObserver(resize).observe(canvas);
-  let t=0;
-  function loop(){
-    t += 0.014;
-    ctx.clearRect(0,0,w,h);
-    const cx=w/2, cy=h/2;
-    const scale = Math.min(w,h)*0.32;
-    const cosY=Math.cos(t), sinY=Math.sin(t);
-    const cosX=Math.cos(t*0.4), sinX=Math.sin(t*0.4);
-    const proj = shape.v.map(([x,y,z])=>{
-      let xr = x*cosY - z*sinY;
-      let zr = x*sinY + z*cosY;
-      let yr = y*cosX - zr*sinX;
-      zr   = y*sinX + zr*cosX;
-      const persp = 3 / (3 - zr);
-      return [cx + xr*scale*persp, cy + yr*scale*persp, zr];
-    });
-    ctx.strokeStyle = 'rgba(163,230,53,0.88)';
-    ctx.lineWidth = 1.1;
-    ctx.beginPath();
-    for(const [a,b] of shape.e){
-      const pa=proj[a], pb=proj[b];
-      ctx.moveTo(pa[0],pa[1]); ctx.lineTo(pb[0],pb[1]);
-    }
-    ctx.stroke();
-    ctx.fillStyle = 'rgba(163,230,53,0.95)';
-    for(const p of proj){
-      ctx.beginPath(); ctx.arc(p[0],p[1],1.3,0,Math.PI*2); ctx.fill();
-    }
-    requestAnimationFrame(loop);
-  }
-  loop();
-}
-
-/* ═══════════════════════════════════════════════════════════════════════
-   Contact orbit: 3D ring with 4 social nodes orbiting a center.
-   ═══════════════════════════════════════════════════════════════════════ */
-function startOrbit(canvas){
-  const ctx = canvas.getContext('2d');
-  let w,h;
-  function resize(){
-    const r = canvas.getBoundingClientRect();
-    const dpr = Math.min(window.devicePixelRatio||1, 2);
-    canvas.width = r.width*dpr; canvas.height = r.height*dpr;
-    ctx.setTransform(dpr,0,0,dpr,0,0);
-    w = r.width; h = r.height;
-  }
-  resize();
-  new ResizeObserver(resize).observe(canvas);
-  const labels = ['gh','in','𝕏','m'];
-  let t=0;
-  function loop(){
-    t += 0.012;
-    ctx.clearRect(0,0,w,h);
-    const cx=w/2, cy=h/2;
-    const R = Math.min(w,h)*0.36;
-    // tilted ring (rotate around X)
-    const tilt = 0.6;
-    const cosT=Math.cos(tilt), sinT=Math.sin(tilt);
-    // ring path
-    ctx.strokeStyle='rgba(163,230,53,0.35)';
-    ctx.lineWidth=1; ctx.setLineDash([3,4]); ctx.beginPath();
-    for(let a=0;a<=Math.PI*2+0.01;a+=0.05){
-      const x = Math.cos(a)*R, y = 0, z = Math.sin(a)*R;
-      const ry = y*cosT - z*sinT;
-      const rz = y*sinT + z*cosT;
-      const persp = 2 / (2.4 - rz/R);
-      const px = cx + x*persp, py = cy + ry*persp;
-      if(a===0) ctx.moveTo(px,py); else ctx.lineTo(px,py);
-    }
-    ctx.stroke(); ctx.setLineDash([]);
-    // center node
-    const grad = ctx.createRadialGradient(cx,cy,0,cx,cy,30);
-    grad.addColorStop(0,'rgba(163,230,53,0.55)');
-    grad.addColorStop(1,'rgba(163,230,53,0)');
-    ctx.fillStyle = grad;
-    ctx.beginPath(); ctx.arc(cx,cy,30,0,Math.PI*2); ctx.fill();
-    ctx.fillStyle='rgba(163,230,53,1)';
-    ctx.beginPath(); ctx.arc(cx,cy,3,0,Math.PI*2); ctx.fill();
-    // orbiting icons
-    const sorted = [];
-    for(let k=0;k<4;k++){
-      const a = t + k*Math.PI/2;
-      const x = Math.cos(a)*R, y = 0, z = Math.sin(a)*R;
-      const ry = y*cosT - z*sinT;
-      const rz = y*sinT + z*cosT;
-      const persp = 2 / (2.4 - rz/R);
-      sorted.push({ x: cx + x*persp, y: cy + ry*persp, z: rz, label: labels[k], persp });
-    }
-    sorted.sort((a,b)=>a.z-b.z);
-    for(const s of sorted){
-      const sz = 14 + 6*s.persp;
-      ctx.fillStyle = '#0a0a0c';
-      ctx.strokeStyle = 'rgba(163,230,53,1)';
-      ctx.lineWidth = 1.2;
-      ctx.beginPath(); ctx.arc(s.x, s.y, sz, 0, Math.PI*2); ctx.fill(); ctx.stroke();
+  _buildGlyphTokens(){
+    if(this.lowFi) return;
+    const glyphs = ['{ }','( )','[ ]','=>','<>','</>','01','▸','$_','#!','&&','->'];
+    const group = new THREE.Group();
+    for(let i=0;i<28;i++){
+      const txt = glyphs[i % glyphs.length];
+      const c = document.createElement('canvas');
+      c.width = 256; c.height = 128;
+      const ctx = c.getContext('2d');
       ctx.fillStyle = 'rgba(163,230,53,1)';
-      ctx.font = `${Math.round(sz*0.7)}px JetBrains Mono, monospace`;
-      ctx.textAlign='center'; ctx.textBaseline='middle';
-      ctx.fillText(s.label, s.x, s.y+1);
+      ctx.font = '600 64px JetBrains Mono, monospace';
+      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.shadowColor = 'rgba(163,230,53,0.7)'; ctx.shadowBlur = 18;
+      ctx.fillText(txt, 128, 64);
+      const tex = new THREE.CanvasTexture(c);
+      tex.minFilter = THREE.LinearFilter;
+      const mat = new THREE.SpriteMaterial({ map: tex, transparent:true, depthWrite:false, blending: THREE.AdditiveBlending });
+      const sp = new THREE.Sprite(mat);
+      const side = i % 2 === 0 ? -1 : 1;
+      sp.position.set(side * (1.6 + Math.random()*1.2), (Math.random()-0.5)*2.4, -3 - (i / 28) * this.length);
+      sp.scale.set(1.4, 0.7, 1);
+      sp.userData.bobAmp = 0.1 + Math.random()*0.2;
+      sp.userData.bobPhase = Math.random()*Math.PI*2;
+      group.add(sp);
     }
-    requestAnimationFrame(loop);
+    this.glyphs = group;
+    this.scene.add(group);
   }
-  loop();
+
+  _buildCheckpoints(){
+    // Glowing rings every ~40 units (visual "section" markers along corridor)
+    const ringGeo = new THREE.RingGeometry(2.3, 2.5, 64);
+    const mat = new THREE.MeshBasicMaterial({ color: 0xa3e635, transparent:true, opacity:0.35, side: THREE.DoubleSide });
+    this.rings = [];
+    const count = 5;
+    for(let i=0;i<count;i++){
+      const r = new THREE.Mesh(ringGeo, mat);
+      r.position.set(0, 0.1, -8 - (i/(count-1)) * (this.length-20));
+      r.userData.basePhase = i;
+      this.scene.add(r);
+      this.rings.push(r);
+    }
+  }
+
+  _tick(ts){
+    if(this.disposed) return;
+    const dt = Math.min(0.05, (ts - this._lastTs)/1000 || 0.016);
+    this._lastTs = ts;
+
+    // Smooth scroll progress
+    this.smoothScrollT += (this.scrollT - this.smoothScrollT) * Math.min(1, dt*8);
+    // Smooth mouse
+    this.mouse.x += (this.mouseTarget.x - this.mouse.x) * Math.min(1, dt*4);
+    this.mouse.y += (this.mouseTarget.y - this.mouse.y) * Math.min(1, dt*4);
+
+    // Camera dolly
+    const targetZ = 4 - this.smoothScrollT * (this.length - 20);
+    this.camera.position.z = targetZ;
+    this.camera.position.x = this.mouse.x * 0.6;
+    this.camera.position.y = 0.4 - this.mouse.y * 0.4;
+    this.camera.lookAt(this.mouse.x*0.3, this.mouse.y*-0.2, this.camera.position.z - 5);
+
+    // Hero arrow follows camera + spins on scroll
+    if(this.hero){
+      this.hero.position.z = this.camera.position.z - 3.6;
+      this.hero.position.x = 1.4 - this.smoothScrollT * 4;
+      this.hero.rotation.y = ts*0.0008 + this.smoothScrollT * Math.PI * 4;
+      this.hero.rotation.x = Math.sin(ts*0.0006) * 0.2;
+    }
+
+    // Wall blocks bob
+    if(this.walls){
+      for(const b of this.walls.children){
+        b.position.y += Math.sin(ts*0.0009 + b.userData.bobPhase) * b.userData.bobAmp * dt;
+      }
+    }
+
+    // Glyph sprites bob
+    if(this.glyphs){
+      for(const g of this.glyphs.children){
+        g.material.opacity = 0.55 + 0.45*Math.sin(ts*0.0014 + g.userData.bobPhase);
+      }
+    }
+
+    // Particles drift forward (toward camera, recycle behind)
+    if(this.particles){
+      const arr = this.particles.geometry.attributes.position.array;
+      const speeds = this.particles.userData.speeds;
+      const camZ = this.camera.position.z;
+      for(let i=0;i<arr.length;i+=3){
+        arr[i+2] += speeds[i/3] * dt * (1 + this.scrollT*1.2);
+        if(arr[i+2] > camZ + 4){
+          arr[i]   = (Math.random()-0.5) * 9;
+          arr[i+1] = (Math.random()-0.5) * 4.5;
+          arr[i+2] = camZ - this.length;
+        }
+      }
+      this.particles.geometry.attributes.position.needsUpdate = true;
+    }
+
+    // Rings pulse
+    for(const r of this.rings){
+      r.material.opacity = 0.18 + 0.35*Math.abs(Math.sin(ts*0.001 + r.userData.basePhase));
+      r.rotation.z += dt * 0.3;
+    }
+
+    this.renderer.render(this.scene, this.camera);
+    this._raf = requestAnimationFrame(this._tick);
+  }
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
-   Per-site scroll wiring.
+   Per-card mini scene (rotating wireframe primitive).
+   ═══════════════════════════════════════════════════════════════════════ */
+function makeMini(canvas, kind){
+  const renderer = new THREE.WebGLRenderer({ canvas, alpha:true, antialias:true });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio||1, 2));
+  renderer.setClearColor(0x000000, 0);
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 50);
+  camera.position.set(0, 0, 4);
+  let mesh;
+  const matLine = new THREE.LineBasicMaterial({ color: 0xa3e635 });
+  if(kind === 'icosa'){
+    const g = new THREE.IcosahedronGeometry(1.1, 0);
+    mesh = new THREE.LineSegments(new THREE.EdgesGeometry(g), matLine);
+    const inner = new THREE.Mesh(g, new THREE.MeshBasicMaterial({ color: 0xa3e635, wireframe:true, transparent:true, opacity:0.3 }));
+    mesh.add(inner);
+  } else {
+    // house
+    const verts = [[-1,-1,1],[1,-1,1],[1,1,1],[-1,1,1],[-1,-1,-1],[1,-1,-1],[1,1,-1],[-1,1,-1],[0,1.7,1],[0,1.7,-1]];
+    const idx = [0,1,1,2,2,3,3,0,4,5,5,6,6,7,7,4,0,4,1,5,2,6,3,7,3,8,2,8,8,9,9,7,9,6];
+    const positions = new Float32Array(idx.length*3);
+    for(let i=0;i<idx.length;i++){
+      positions[i*3]=verts[idx[i]][0]; positions[i*3+1]=verts[idx[i]][1]; positions[i*3+2]=verts[idx[i]][2];
+    }
+    const geo = new THREE.BufferGeometry();
+    geo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+    mesh = new THREE.LineSegments(geo, matLine);
+  }
+  scene.add(mesh);
+
+  function resize(){
+    const r = canvas.getBoundingClientRect();
+    if(!r.width||!r.height) return;
+    renderer.setSize(r.width, r.height, false);
+    camera.aspect = r.width / r.height;
+    camera.updateProjectionMatrix();
+  }
+  resize();
+  new ResizeObserver(resize).observe(canvas);
+
+  function loop(ts){
+    mesh.rotation.y = ts*0.0009;
+    mesh.rotation.x = Math.sin(ts*0.0005)*0.5;
+    renderer.render(scene, camera);
+    requestAnimationFrame(loop);
+  }
+  requestAnimationFrame(loop);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   Contact orbit — 3D ring with depth-sorted nodes.
+   ═══════════════════════════════════════════════════════════════════════ */
+function makeOrbit(canvas){
+  const renderer = new THREE.WebGLRenderer({ canvas, alpha:true, antialias:true });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio||1, 2));
+  renderer.setClearColor(0x000000, 0);
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 50);
+  camera.position.set(0, 1.4, 3.2);
+  camera.lookAt(0,0,0);
+
+  // ring
+  const ringGeo = new THREE.RingGeometry(1.0, 1.05, 80);
+  const ring = new THREE.Mesh(ringGeo, new THREE.MeshBasicMaterial({ color:0xa3e635, side:THREE.DoubleSide, transparent:true, opacity:0.55 }));
+  ring.rotation.x = Math.PI/2;
+  scene.add(ring);
+
+  // center node
+  const center = new THREE.Mesh(new THREE.SphereGeometry(0.08, 24, 24), new THREE.MeshBasicMaterial({ color:0xa3e635 }));
+  scene.add(center);
+
+  // orbiting icons (text sprites)
+  const labels = ['gh','in','𝕏','m'];
+  const sprites = labels.map(t=>{
+    const c = document.createElement('canvas'); c.width=128; c.height=128;
+    const cx = c.getContext('2d');
+    cx.fillStyle='#06070a'; cx.beginPath(); cx.arc(64,64,52,0,Math.PI*2); cx.fill();
+    cx.lineWidth = 3; cx.strokeStyle='#a3e635'; cx.stroke();
+    cx.fillStyle='#a3e635'; cx.font='600 52px JetBrains Mono, monospace';
+    cx.textAlign='center'; cx.textBaseline='middle';
+    cx.shadowColor='rgba(163,230,53,0.8)'; cx.shadowBlur=20;
+    cx.fillText(t, 64, 68);
+    const tex = new THREE.CanvasTexture(c);
+    const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex, transparent:true }));
+    sp.scale.set(0.4,0.4,1);
+    scene.add(sp);
+    return sp;
+  });
+
+  function resize(){
+    const r = canvas.getBoundingClientRect();
+    if(!r.width||!r.height) return;
+    renderer.setSize(r.width, r.height, false);
+    camera.aspect = r.width / r.height;
+    camera.updateProjectionMatrix();
+  }
+  resize();
+  new ResizeObserver(resize).observe(canvas);
+
+  function loop(ts){
+    const t = ts*0.0008;
+    sprites.forEach((sp,k)=>{
+      const a = t + k*Math.PI/2;
+      sp.position.set(Math.cos(a), 0, Math.sin(a));
+    });
+    ring.rotation.z = t*0.4;
+    renderer.render(scene, camera);
+    requestAnimationFrame(loop);
+  }
+  requestAnimationFrame(loop);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   DOM wiring — reveal-on-scroll, rail, magnetic buttons, tilt.
    ═══════════════════════════════════════════════════════════════════════ */
 function wireSite(site){
-  let scrollProgress = 0;
-  function update(){
-    const sh = site.scrollHeight - site.clientHeight;
-    scrollProgress = sh > 0 ? Math.min(1, Math.max(0, site.scrollTop/sh)) : 0;
-    // hero parallax
-    const hero = site.querySelector('[data-hero]');
-    if(hero){
-      const heroProgress = Math.min(1, Math.max(0, site.scrollTop / (site.clientHeight*0.9)));
-      hero.style.transform = `translateZ(${-heroProgress*200}px) translateY(${-heroProgress*40}px) rotateX(${heroProgress*-12}deg)`;
-      hero.style.opacity = 1 - heroProgress*0.85;
-    }
-    // glyph: rotation already driven via getScroll; also translate it
-    const glyph = site.querySelector('.glyph-3d');
-    if(glyph){
-      glyph.style.transform = `translate(${-scrollProgress*30}px, ${scrollProgress*60}px) scale(${1 - scrollProgress*0.3})`;
-    }
-    // rail
-    site.querySelectorAll('[data-rail-cell]').forEach((cell, i, arr)=>{
-      const filled = scrollProgress * arr.length;
-      if(i < filled){ cell.outerHTML = '<b data-rail-cell>▮</b>'; }
-    });
-  }
-  site.addEventListener('scroll', update, { passive:true });
-  update();
-  return ()=>scrollProgress;
-}
-
-/* ═══════════════════════════════════════════════════════════════════════
-   Reveal-on-scroll w/ 3D enter.
-   ═══════════════════════════════════════════════════════════════════════ */
-function wireReveals(site){
   const obs = new IntersectionObserver(entries=>{
     for(const e of entries){
       if(e.isIntersecting){ e.target.classList.add('in'); obs.unobserve(e.target); }
     }
-  },{ root: site, threshold: .12 });
+  }, { root: site, threshold:.12 });
   site.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
-}
 
-/* ═══════════════════════════════════════════════════════════════════════
-   Magnetic buttons + card tilt (desktop only).
-   ═══════════════════════════════════════════════════════════════════════ */
-function wireDesktopInteractions(site){
-  if(site.dataset.mode !== 'desktop') return;
-  site.querySelectorAll('.btn').forEach(btn=>{
-    btn.addEventListener('mousemove',e=>{
-      const r = btn.getBoundingClientRect();
-      const x = e.clientX - r.left - r.width/2;
-      const y = e.clientY - r.top - r.height/2;
-      btn.style.transform = `translate(${x*0.18}px, ${y*0.22 - 2}px)`;
+  // Rail fill
+  const rail = site.querySelector('[data-rail]');
+  if(rail){
+    site.addEventListener('scroll', ()=>{
+      const sh = site.scrollHeight - site.clientHeight;
+      const p = sh>0 ? site.scrollTop/sh : 0;
+      const cells = rail.querySelectorAll('span,b');
+      const filled = Math.floor(p * cells.length);
+      cells.forEach((c,i)=>{
+        if(i < filled){ c.outerHTML = c.tagName==='B' ? c.outerHTML : c.outerHTML.replace('<span','<b').replace('▯','▮').replace('</span>','</b>'); }
+      });
+    }, { passive:true });
+  }
+
+  // Hero parallax
+  const hero = site.querySelector('[data-hero]');
+  if(hero){
+    site.addEventListener('scroll', ()=>{
+      const p = Math.min(1, Math.max(0, site.scrollTop / (site.clientHeight*0.9)));
+      hero.style.transform = `translateZ(${-p*220}px) translateY(${-p*40}px) rotateX(${p*-12}deg)`;
+      hero.style.opacity = String(1 - p*0.85);
+    }, { passive:true });
+  }
+
+  if(site.dataset.mode === 'desktop'){
+    site.querySelectorAll('.btn').forEach(btn=>{
+      btn.addEventListener('mousemove',e=>{
+        const r = btn.getBoundingClientRect();
+        const x = e.clientX - r.left - r.width/2;
+        const y = e.clientY - r.top - r.height/2;
+        btn.style.transform = `translate(${x*0.18}px, ${y*0.22 - 2}px)`;
+      });
+      btn.addEventListener('mouseleave',()=>{ btn.style.transform=''; });
     });
-    btn.addEventListener('mouseleave',()=>{ btn.style.transform=''; });
-  });
-  site.querySelectorAll('.work-card').forEach(card=>{
-    card.addEventListener('mousemove',e=>{
-      const r = card.getBoundingClientRect();
-      const x = (e.clientX - r.left)/r.width - .5;
-      const y = (e.clientY - r.top)/r.height - .5;
-      card.style.transform = `perspective(900px) rotateY(${x*5}deg) rotateX(${-y*5}deg) translateY(-2px) translateZ(20px)`;
+    site.querySelectorAll('.work-card').forEach(card=>{
+      card.addEventListener('mousemove',e=>{
+        const r = card.getBoundingClientRect();
+        const x = (e.clientX - r.left)/r.width - .5;
+        const y = (e.clientY - r.top)/r.height - .5;
+        card.style.transform = `perspective(900px) rotateY(${x*5}deg) rotateX(${-y*5}deg) translateY(-2px) translateZ(20px)`;
+      });
+      card.addEventListener('mouseleave',()=>{ card.style.transform=''; });
     });
-    card.addEventListener('mouseleave',()=>{ card.style.transform=''; });
-  });
+  }
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
@@ -899,20 +935,21 @@ function wireDesktopInteractions(site){
    ═══════════════════════════════════════════════════════════════════════ */
 ['site-desktop','site-mobile'].forEach(id=>{
   const site = document.getElementById(id);
-  const getScroll = wireSite(site);
-  wireReveals(site);
-  wireDesktopInteractions(site);
-
-  const bgCanvas = site.querySelector('[data-bg="terrain"]');
-  if(bgCanvas) startTerrain(bgCanvas, getScroll);
-
-  const glyph = site.querySelector('[data-glyph]');
-  if(glyph) startGlyph(glyph, getScroll);
-
-  site.querySelectorAll('.mini3d canvas').forEach(startMini);
-
+  wireSite(site);
+  const stage = site.querySelector('[data-stage]');
+  const loading = site.querySelector('.stage-loading');
+  if(stage){
+    try{
+      new Corridor(stage, site, { lowFi: site.dataset.mode === 'mobile' });
+      loading?.classList.add('hide');
+    }catch(err){
+      console.error('three.js init failed', err);
+      if(loading) loading.textContent = '▸ webgl unavailable';
+    }
+  }
+  site.querySelectorAll('[data-mini]').forEach(c => makeMini(c, c.dataset.mini));
   const orbit = site.querySelector('[data-orbit]');
-  if(orbit) startOrbit(orbit);
+  if(orbit) makeOrbit(orbit);
 });
 </script>
 
