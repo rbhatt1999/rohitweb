@@ -1,22 +1,63 @@
 import React from 'react'
 import Link from 'next/link'
-import NavItems from './NavItems'
 import NavigationBarMobile from './NavigationBarMobile'
-import Image from 'next/image'
-import logo from '@/assets/images/logo.png'
 
 export default function NavigationBar() {
   return (
-    <div className="fixed bg-neutral-800 left-0 right-0 top-0 flex p-2 px-8 flex-row justify-between z-20 items-center shadow-md h-16 md:h-20">
-      <Link href="/">
-        <Image src={logo} width={90} height={10} className='w-12 h-12 md:w-16 md:h-16' alt='logo' />
-      </Link>
-      <div className="hidden lg:flex flex-row gap-10 justify-between items-center">
-        <NavItems />
-      </div>
-      <div className="flex lg:hidden">
-        <NavigationBarMobile />
-      </div>
-    </div>
+    <header style={{
+      position: 'fixed', top: 0, left: 0, right: 0,
+      zIndex: 30,
+      backdropFilter: 'blur(14px)',
+      WebkitBackdropFilter: 'blur(14px)',
+      background: 'rgba(6,7,10,0.82)',
+      borderBottom: '1px solid #1f2128',
+    }}>
+      <nav style={{
+        display: 'flex', alignItems: 'center', padding: '13px 32px',
+        fontFamily: 'var(--font-jetbrains), ui-monospace, monospace',
+        fontSize: '13px', gap: '24px',
+        maxWidth: '1400px', margin: '0 auto',
+      }}>
+        {/* Brand */}
+        <Link href="/" className="nav-link" style={{ color: '#e4e4e7', display: 'flex', alignItems: 'center', gap: '6px' }}>
+          <span style={{ color: '#a3e635', textShadow: '0 0 12px #a3e635' }}>▸</span>
+          <span>rohit.bhatt</span>
+        </Link>
+
+        {/* Desktop links */}
+        <div style={{ display: 'flex', gap: '24px', marginLeft: 'auto', alignItems: 'center' }} className="nav-desktop">
+          <Link href="/#work"    className="nav-link">work</Link>
+          <Link href="/#writing" className="nav-link">writing</Link>
+          <Link href="/#about"   className="nav-link">about</Link>
+          <Link href="/#contact" className="nav-link">contact</Link>
+          <Link href="/blogs"    className="nav-link nav-blogs">
+            /blogs ↗
+          </Link>
+        </div>
+
+        {/* Mobile hamburger */}
+        <div style={{ marginLeft: 'auto' }} className="nav-mobile">
+          <NavigationBarMobile />
+        </div>
+      </nav>
+
+      <style>{`
+        .nav-desktop { display: flex; }
+        .nav-mobile  { display: none; }
+        .nav-blogs {
+          color: #a3e635 !important;
+          border: 1px solid rgba(163,230,53,0.45);
+          padding: 5px 14px; border-radius: 4px;
+          background: rgba(163,230,53,0.07);
+          font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase;
+          transition: background 0.2s;
+        }
+        .nav-blogs:hover { background: rgba(163,230,53,0.15) !important; }
+        @media (max-width: 768px) {
+          .nav-desktop { display: none !important; }
+          .nav-mobile  { display: block !important; }
+        }
+      `}</style>
+    </header>
   )
 }

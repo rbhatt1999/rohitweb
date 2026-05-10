@@ -1,52 +1,119 @@
 'use client'
-import { useState } from 'react'
-import pic2 from '@/assets/images/rohit-bhatt.png'
-import Link from 'next/link'
-import { Link as Link2 } from 'react-scroll'
 import { motion } from 'framer-motion'
-import Image from 'next/image'
-import { sora, crete_round } from '@/lib/fonts'
 import { useInView } from 'react-intersection-observer'
 
+const STACK = [
+  { name: 'rails',          badge: '◆ daily', tree: '├─' },
+  { name: 'react',          badge: '◆ daily', tree: '├─' },
+  { name: 'python · flask', badge: '',        tree: '├─' },
+  { name: 'langchain · gemini', badge: '',   tree: '├─' },
+  { name: 'postgres',       badge: '',        tree: '├─' },
+  { name: 'tailwind',       badge: '',        tree: '├─' },
+  { name: 'node',           badge: '',        tree: '└─' },
+]
+
+const sectionStyle = {
+  padding: '96px 48px',
+  position: 'relative',
+}
+
+const cardStyle = {
+  background: 'rgba(6,7,10,0.92)',
+  border: '1px solid #1f2128',
+  borderRadius: '6px',
+  padding: '26px 28px',
+  backdropFilter: 'blur(20px)',
+  WebkitBackdropFilter: 'blur(20px)',
+}
+
 export default function About() {
-    const [professional, setprofessional] = useState(true);
-    const { ref, inView } = useInView();
-    return (
-        <div id="about" ref={ref} className="min-h-screen box-border flex flex-col lg:flex-row items-center animate-text bg-gradient-to-r from-white/5 to-blue-500/5 text-white justify-between px-5 md:px-10 lg:px-14 py-10 md:py-24 gap-5 md:gap-10 w-full h-full overflow-hidden flex-1">
-            <motion.div
-                initial={{ x: '-100%', opacity: 0 }}
-                animate={inView ? { x: 0, opacity: 1 } : { x: '-100%', opacity: 0 }}
-                transition={{ type: 'spring', stiffness: 30, duration: 1 }}
-                className={`flex flex-col flex-1 items-start`}>
-                <Image src={pic2} alt="Rohit Bhatt" width={1000} height={1000} className="rounded-full blueShadow w-40 md:w-80 h-auto z-10" />
-            </motion.div>
-            <motion.div
-                initial={{ x: '100%', opacity: 0 }}
-                animate={inView ? { x: 0, opacity: 1 } : { x: '100%', opacity: 0 }}
-                transition={{ type: 'spring', stiffness: 30, duration: 1 }}
-                className={`flex flex-col w-full md:w-7/12 gap-2 md:gap-5 items-center md:items-start`}>
-                <h1 className={`${crete_round.className} text-2xl text-center md:text-left md:text-6xl font-semibold`}>About me</h1>
-                <div className={`flex flex-row w-fit text-xl`}>
-                    <span className={`text-lg md:text-2xl p-2 px-5 cursor-pointer border-r-2 select-none rounded-l-xl ${professional ? 'bg-blue-500/80' : 'bg-white/10'}`} onClick={() => setprofessional(true)}>Professional</span>
-                    <span className={`text-lg md:text-2xl p-2 px-6 cursor-pointer select-none border-l-2 rounded-r-xl ${professional ? 'bg-white/10' : 'bg-blue-500/80'}`} onClick={() => setprofessional(false)} >Personal</span>
-                </div>
-                {professional ?
-                    (<>
-                        <p className='text-base md:text-xl font-normal text-center md:text-left'>Immersed in remote development, I specialize in building stunning landing pages to full-stack websites. Early delivery is my secret to success. Working across time zones, I excel in remote collaboration. As a seasoned web developer, I combine technical expertise with creative flair. From captivating designs to seamless user experiences, I conquer complex challenges with innovative solutions. Let&apos;s shape your exceptional online presence together. Explore my skills and resume below to get started on our digital journey.</p>
-                        <div className={`flex flex-row gap-5 md:gap-10 self-stretch md:w-5/12`}>
-                            <Link2 to="skills" smooth={true} duration={1000} className={`text-base text-center flex-1 md:flex-0 md:text-lg bg-white/30 rounded-lg border-2 border-blue-500/30 p-2 px-5 hover:bg-blue-500/30 hover:scale-105 hover:border-blue-500 transition-all duration-150`}>Skills</Link2>
-                            <Link href="./assets/resume.pdf" target="_blank" rel="noreferrer" className={`text-base text-center flex-1 md:flex-0 md:text-lg bg-white/30 rounded-lg border-2 border-blue-500/30 p-2 px-5 hover:bg-blue-500/30 hover:scale-105 hover:border-blue-500 transition-all duration-150`}>Resume</Link>
-                        </div>
-                    </>)
-                    :
-                    (<>
-                        <p className='text-base md:text-xl font-normal'>Beyond my professional pursuits, I find solace and inspiration in the wonders of the natural world. Hiking through picturesque trails, I embrace the serenity and beauty that nature provides. Additionally, I am an avid reader, constantly seeking new literary adventures. If you&apos;re in search of a captivating novel, I highly recommend immersing yourself in the thrilling pages of &quot;The Night Circus&quot; by Erin Morgenstern. This enchanting tale will transport you to a realm of wonder and magic, captivating your imagination.</p>
-                        <div className={`flex flex-row gap-10`}>
-                            <a href="https://www.linkedin.com/in/rohitbhatt-dev/" target="_blank" className={`text-base md:text-lg bg-white/30 rounded-lg border-2 border-blue-500/30 p-2 px-5 hover:bg-blue-500/30 hover:scale-105 hover:border-blue-500 transition-all duration-150`} rel="noreferrer">Connect on LinkedIn</a>
-                        </div>
-                    </>)
-                }
-            </motion.div>
+  const { ref, inView } = useInView({ threshold: 0.15, triggerOnce: true })
+
+  return (
+    <section id="about" ref={ref} style={sectionStyle}>
+      <SectionLabel num="01" label="about" />
+
+      <motion.div
+        initial={{ opacity: 0, y: 40 }}
+        animate={inView ? { opacity: 1, y: 0 } : {}}
+        transition={{ duration: 0.7 }}
+        style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+          gap: '24px',
+          maxWidth: '960px',
+        }}
+      >
+        {/* Bio */}
+        <div style={cardStyle}>
+          <p style={{ color: '#d4d4d8', lineHeight: 1.75, margin: '0 0 14px', fontSize: '15px', fontWeight: 300, fontFamily: 'var(--font-inter), ui-sans-serif, sans-serif' }}>
+            I build software that feels considered. Currently working remote, shipping landing pages → full-stack apps, with a recent focus on LLM-backed tools (LangChain, Gemini).
+          </p>
+          <p style={{ color: '#d4d4d8', lineHeight: 1.75, margin: 0, fontSize: '15px', fontWeight: 300, fontFamily: 'var(--font-inter), ui-sans-serif, sans-serif' }}>
+            Off-screen: hiking trails and Erin Morgenstern novels.
+          </p>
+          <div style={{ marginTop: '20px', display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
+            <a
+              href="/assets/resume.pdf"
+              target="_blank"
+              rel="noreferrer"
+              style={{
+                fontFamily: 'var(--font-jetbrains), ui-monospace, monospace',
+                fontSize: '12px', color: '#a3e635',
+                border: '1px solid rgba(163,230,53,0.4)',
+                padding: '6px 14px', borderRadius: '4px',
+                background: 'rgba(163,230,53,0.06)',
+                textDecoration: 'none', transition: 'background 0.2s',
+              }}
+            >
+              resume ↗
+            </a>
+          </div>
         </div>
-    )
+
+        {/* Stack */}
+        <div style={cardStyle}>
+          <span style={{
+            fontFamily: 'var(--font-jetbrains), ui-monospace, monospace',
+            color: '#e4e4e7', fontSize: '13px',
+            display: 'block', marginBottom: '10px',
+          }}>
+            stack/
+          </span>
+          {STACK.map(({ name, badge, tree }) => (
+            <div
+              key={name}
+              style={{
+                display: 'flex', alignItems: 'center',
+                fontFamily: 'var(--font-jetbrains), ui-monospace, monospace',
+                fontSize: '13px', color: '#71717a',
+                lineHeight: 1.9, cursor: 'default',
+              }}
+            >
+              <span style={{ color: '#3f3f46', marginRight: '10px' }}>{tree}</span>
+              <span>{name}</span>
+              {badge && (
+                <span style={{ marginLeft: 'auto', color: '#a3e635', fontSize: '11px' }}>{badge}</span>
+              )}
+            </div>
+          ))}
+        </div>
+      </motion.div>
+    </section>
+  )
+}
+
+export function SectionLabel({ num, label }) {
+  return (
+    <>
+      <div style={{
+        fontFamily: 'var(--font-jetbrains), ui-monospace, monospace',
+        fontSize: '12px', color: '#71717a',
+        marginBottom: '10px', letterSpacing: '0.05em',
+      }}>
+        <span style={{ color: '#a3e635' }}>// {num}</span> — {label}
+      </div>
+      <div className="label-rule" style={{ marginBottom: '32px' }} />
+    </>
+  )
 }

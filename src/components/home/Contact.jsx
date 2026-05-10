@@ -1,66 +1,88 @@
 'use client'
-import React, { useState } from 'react'
-import contactimg from '@/assets/images/contact-form.png'
-import Image from 'next/image'
-import { sora, crete_round } from '@/lib/fonts'
+import { motion } from 'framer-motion'
 import { useInView } from 'react-intersection-observer'
-import { AnimatePresence, motion } from 'framer-motion'
-import { AiFillGithub, AiFillLinkedin, AiOutlineTwitter, AiFillMediumSquare } from 'react-icons/ai'
-import Link from 'next/link'
+import { useState } from 'react'
+import { SectionLabel } from './About'
+
+const SOCIALS = [
+  { label: 'github',   href: 'https://github.com/rbhatt1999' },
+  { label: 'linkedin', href: 'https://www.linkedin.com/in/rohitbhatt-dev/' },
+  { label: 'twitter',  href: 'https://twitter.com/Rohit_Bhatt_' },
+  { label: 'medium',   href: 'https://medium.com/@rbhatt199924' },
+]
+
+const EMAIL = 'rohit.bhatt.dev@gmail.com'
 
 export default function Contact() {
-    const { ref, inView } = useInView();
-    const [formStatus, setFormStatus] = useState(true);
-    const [msgStatus, setMsgStatus] = useState(false);
-    const handleSubmit = () => {
-        setFormStatus(false);
-        setMsgStatus(true);
-    }
-    return (
-        <div ref={ref} className={`flex flex-col lg:flex-row items-center text-white justify-between px-5 md:px-10 lg:px-14 py-10 md:py-18 gap-5 md:gap-10 w-full h-full overflow-hidden flex-1`} id="contact">
-            <div className={`flex flex-col justify-center items-center gap-10 w-full h-full overflow-hidden`}>
-                <Image src={contactimg} alt="contact form" className={`w-full`} />
-            </div>
-            <div className={`flex flex-col justify-center items-center gap-4 w-full h-full overflow-hidden`}>
-                <h1 className={`${crete_round.className} text-2xl md:text-6xl font-semibold`}>Contact Me</h1>
-                <p className='text-base md:text-xl text-center font-normal'>I&apos;m always interested in hearing about new projects, so if you&apos;d like to chat please get in touch.</p>
-                <section className={` flex flex-col w-full gap-5`}>
-                    <iframe name="hiddenConfirm" id="hiddenConfirm" style={{ display: 'none' }} />
-                    <AnimatePresence>
-                        {formStatus && (
-                            <motion.form
-                                exit={{ height: 0, transition: { duration: 1 } }}
-                                className={`flex flex-col gap-5 w-full overflow-hidden`} action="https://docs.google.com/forms/d/e/1FAIpQLScyBwHkoOVll5LwDaR17K__OZlpOpx3jA6M3iY0Vut9XghCQA/formResponse" onSubmit={handleSubmit} target="hiddenConfirm" method="post">
-                                <motion.input
-                                    initial={{ opacity: 0, x: 500 }}
-                                    animate={inView ? { opacity: 1, x: 0, transition: { duration: 0.5, delay: 0.2 } } : { opacity: 0, x: 500 }}
-                                    className={`w-full p-3 border-2 border-blue-500 rounded-lg text-black font-medium`} type="text" id="name" name="entry.191940924" placeholder="Full name" required maxLength="30" />
-                                <motion.input
-                                    initial={{ opacity: 0, x: -500 }}
-                                    animate={inView ? { opacity: 1, x: 0, transition: { duration: 0.5, delay: 0.4 } } : { opacity: 0, x: -500 }}
-                                    className={`w-full p-3 border-2 border-blue-500 rounded-lg text-black font-medium`} type="email" name="entry.104733681" id="email" placeholder="Email address" required />
-                                <motion.textarea
-                                    initial={{ opacity: 0, x: 500 }}
-                                    animate={inView ? { opacity: 1, x: 0, transition: { duration: 0.5, delay: 0.6 } } : { opacity: 0, x: 500 }}
-                                    className={`w-full p-3 border-2 border-blue-500 rounded-lg text-black font-medium`} name="entry.1550334487" id="message" rows="5" maxLength="500" placeholder="Enter text here" required></motion.textarea>
-                                <motion.button
-                                    initial={{ opacity: 0, x: -500 }}
-                                    animate={inView ? { opacity: 1, x: 0, transition: { duration: 0.5, delay: 0.8, type: 'spring', stiffness: 30 } } : { opacity: 0, x: -500 }}
-                                    className={`w-full p-3 border-2 border-blue-500 rounded-lg font-medium bg-blue-500 hover:bg-blue-600 transition-all duration-150`} type="submit">Send Message</motion.button>
-                            </motion.form>
-                        )}
-                    </AnimatePresence>
-                    {msgStatus && (
-                        <motion.div
-                            initial={{ opacity: 0, y: 50 }}
-                            animate={inView ? {opacity: 1, y: 0, transition: { duration: 0.5 } } : { opacity: 0, y: 50 }}
-                            className={`bg-green-700 bg-opacity-50 rounded-3xl p-5 flex flex-col gap-5 w-full`}>
-                            <h2 className={`text-2xl md:text-4xl font-semibold text-center`}>Thanks for reaching out!</h2>
-                            <p className={`text-base md:text-xl font-normal text-center`}>I&apos;ll get back to you as soon as possible.</p>
-                        </motion.div>
-                    )}
-                </section>
-            </div>
+  const { ref, inView } = useInView({ threshold: 0.15, triggerOnce: true })
+  const [copied, setCopied] = useState(false)
+
+  function copyEmail() {
+    navigator.clipboard.writeText(EMAIL).then(() => {
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    })
+  }
+
+  return (
+    <section id="contact" ref={ref} style={{ padding: '96px 48px 120px', position: 'relative' }}>
+      <SectionLabel num="04" label="contact" />
+
+      <motion.div
+        initial={{ opacity: 0, y: 30 }}
+        animate={inView ? { opacity: 1, y: 0 } : {}}
+        transition={{ duration: 0.6 }}
+        style={{ maxWidth: '560px' }}
+      >
+        {/* Echo prompt */}
+        <div style={{
+          fontFamily: 'var(--font-jetbrains), ui-monospace, monospace',
+          fontSize: '14px', color: '#71717a', marginBottom: '24px',
+        }}>
+          <span style={{ color: '#a3e635' }}>$</span> echo &quot;let&apos;s talk&quot;
         </div>
-    )
+
+        {/* Email */}
+        <div style={{ position: 'relative', marginBottom: '28px' }}>
+          <button
+            onClick={copyEmail}
+            style={{
+              fontFamily: 'var(--font-jetbrains), ui-monospace, monospace',
+              fontSize: 'clamp(15px, 2.5vw, 20px)',
+              color: copied ? '#a3e635' : '#e4e4e7',
+              background: 'none', border: 'none', cursor: 'pointer',
+              borderBottom: `1px solid ${copied ? '#a3e635' : '#1f2128'}`,
+              paddingBottom: '6px', padding: '0 0 6px',
+              transition: 'color 0.2s, border-color 0.2s',
+              textShadow: copied ? '0 0 12px rgba(163,230,53,0.6)' : 'none',
+            }}
+            title="Click to copy"
+          >
+            {EMAIL} {copied ? '✓ copied!' : '↗'}
+          </button>
+        </div>
+
+        {/* Socials */}
+        <div style={{
+          fontFamily: 'var(--font-jetbrains), ui-monospace, monospace',
+          fontSize: '13px',
+          display: 'flex', flexWrap: 'wrap', gap: '20px',
+        }}>
+          {SOCIALS.map(({ label, href }) => (
+            <a
+              key={label}
+              href={href}
+              target="_blank"
+              rel="noreferrer"
+              style={{ color: '#71717a', textDecoration: 'none', transition: 'color 0.2s' }}
+              onMouseEnter={e => e.currentTarget.style.color = '#a3e635'}
+              onMouseLeave={e => e.currentTarget.style.color = '#71717a'}
+            >
+              <span style={{ color: '#a3e635', opacity: 0.7 }}>▸ </span>{label}
+            </a>
+          ))}
+        </div>
+      </motion.div>
+    </section>
+  )
 }

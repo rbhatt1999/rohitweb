@@ -2,96 +2,172 @@
 @tailwind components;
 @tailwind utilities;
 
-.active_underline {
-  border-bottom: 3px solid rgb(59 130 246);
+:root {
+  --bg: #06070a;
+  --surface: rgba(6, 7, 10, 0.92);
+  --border: #1f2128;
+  --text: #e4e4e7;
+  --muted: #71717a;
+  --accent: #a3e635;
+  --accent-dim: #65a30d;
 }
 
-.blueShadow {
-  box-shadow: 0 0 30px 2px rgb(59 130 246);
+* { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  margin: 0;
+  padding: 0;
+  background: var(--bg);
+  color: var(--text);
 }
 
-.hoverblueShadow:hover {
-  box-shadow: 0 0 30px 2px rgb(59 130 246);
-}
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: #0a0a0c; }
+::-webkit-scrollbar-thumb { background: #27272a; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--accent-dim); }
 
-/* width */
-::-webkit-scrollbar {
+/* Blinking cursor */
+@keyframes cursor-blink {
+  50% { opacity: 0; }
+}
+.cursor-blink {
+  display: inline-block;
   width: 8px;
+  height: 1.1em;
+  background: var(--accent);
+  margin-left: 3px;
+  vertical-align: middle;
+  animation: cursor-blink 1s steps(2) infinite;
+  box-shadow: 0 0 10px var(--accent);
 }
 
-/* Track */
-::-webkit-scrollbar-track {
-  background: #3c3c3c;
+/* Hero typewriter */
+@keyframes type-hero {
+  from { width: 0; }
+  to { width: 11ch; }
+}
+.hero-title {
+  overflow: hidden;
+  white-space: nowrap;
+  animation: type-hero 1.6s steps(11, end) 0.3s both;
 }
 
-/* Handle */
-::-webkit-scrollbar-thumb {
-  background: rgb(79, 79, 79)
+/* Label rule shimmer */
+@keyframes rule-shimmer {
+  0%, 100% { left: -100%; }
+  50% { left: 140%; }
+}
+.label-rule {
+  height: 1px;
+  width: 200px;
+  background: var(--border);
+  margin: 0 0 28px;
+  position: relative;
+  overflow: hidden;
+}
+.label-rule::after {
+  content: '';
+  position: absolute;
+  left: -100%;
+  top: 0;
+  height: 100%;
+  width: 60%;
+  background: linear-gradient(90deg, transparent, var(--accent), transparent);
+  animation: rule-shimmer 3s ease-in-out infinite;
 }
 
-/* Handle on hover */
-::-webkit-scrollbar-thumb:hover {
-  background: rgb(112, 112, 112);
+/* Pulse dot */
+@keyframes pulse-dot {
+  50% { opacity: 0.3; box-shadow: 0 0 16px var(--accent); }
+}
+.pulse-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  background: var(--accent);
+  border-radius: 50%;
+  margin-left: 6px;
+  animation: pulse-dot 2s ease-in-out infinite;
+  box-shadow: 0 0 10px var(--accent);
 }
 
+/* Glitch on writing titles */
+@keyframes glitch {
+  0%   { transform: translateX(0);   text-shadow: none; }
+  25%  { transform: translateX(-1px); text-shadow: 1px 0 var(--accent), -1px 0 #f43f5e; }
+  50%  { transform: translateX(1px);  text-shadow: -1px 0 var(--accent), 1px 0 #38bdf8; }
+  100% { transform: translateX(0);   text-shadow: none; }
+}
+.post-title-hover:hover {
+  animation: glitch 0.4s steps(2) 1;
+}
+
+/* Nav link hover — used to avoid JS event handlers in server components */
+.nav-link {
+  color: #71717a;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+.nav-link:hover { color: #a3e635; }
+
+/* Content veil — sits between 3D canvas (z:0) and DOM content (z:10+) */
+.content-veil {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: rgba(6, 7, 10, 0.55);
+}
+
+/* Card / work card shared */
+.glass-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+/* Blog system — keep existing */
 .blog-section br {
   display: block;
   content: "";
   margin: 5px 0;
 }
 
-/* Blog content: links readable on dark background */
 .blog-section .anchor-tag a {
-  color: #7dd3fc; /* sky-300 – works on dark bg */
+  color: var(--accent);
   text-decoration: underline;
   text-underline-offset: 3px;
   transition: color 0.15s ease;
 }
 
-.blog-section .anchor-tag a:hover {
-  color: #bae6fd; /* sky-200 */
-  text-decoration: underline;
-}
+.blog-section .anchor-tag a:hover { color: #d9f99d; }
 
-/* Bold text in blog body – align with headings */
 .blog-section .anchor-tag strong {
-  color: rgb(147 197 253); /* blue-300 */
+  color: #d9f99d;
   font-weight: 600;
 }
 
-/* Slightly looser line height for long-form readability */
 .blog-section p.anchor-tag,
 .blog-section .sectionAnchor p.anchor-tag {
   line-height: 1.7;
 }
 
+/* Loading spinner */
 .loader {
-  border: 16px solid #b6b6b6;
+  border: 16px solid #3f3f46;
   border-radius: 50%;
-  border-top: 16px solid #51c07f;
+  border-top: 16px solid var(--accent);
   width: 120px;
   height: 120px;
-  -webkit-animation: spin 2s linear infinite; /* Safari */
   animation: spin 2s linear infinite;
 }
 
-/* Safari */
-@-webkit-keyframes spin {
-  0% {
-    -webkit-transform: rotate(0deg);
-  }
-
-  100% {
-    -webkit-transform: rotate(360deg);
-  }
-}
-
 @keyframes spin {
-  0% {
-    transform: rotate(0deg);
-  }
-
-  100% {
-    transform: rotate(360deg);
-  }
+  0%   { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
