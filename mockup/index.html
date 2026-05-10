@@ -3,14 +3,14 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>rohitweb · redesign mockup v4 (gamified)</title>
+<title>rohitweb · redesign mockup v5 (readable)</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <script type="importmap">
 { "imports": { "three": "https://esm.sh/three@0.160.0" } }
 </script>
 <style>
   :root{
-    --bg:#06070a;--surface:rgba(10,12,16,.55);--border:#1f2128;
+    --bg:#06070a;--surface:rgba(6,7,10,.92);--border:#1f2128;
     --text:#e4e4e7;--muted:#71717a;--accent:#a3e635;--accent-dim:#65a30d;
     --mono:'JetBrains Mono',ui-monospace,monospace;
     --sans:'Inter',ui-sans-serif,system-ui,sans-serif;
@@ -57,8 +57,11 @@
   .desktop .stage{height:100%}
   .stage-loading{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:var(--accent);font-family:var(--mono);font-size:12px;opacity:.6;pointer-events:none;z-index:1}
   .stage-loading.hide{display:none}
-  .vignette{position:sticky;top:0;left:0;width:100%;height:100vh;display:block;margin-bottom:-100vh;z-index:2;pointer-events:none;background:radial-gradient(ellipse at center, transparent 45%, rgba(6,7,10,.78) 100%),repeating-linear-gradient(0deg, rgba(255,255,255,.012) 0 1px, transparent 1px 3px)}
+  .vignette{position:sticky;top:0;left:0;width:100%;height:100vh;display:block;margin-bottom:-100vh;z-index:2;pointer-events:none;background:radial-gradient(ellipse 90% 90% at center, rgba(6,7,10,.52) 0%, rgba(6,7,10,.38) 40%, rgba(6,7,10,.88) 75%, rgba(6,7,10,.97) 100%),repeating-linear-gradient(0deg, rgba(255,255,255,.008) 0 1px, transparent 1px 3px)}
   .desktop .vignette{height:100%}
+  /* solid dark scrim that sits between the 3D canvas and the DOM content */
+  .content-veil{position:sticky;top:0;left:0;width:100%;height:100vh;display:block;margin-bottom:-100vh;z-index:3;pointer-events:none;background:rgba(6,7,10,.52)}
+  .desktop .content-veil{height:100%}
 
   .nav{position:sticky;top:0;z-index:30;backdrop-filter:blur(12px);background:rgba(6,7,10,.75);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:12px 28px;font-family:var(--mono);font-size:13px;gap:16px}
   .mobile .nav{padding:12px 14px;font-size:12px;gap:10px}
@@ -139,8 +142,8 @@
   .mobile .container{padding:0 20px}
   .site.play-mode .container,.site.play-mode footer{visibility:hidden}
 
-  .hero{padding:72px 0 96px;position:relative;min-height:80vh;display:flex;flex-direction:column;justify-content:center;will-change:transform,opacity}
-  .mobile .hero{padding:48px 0 64px;min-height:auto}
+  .hero{padding:72px 0 96px;position:relative;min-height:80vh;display:flex;flex-direction:column;justify-content:center;will-change:transform,opacity;background:radial-gradient(ellipse 130% 90% at 25% 50%, rgba(6,7,10,.88) 30%, rgba(6,7,10,.6) 65%, transparent 100%)}
+  .mobile .hero{padding:48px 0 64px;min-height:auto;background:linear-gradient(to bottom, rgba(6,7,10,.85) 0%, rgba(6,7,10,.7) 100%)}
   .prompt{font-family:var(--mono);color:var(--muted);font-size:13px;letter-spacing:.04em;margin-bottom:20px}
   .prompt .dollar{color:var(--accent);margin-right:8px}
   .prompt .cursor{display:inline-block;width:8px;height:14px;background:var(--accent);margin-left:2px;vertical-align:middle;animation:blink 1s steps(2) infinite;box-shadow:0 0 10px var(--accent)}
@@ -161,6 +164,7 @@
   .mobile .ctas .btn{flex:1;text-align:center}
 
   section{padding:80px 0;position:relative;will-change:transform,opacity;transform-style:preserve-3d}
+  section.reveal{background:rgba(6,7,10,.6);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border-radius:8px;padding-left:20px;padding-right:20px;margin-bottom:4px}
   .mobile section{padding:54px 0}
   .label{font-family:var(--mono);font-size:12px;color:var(--muted);margin:0 0 10px;letter-spacing:.05em}
   .label .num{color:var(--accent)}
@@ -176,7 +180,7 @@
 
   .about-grid{display:grid;grid-template-columns:1.2fr 1fr;gap:36px;align-items:start}
   .mobile .about-grid{grid-template-columns:1fr;gap:24px}
-  .card{background:var(--surface);border:1px solid var(--border);padding:24px 26px;border-radius:6px;transition:border-color .2s, box-shadow .25s, transform .3s;backdrop-filter:blur(10px)}
+  .card{background:var(--surface);border:1px solid var(--border);padding:24px 26px;border-radius:6px;transition:border-color .2s, box-shadow .25s, transform .3s;backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px)}
   .card:hover{border-color:#3f3f46}
   .about p{color:#d4d4d8;line-height:1.7;margin:0 0 14px;font-size:15px;font-weight:300}
   .stack{font-family:var(--mono);font-size:13.5px;color:var(--muted);line-height:1.85}
@@ -187,7 +191,7 @@
   .stack .tree{color:#3f3f46;margin-right:10px}
   .stack .badge{margin-left:auto;color:var(--accent);font-size:11px}
 
-  .work-card{background:var(--surface);border:1px solid var(--border);padding:30px 32px;border-radius:6px;margin-bottom:18px;position:relative;overflow:hidden;transition:transform .35s ease, border-color .25s, box-shadow .35s;backdrop-filter:blur(10px);transform-style:preserve-3d}
+  .work-card{background:var(--surface);border:1px solid var(--border);padding:30px 32px;border-radius:6px;margin-bottom:18px;position:relative;overflow:hidden;transition:transform .35s ease, border-color .25s, box-shadow .35s;backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);transform-style:preserve-3d}
   .work-card.featured-1{border-color:rgba(163,230,53,.4);box-shadow:0 0 0 1px rgba(163,230,53,.07), 0 0 40px -10px rgba(163,230,53,.15)}
   .work-card.discovered{border-color:var(--accent);box-shadow:0 0 0 1px rgba(163,230,53,.3), 0 0 60px -10px rgba(163,230,53,.4);animation:discoveryPulse .8s ease}
   @keyframes discoveryPulse{0%{box-shadow:0 0 0 0 rgba(163,230,53,.7)}100%{box-shadow:0 0 0 30px rgba(163,230,53,0)}}
@@ -258,8 +262,8 @@
 <body>
 
 <div class="preview-header">
-  <div class="crumb">// rohitweb / redesign / preview · v4 (gamified)</div>
-  <h1>Code-corridor 3D — now with Play Mode</h1>
+  <div class="crumb">// rohitweb / redesign / preview · v5 (readable + gamified)</div>
+  <h1>Code-corridor 3D — Play Mode + Readable Text</h1>
   <div class="sub">
     Default behaviour is <b>scroll mode</b> — read the portfolio normally, the camera flies forward as you scroll. Click <b>▶ play</b> in
     the nav to enter <b>play mode</b>: free-fly through the corridor with WASD + mouse-drag, collect <b>commit tokens</b> (lime octahedra),
@@ -290,6 +294,7 @@
         <canvas class="stage" data-stage></canvas>
         <div class="stage-loading">▸ initialising webgl scene…</div>
         <div class="vignette"></div>
+        <div class="content-veil"></div>
 
         <!-- HUD overlay (visible in play mode) -->
         <div class="hud">
@@ -465,6 +470,7 @@
         <canvas class="stage" data-stage></canvas>
         <div class="stage-loading">▸ webgl…</div>
         <div class="vignette"></div>
+        <div class="content-veil"></div>
 
         <div class="hud">
           <div class="corner tl">
@@ -634,7 +640,7 @@ class Corridor {
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio||1, lowFi?1.25:2));
     this.renderer.setClearColor(0x06070a, 1);
     this.scene = new THREE.Scene();
-    this.scene.fog = new THREE.Fog(0x06070a, 6, lowFi?55:90);
+    this.scene.fog = new THREE.Fog(0x06070a, 4, lowFi?40:65);
     this.camera = new THREE.PerspectiveCamera(72, 1, 0.05, 300);
     this.camera.rotation.order = 'YXZ';
     this.camera.position.copy(this.camPos);
@@ -694,8 +700,8 @@ class Corridor {
   _buildWalls(){
     const blocks = this.lowFi ? 70 : 140;
     const group = new THREE.Group();
-    const matBright = new THREE.LineBasicMaterial({ color:0xa3e635, transparent:true, opacity:0.55 });
-    const matDim = new THREE.LineBasicMaterial({ color:0x65a30d, transparent:true, opacity:0.32 });
+    const matBright = new THREE.LineBasicMaterial({ color:0xa3e635, transparent:true, opacity:0.3 });
+    const matDim = new THREE.LineBasicMaterial({ color:0x65a30d, transparent:true, opacity:0.15 });
     for(let i=0;i<blocks;i++){
       const sideLeft = i%2===0;
       const z = -2 - (i/blocks)*this.length;
@@ -713,7 +719,7 @@ class Corridor {
   _buildFloorCeil(){
     const planeGeo = new THREE.PlaneGeometry(14, this.length, 14, this.lowFi?50:90);
     const wireGeo = new THREE.WireframeGeometry(planeGeo);
-    const mat = new THREE.LineBasicMaterial({ color:0x65a30d, transparent:true, opacity:0.18 });
+    const mat = new THREE.LineBasicMaterial({ color:0x65a30d, transparent:true, opacity:0.09 });
     const floor = new THREE.LineSegments(wireGeo, mat);
     floor.rotation.x = -Math.PI/2; floor.position.set(0,-2.2,-this.length/2+2);
     this.scene.add(floor);
@@ -740,7 +746,7 @@ class Corridor {
       speeds[i] = 0.6 + Math.random()*1.6;
     }
     const geo = new THREE.BufferGeometry(); geo.setAttribute('position', new THREE.BufferAttribute(positions,3));
-    const mat = new THREE.PointsMaterial({ color:0xa3e635, size:0.045, transparent:true, opacity:0.85, blending:THREE.AdditiveBlending, depthWrite:false });
+    const mat = new THREE.PointsMaterial({ color:0xa3e635, size:0.045, transparent:true, opacity:0.5, blending:THREE.AdditiveBlending, depthWrite:false });
     this.particles = new THREE.Points(geo, mat);
     this.particles.userData.speeds = speeds;
     this.scene.add(this.particles);
