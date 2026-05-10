@@ -123,7 +123,7 @@ export default function HomeComponent() {
               marginBottom: '36px',
             }}
           >
-            ── 2+ years &nbsp;·&nbsp; remote &nbsp;·&nbsp;{' '}
+            ── 5+ years &nbsp;·&nbsp; remote &nbsp;·&nbsp;{' '}
             <span style={{ color: '#a3e635', fontWeight: 500 }}>open to work</span>
           </motion.div>
 
