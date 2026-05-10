@@ -1,15 +1,10 @@
 import React from 'react'
-import { DM_Sans } from 'next/font/google'
+import { lato as dmSans } from '@/lib/fonts'
 import { notFound } from 'next/navigation'
 import url from '@/utils/url'
 import Link from 'next/link'
 import SideBar from '@/components/blogs/SideBar'
 import BlogsList from '@/components/blogs/BlogsList'
-
-const dmSans = DM_Sans({
-  weight: '500',
-  subsets: ['latin'],
-})
 
 export const metadata = {
   title: `Exploring the Latest Web Technology Trends and Innovations`,
