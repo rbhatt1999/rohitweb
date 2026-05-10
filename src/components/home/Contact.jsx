@@ -2,7 +2,7 @@
 import { motion } from 'framer-motion'
 import { useInView } from 'react-intersection-observer'
 import { useState } from 'react'
-import { SectionLabel } from './About'
+import { SectionLabel, sectionStyle, containerStyle } from './About'
 
 const SOCIALS = [
   { label: 'github',   href: 'https://github.com/rbhatt1999' },
@@ -25,64 +25,82 @@ export default function Contact() {
   }
 
   return (
-    <section id="contact" ref={ref} style={{ padding: '96px 48px 120px', position: 'relative' }}>
-      <SectionLabel num="04" label="contact" />
+    <>
+      <div className="section-divider" />
+      <section id="contact" ref={ref} className="section" style={{ ...sectionStyle, paddingBottom: 'clamp(80px, 12vw, 140px)' }}>
+        <div style={containerStyle}>
+          <SectionLabel num="04" label="contact" />
 
-      <motion.div
-        initial={{ opacity: 0, y: 30 }}
-        animate={inView ? { opacity: 1, y: 0 } : {}}
-        transition={{ duration: 0.6 }}
-        style={{ maxWidth: '560px' }}
-      >
-        {/* Echo prompt */}
-        <div style={{
-          fontFamily: 'var(--font-jetbrains), ui-monospace, monospace',
-          fontSize: '14px', color: '#71717a', marginBottom: '24px',
-        }}>
-          <span style={{ color: '#a3e635' }}>$</span> echo &quot;let&apos;s talk&quot;
-        </div>
-
-        {/* Email */}
-        <div style={{ position: 'relative', marginBottom: '28px' }}>
-          <button
-            onClick={copyEmail}
-            style={{
-              fontFamily: 'var(--font-jetbrains), ui-monospace, monospace',
-              fontSize: 'clamp(15px, 2.5vw, 20px)',
-              color: copied ? '#a3e635' : '#e4e4e7',
-              background: 'none', border: 'none', cursor: 'pointer',
-              borderBottom: `1px solid ${copied ? '#a3e635' : '#1f2128'}`,
-              paddingBottom: '6px', padding: '0 0 6px',
-              transition: 'color 0.2s, border-color 0.2s',
-              textShadow: copied ? '0 0 12px rgba(163,230,53,0.6)' : 'none',
-            }}
-            title="Click to copy"
+          <motion.div
+            initial={{ opacity: 0, y: 24 }}
+            animate={inView ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.6 }}
+            style={{ maxWidth: '620px' }}
           >
-            {EMAIL} {copied ? '✓ copied!' : '↗'}
-          </button>
+            <div
+              style={{
+                fontFamily: 'var(--font-jetbrains), ui-monospace, monospace',
+                fontSize: '14px',
+                color: '#a1a1aa',
+                marginBottom: '24px',
+              }}
+            >
+              <span style={{ color: '#a3e635' }}>$</span> echo &quot;let&apos;s talk&quot;
+            </div>
+
+            <div style={{ marginBottom: '32px' }}>
+              <button
+                onClick={copyEmail}
+                style={{
+                  fontFamily: 'var(--font-jetbrains), ui-monospace, monospace',
+                  fontSize: 'clamp(15px, 2.4vw, 22px)',
+                  color: copied ? '#a3e635' : '#fafafa',
+                  background: 'none',
+                  border: 'none',
+                  cursor: 'pointer',
+                  borderBottom: `1px solid ${copied ? '#a3e635' : '#3f3f46'}`,
+                  padding: '0 0 8px',
+                  transition: 'color 0.2s, border-color 0.2s',
+                  textShadow: copied ? '0 0 12px rgba(163,230,53,0.6)' : 'none',
+                  wordBreak: 'break-word',
+                  textAlign: 'left',
+                }}
+                title="Click to copy"
+              >
+                {EMAIL} {copied ? '✓ copied!' : '↗'}
+              </button>
+            </div>
+
+            <div
+              style={{
+                fontFamily: 'var(--font-jetbrains), ui-monospace, monospace',
+                fontSize: '13.5px',
+                display: 'flex',
+                flexWrap: 'wrap',
+                gap: '22px',
+              }}
+            >
+              {SOCIALS.map(({ label, href }) => (
+                <a
+                  key={label}
+                  href={href}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="social-link"
+                  style={{ color: '#d4d4d8', textDecoration: 'none', transition: 'color 0.2s' }}
+                >
+                  <span style={{ color: '#a3e635', opacity: 0.85 }}>▸ </span>
+                  {label}
+                </a>
+              ))}
+            </div>
+          </motion.div>
         </div>
 
-        {/* Socials */}
-        <div style={{
-          fontFamily: 'var(--font-jetbrains), ui-monospace, monospace',
-          fontSize: '13px',
-          display: 'flex', flexWrap: 'wrap', gap: '20px',
-        }}>
-          {SOCIALS.map(({ label, href }) => (
-            <a
-              key={label}
-              href={href}
-              target="_blank"
-              rel="noreferrer"
-              style={{ color: '#71717a', textDecoration: 'none', transition: 'color 0.2s' }}
-              onMouseEnter={e => e.currentTarget.style.color = '#a3e635'}
-              onMouseLeave={e => e.currentTarget.style.color = '#71717a'}
-            >
-              <span style={{ color: '#a3e635', opacity: 0.7 }}>▸ </span>{label}
-            </a>
-          ))}
-        </div>
-      </motion.div>
-    </section>
+        <style>{`
+          .social-link:hover { color: #a3e635 !important; }
+        `}</style>
+      </section>
+    </>
   )
 }

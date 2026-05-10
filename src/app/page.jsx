@@ -12,7 +12,7 @@ export const metadata = {
 
 export default function Home() {
   return (
-    <main style={{ position: 'relative', zIndex: 10, minHeight: '100vh' }}>
+    <main style={{ background: '#06070a' }}>
       <HomeComponent />
       <About />
       <Projects />

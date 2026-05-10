@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import blogdata from '@/app/api/blogs/blog'
-import { SectionLabel } from './About'
+import { SectionLabel, sectionStyle, containerStyle } from './About'
 
 function getRecentPosts() {
   return [...blogdata]
@@ -20,49 +20,51 @@ export default function Writing() {
   const posts = getRecentPosts()
 
   return (
-    <section id="writing" style={{ padding: '96px 48px', position: 'relative' }}>
-      <SectionLabel num="03" label="writing" />
+    <>
+      <div className="section-divider" />
+      <section id="writing" className="section" style={sectionStyle}>
+        <div style={containerStyle}>
+          <SectionLabel
+            num="03"
+            label="writing"
+            right={<Link href="/blogs" className="nav-link">read all on /blogs ↗</Link>}
+          />
 
-      <div style={{ maxWidth: '760px' }}>
-        {posts.map((post) => (
-          <Link
-            key={post.id}
-            href={`/blogs/${post.slug}`}
-            style={{
-              display: 'flex', alignItems: 'baseline', gap: '14px',
-              padding: '14px 8px',
-              borderBottom: '1px dashed #1c1c20',
-              fontFamily: 'var(--font-jetbrains), ui-monospace, monospace',
-              fontSize: '13px', color: '#71717a',
-              textDecoration: 'none',
-            }}
-            className="post-row"
-          >
-            <span style={{ color: '#a3e635' }}>▸</span>
-            <span className="post-title-hover" style={{ color: '#e4e4e7', flex: 1 }}>
-              {post.title}
-            </span>
-            <span style={{ color: '#52525b', fontSize: '12px', flexShrink: 0 }}>
-              {formatDate(post.date)}
-            </span>
-            <span style={{ color: '#71717a', flexShrink: 0 }}>[ read → ]</span>
-          </Link>
-        ))}
+          <div style={{ maxWidth: '860px' }}>
+            {posts.map((post) => (
+              <Link
+                key={post.id}
+                href={`/blogs/${post.slug}`}
+                className="post-row"
+                style={{
+                  display: 'flex',
+                  alignItems: 'baseline',
+                  gap: '16px',
+                  padding: '16px 10px',
+                  borderBottom: '1px dashed #1c1c20',
+                  fontFamily: 'var(--font-jetbrains), ui-monospace, monospace',
+                  fontSize: '13.5px',
+                  color: '#a1a1aa',
+                  textDecoration: 'none',
+                  transition: 'background 0.2s',
+                  flexWrap: 'wrap',
+                }}
+              >
+                <span style={{ color: '#a3e635' }}>▸</span>
+                <span className="post-title-hover" style={{ color: '#fafafa', flex: 1, minWidth: '200px' }}>
+                  {post.title}
+                </span>
+                <span style={{ color: '#71717a', fontSize: '12.5px' }}>{formatDate(post.date)}</span>
+                <span style={{ color: '#a1a1aa' }}>[ read → ]</span>
+              </Link>
+            ))}
+          </div>
 
-        <div style={{ marginTop: '20px' }}>
-          <Link href="/blogs" className="nav-link" style={{ fontFamily: 'var(--font-jetbrains), ui-monospace, monospace', fontSize: '12px' }}>
-            read all on /blogs ↗
-          </Link>
+          <style>{`
+            .post-row:hover { background: rgba(163,230,53,0.05); }
+          `}</style>
         </div>
-      </div>
-
-      <style>{`
-        .post-row:hover { background: rgba(163,230,53,0.05); }
-        .post-row:hover .post-read { color: #a3e635; }
-        @media (max-width: 640px) {
-          .post-row { flex-wrap: wrap; font-size: 12px; }
-        }
-      `}</style>
-    </section>
+      </section>
+    </>
   )
 }

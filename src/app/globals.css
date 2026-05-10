@@ -4,9 +4,12 @@
 
 :root {
   --bg: #06070a;
-  --surface: rgba(6, 7, 10, 0.92);
+  --bg-elev: #0a0b10;
+  --surface: #0d0f15;
   --border: #1f2128;
+  --border-soft: #16181f;
   --text: #e4e4e7;
+  --text-dim: #d4d4d8;
   --muted: #71717a;
   --accent: #a3e635;
   --accent-dim: #65a30d;
@@ -24,9 +27,9 @@ body {
 }
 
 /* Scrollbar */
-::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar { width: 8px; }
 ::-webkit-scrollbar-track { background: #0a0a0c; }
-::-webkit-scrollbar-thumb { background: #27272a; border-radius: 3px; }
+::-webkit-scrollbar-thumb { background: #27272a; border-radius: 4px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--accent-dim); }
 
 /* Blinking cursor */
@@ -105,7 +108,7 @@ body {
   animation: glitch 0.4s steps(2) 1;
 }
 
-/* Nav link hover — used to avoid JS event handlers in server components */
+/* Nav link hover */
 .nav-link {
   color: #71717a;
   text-decoration: none;
@@ -113,22 +116,46 @@ body {
 }
 .nav-link:hover { color: #a3e635; }
 
-/* Content veil — sits between 3D canvas (z:0) and DOM content (z:10+) */
-.content-veil {
-  position: fixed;
-  inset: 0;
-  z-index: 1;
-  pointer-events: none;
-  background: rgba(6, 7, 10, 0.55);
+/* Subtle dot grid that shows through under hero (above 3D canvas) */
+.hero-dotgrid {
+  background-image: radial-gradient(rgba(163, 230, 53, 0.07) 1px, transparent 1px);
+  background-size: 22px 22px;
 }
 
-/* Card / work card shared */
-.glass-card {
+/* Section helpers */
+.section {
+  background: var(--bg);
+  position: relative;
+  z-index: 10;
+}
+
+.section-divider {
+  height: 1px;
+  background: linear-gradient(to right, transparent, var(--border), transparent);
+  width: 100%;
+}
+
+/* Card */
+.card {
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 6px;
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  transition: border-color 0.2s, box-shadow 0.25s, transform 0.3s;
+}
+.card:hover { border-color: #3f3f46; }
+
+/* Featured work card */
+.work-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  transition: border-color 0.2s, box-shadow 0.3s, transform 0.3s;
+}
+.work-card.featured { border-color: rgba(163, 230, 53, 0.4); box-shadow: 0 0 36px -10px rgba(163, 230, 53, 0.15); }
+.work-card:hover {
+  border-color: var(--accent);
+  box-shadow: 0 0 1px rgba(163, 230, 53, 0.22), 0 18px 48px -12px rgba(163, 230, 53, 0.22);
+  transform: translateY(-2px);
 }
 
 /* Blog system — keep existing */
