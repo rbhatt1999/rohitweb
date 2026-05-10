@@ -1,0 +1,815 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>rohitweb · redesign mockup</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  /* ──────────────────────────────────────────────────────────────────
+     Mockup wrapper (the page that holds the two device frames)
+     ────────────────────────────────────────────────────────────────── */
+  :root{
+    --bg:#09090b;
+    --surface:rgba(24,24,27,.6);
+    --border:#27272a;
+    --text:#e4e4e7;
+    --muted:#71717a;
+    --accent:#a3e635;
+    --accent-dim:#65a30d;
+    --mono:'JetBrains Mono',ui-monospace,monospace;
+    --sans:'Inter',ui-sans-serif,system-ui,sans-serif;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0;background:#0b0b0d;color:#a1a1aa;font-family:var(--sans)}
+  body{
+    min-height:100vh;
+    padding:32px 24px 80px;
+    background:
+      radial-gradient(circle at 20% 0%, rgba(163,230,53,.04), transparent 50%),
+      radial-gradient(circle at 80% 100%, rgba(163,230,53,.03), transparent 50%),
+      #0b0b0d;
+  }
+  .preview-header{
+    max-width:1700px;margin:0 auto 32px;padding:0 8px;
+    font-family:var(--mono);
+  }
+  .preview-header .crumb{color:var(--muted);font-size:12px;letter-spacing:.05em}
+  .preview-header h1{margin:6px 0 4px;color:var(--text);font-size:18px;font-weight:500}
+  .preview-header .sub{color:var(--muted);font-size:13px;line-height:1.5;max-width:720px}
+  .preview-header .sub b{color:var(--accent)}
+
+  .frames{
+    max-width:1700px;margin:0 auto;
+    display:grid;
+    grid-template-columns: minmax(0,1fr) auto;
+    gap:32px;
+    align-items:start;
+  }
+  @media (max-width:1100px){ .frames{grid-template-columns:1fr; } }
+
+  .frame-label{
+    font-family:var(--mono);font-size:11px;color:var(--muted);
+    letter-spacing:.1em;text-transform:uppercase;margin:0 0 10px;
+    display:flex;justify-content:space-between;align-items:center;
+  }
+  .frame-label .dim{opacity:.6}
+
+  /* Device chrome */
+  .device{
+    background:var(--bg);
+    border:1px solid var(--border);
+    border-radius:14px;
+    overflow:hidden;
+    box-shadow:0 30px 80px -20px rgba(0,0,0,.6), 0 0 0 1px rgba(255,255,255,.02) inset;
+    position:relative;
+  }
+  .device-bar{
+    display:flex;align-items:center;gap:8px;
+    padding:10px 14px;background:#111114;border-bottom:1px solid var(--border);
+    font-family:var(--mono);font-size:11px;color:var(--muted);
+  }
+  .device-bar .dot{width:10px;height:10px;border-radius:50%;background:#3f3f46}
+  .device-bar .dot.r{background:#52525b}
+  .device-bar .url{margin-left:auto;color:#52525b}
+
+  .desktop{aspect-ratio: 16 / 10; min-height:840px}
+  .mobile{width:380px; height:780px}
+  @media (max-width:1100px){ .mobile{margin:0 auto; width:min(380px,92vw)} }
+
+  /* ──────────────────────────────────────────────────────────────────
+     Site itself (rendered inside each device)
+     ────────────────────────────────────────────────────────────────── */
+  .site{
+    height:100%;
+    overflow-y:auto;
+    overflow-x:hidden;
+    background:var(--bg);
+    color:var(--text);
+    font-family:var(--sans);
+    position:relative;
+    scrollbar-width:thin;
+    scrollbar-color:#27272a transparent;
+  }
+  .site::-webkit-scrollbar{width:8px}
+  .site::-webkit-scrollbar-thumb{background:#27272a;border-radius:4px}
+  .site::-webkit-scrollbar-thumb:hover{background:var(--accent-dim)}
+
+  /* Persistent 3D-ish background (canvas) */
+  .bg-canvas{
+    position:absolute;inset:0;width:100%;height:100%;
+    pointer-events:none;z-index:0;opacity:.6;
+  }
+  .dot-grid{
+    position:absolute;inset:0;z-index:0;pointer-events:none;
+    background-image: radial-gradient(rgba(228,228,231,.06) 1px, transparent 1px);
+    background-size: 22px 22px;
+    mask-image: radial-gradient(ellipse at center, black 30%, transparent 80%);
+  }
+
+  /* Nav */
+  .nav{
+    position:sticky;top:0;z-index:20;
+    backdrop-filter:blur(10px);
+    background:rgba(9,9,11,.65);
+    border-bottom:1px solid var(--border);
+    display:flex;align-items:center;
+    padding:12px 28px;
+    font-family:var(--mono);font-size:13px;
+  }
+  .mobile .nav{padding:12px 18px;font-size:12px}
+  .nav .brand{color:var(--text)}
+  .nav .brand .arrow{color:var(--accent);margin-right:6px}
+  .nav .links{display:flex;gap:22px;margin-left:auto;color:var(--muted)}
+  .nav .links a{color:var(--muted);text-decoration:none;transition:color .2s}
+  .nav .links a:hover{color:var(--accent)}
+  .nav .cmdk{margin-left:22px;color:var(--muted);border:1px solid var(--border);padding:2px 8px;border-radius:4px;font-size:11px}
+  .mobile .nav .links,.mobile .nav .cmdk{display:none}
+  .nav .burger{margin-left:auto;color:var(--text);font-size:18px;display:none}
+  .mobile .nav .burger{display:block}
+
+  /* Scroll-progress rail (desktop only) */
+  .rail{position:absolute;left:8px;top:80px;bottom:80px;width:14px;z-index:5;font-family:var(--mono);font-size:9px;color:var(--muted);letter-spacing:1px;display:flex;flex-direction:column;align-items:center;gap:2px;opacity:.55}
+  .mobile .rail{display:none}
+  .rail b{color:var(--accent);font-weight:400}
+
+  /* Content */
+  .container{position:relative;z-index:1;padding:0 36px}
+  .mobile .container{padding:0 20px}
+
+  /* Hero */
+  .hero{padding:72px 0 96px;position:relative}
+  .mobile .hero{padding:48px 0 64px}
+  .prompt{font-family:var(--mono);color:var(--muted);font-size:13px;letter-spacing:.04em;margin-bottom:20px}
+  .prompt .dollar{color:var(--accent);margin-right:8px}
+  .prompt .cursor{display:inline-block;width:8px;height:14px;background:var(--accent);margin-left:2px;vertical-align:middle;animation:blink 1s steps(2) infinite}
+  @keyframes blink{50%{opacity:0}}
+  .hero h1{
+    font-family:var(--mono);font-weight:600;
+    font-size:72px;line-height:.95;letter-spacing:-.02em;margin:0 0 16px;
+    color:var(--text);
+    overflow:hidden; white-space:nowrap;
+    border-right:0;
+    animation: type 1.6s steps(11,end) .3s both;
+  }
+  .mobile .hero h1{font-size:44px;white-space:normal;animation:none}
+  @keyframes type{from{width:0}to{width:11ch}}
+  .hero .rule{height:1px;width:120px;background:var(--border);margin:0 0 24px}
+  .hero p.lead{color:#d4d4d8;font-size:18px;line-height:1.55;max-width:560px;margin:0 0 18px;font-weight:300}
+  .mobile .hero p.lead{font-size:15px}
+  .hero .meta{font-family:var(--mono);font-size:13px;color:var(--muted);margin-bottom:36px}
+  .hero .meta b{color:var(--accent);font-weight:400}
+  .ctas{display:flex;gap:14px;flex-wrap:wrap}
+  .btn{
+    font-family:var(--mono);font-size:13px;
+    border:1px solid var(--accent);color:var(--accent);
+    padding:12px 22px;background:transparent;cursor:pointer;
+    transition:transform .25s ease, background .2s, box-shadow .25s;
+    text-decoration:none;display:inline-block;
+  }
+  .btn:hover{background:rgba(163,230,53,.08);box-shadow:0 0 24px rgba(163,230,53,.18);transform:translateY(-2px)}
+  .btn.ghost{border-color:var(--border);color:var(--text)}
+  .btn.ghost:hover{border-color:var(--text);background:rgba(255,255,255,.03)}
+  .mobile .ctas .btn{flex:1;text-align:center}
+
+  /* Floating glyph (right of hero) */
+  .glyph{
+    position:absolute;right:40px;top:120px;
+    font-family:var(--mono);font-size:140px;font-weight:700;
+    color:var(--accent);
+    text-shadow: 0 0 30px rgba(163,230,53,.45), 0 0 60px rgba(163,230,53,.25);
+    animation: float 6s ease-in-out infinite;
+    user-select:none;
+    line-height:1;
+  }
+  .mobile .glyph{display:none}
+  @keyframes float{
+    0%,100%{transform:translateY(0) rotate(-4deg)}
+    50%{transform:translateY(-14px) rotate(4deg)}
+  }
+
+  /* Section */
+  section{padding:60px 0;position:relative;border-top:1px solid #18181b}
+  .mobile section{padding:44px 0}
+  .label{font-family:var(--mono);font-size:12px;color:var(--muted);margin:0 0 10px;letter-spacing:.05em}
+  .label .num{color:var(--accent)}
+  .label .right{float:right;font-size:11px}
+  .label .right a{color:var(--muted);text-decoration:none}
+  .label .right a:hover{color:var(--accent)}
+  .label-rule{height:1px;width:200px;background:var(--border);margin:0 0 28px}
+
+  /* About */
+  .about-grid{display:grid;grid-template-columns:1.2fr 1fr;gap:36px;align-items:start}
+  .mobile .about-grid{grid-template-columns:1fr;gap:24px}
+  .card{
+    background:var(--surface);
+    border:1px solid var(--border);
+    padding:24px 26px;
+    border-radius:6px;
+    transition:border-color .2s, box-shadow .25s;
+  }
+  .card:hover{border-color:#3f3f46}
+  .about p{color:#d4d4d8;line-height:1.7;margin:0 0 14px;font-size:15px;font-weight:300}
+  .stack{font-family:var(--mono);font-size:13.5px;color:var(--muted);line-height:1.85}
+  .stack .label-h{color:var(--text);margin-bottom:8px;display:block}
+  .stack .item{display:flex;align-items:center;cursor:default;transition:color .2s}
+  .stack .item:hover{color:var(--text)}
+  .stack .item:hover .tree{color:var(--accent)}
+  .stack .tree{color:#3f3f46;margin-right:10px}
+  .stack .badge{margin-left:auto;color:var(--accent);font-size:11px}
+
+  /* Featured work */
+  .work-card{
+    background:var(--surface);
+    border:1px solid var(--border);
+    padding:30px 32px;
+    border-radius:6px;
+    margin-bottom:18px;
+    position:relative;
+    overflow:hidden;
+    transition: transform .35s ease, border-color .25s, box-shadow .35s;
+  }
+  .work-card:hover{
+    border-color:var(--accent);
+    box-shadow: 0 0 0 1px rgba(163,230,53,.15), 0 12px 40px -10px rgba(163,230,53,.18);
+    transform:translateY(-2px);
+  }
+  .work-head{display:flex;align-items:flex-start;gap:20px}
+  .work-title{font-family:var(--mono);font-size:22px;color:var(--text);margin:0;font-weight:500}
+  .mobile .work-title{font-size:18px}
+  .work-rule{height:1px;width:80px;background:var(--accent);opacity:.4;margin:8px 0 14px}
+  .work-card p{color:#d4d4d8;line-height:1.65;margin:0 0 16px;font-weight:300;font-size:14.5px}
+  .stack-line{font-family:var(--mono);font-size:12.5px;color:var(--muted)}
+  .stack-line span{color:#52525b;margin:0 6px}
+  .live{
+    margin-left:auto;font-family:var(--mono);font-size:12px;
+    color:var(--accent);text-decoration:none;border:1px solid var(--accent);
+    padding:6px 12px;border-radius:4px;white-space:nowrap;
+    transition:background .2s;
+  }
+  .live:hover{background:rgba(163,230,53,.1)}
+
+  /* Mini 3D preview (faux) */
+  .mini3d{
+    width:140px;height:90px;flex-shrink:0;
+    border:1px solid var(--border);border-radius:4px;
+    background:radial-gradient(circle at 50% 60%, rgba(163,230,53,.18), transparent 70%), #0a0a0c;
+    position:relative;overflow:hidden;
+  }
+  .mobile .mini3d{width:100%;height:120px;margin-bottom:14px}
+  .mini3d canvas{width:100%;height:100%;display:block}
+
+  .mobile .work-head{flex-direction:column}
+  .mobile .work-head .live{margin-left:0;margin-top:10px;align-self:flex-start}
+
+  /* More projects ASCII list */
+  .more{margin-top:26px;font-family:var(--mono);font-size:13px;color:var(--muted);line-height:2.1}
+  .more .head{color:var(--text);margin-bottom:6px;display:block}
+  .more .row{
+    display:flex;align-items:center;padding:2px 8px;margin-left:-8px;
+    border-radius:4px;cursor:default;
+    transition: background .25s, color .2s;
+    position:relative;
+  }
+  .more .row:hover{background:linear-gradient(90deg, rgba(163,230,53,.12), transparent);color:var(--text)}
+  .more .row .tree{color:#3f3f46;margin-right:10px}
+  .more .row .desc{color:#52525b;margin:0 12px}
+  .more .row .gh{margin-left:auto;color:var(--muted);text-decoration:none;font-size:12px}
+  .more .row:hover .gh{color:var(--accent)}
+
+  /* Writing */
+  .post{
+    display:flex;align-items:baseline;gap:14px;
+    padding:14px 8px;border-bottom:1px dashed #1c1c20;
+    font-family:var(--mono);font-size:13.5px;color:var(--muted);
+    text-decoration:none;transition:background .2s;
+  }
+  .post:hover{background:rgba(163,230,53,.04)}
+  .post .marker{color:var(--accent)}
+  .post .title{color:var(--text);flex:1}
+  .post:hover .title{animation: glitch .4s steps(2) 1}
+  @keyframes glitch{
+    0%{transform:translateX(0);text-shadow:none}
+    25%{transform:translateX(-1px);text-shadow:1px 0 var(--accent), -1px 0 #f43f5e}
+    50%{transform:translateX(1px);text-shadow:-1px 0 var(--accent), 1px 0 #38bdf8}
+    100%{transform:translateX(0);text-shadow:none}
+  }
+  .post .date{color:#52525b}
+  .post .read{color:var(--muted)}
+  .post:hover .read{color:var(--accent)}
+  .mobile .post{flex-wrap:wrap;font-size:12.5px}
+  .mobile .post .date{flex-basis:100%;margin-left:24px;font-size:11px}
+
+  /* Contact */
+  .contact-wrap{display:grid;grid-template-columns:1fr auto;gap:36px;align-items:center}
+  .mobile .contact-wrap{grid-template-columns:1fr;gap:24px}
+  .echo{font-family:var(--mono);font-size:14px;color:var(--muted);margin-bottom:20px}
+  .echo .dollar{color:var(--accent)}
+  .email{font-family:var(--mono);font-size:22px;color:var(--text);text-decoration:none;border-bottom:1px solid var(--border);padding-bottom:6px;display:inline-block;transition:border-color .2s,color .2s}
+  .email:hover{color:var(--accent);border-color:var(--accent)}
+  .mobile .email{font-size:16px;word-break:break-all}
+  .socials{margin-top:22px;font-family:var(--mono);font-size:13px;display:flex;flex-wrap:wrap;gap:18px}
+  .socials a{color:var(--muted);text-decoration:none;transition:color .2s}
+  .socials a:hover{color:var(--accent)}
+  .socials a::before{content:'▸ ';color:var(--accent);opacity:.7}
+
+  .orbit{
+    width:200px;height:200px;border:1px solid var(--border);border-radius:50%;
+    position:relative;
+    background:radial-gradient(circle, rgba(163,230,53,.05), transparent 70%);
+  }
+  .mobile .orbit{display:none}
+  .orbit::after{
+    content:'';position:absolute;inset:30px;border:1px dashed #27272a;border-radius:50%;
+    animation:spin 30s linear infinite;
+  }
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .orbit .icon{
+    position:absolute;width:36px;height:36px;
+    background:#0a0a0c;border:1px solid var(--accent);border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    font-family:var(--mono);font-size:13px;color:var(--accent);
+    box-shadow:0 0 18px rgba(163,230,53,.3);
+  }
+  .orbit .icon:nth-child(1){top:10px;left:50%;margin-left:-18px}
+  .orbit .icon:nth-child(2){right:10px;top:50%;margin-top:-18px}
+  .orbit .icon:nth-child(3){bottom:10px;left:50%;margin-left:-18px}
+  .orbit .icon:nth-child(4){left:10px;top:50%;margin-top:-18px}
+
+  /* Footer */
+  footer{
+    border-top:1px solid var(--border);
+    padding:24px 36px;
+    font-family:var(--mono);font-size:12px;color:var(--muted);
+    display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;
+    position:relative;z-index:1;
+  }
+  .mobile footer{padding:20px;flex-direction:column}
+  footer .pulse{display:inline-block;width:8px;height:8px;background:var(--accent);border-radius:50%;margin-left:8px;animation:pulse 2s ease-in-out infinite}
+  @keyframes pulse{50%{opacity:.3;box-shadow:0 0 12px var(--accent)}}
+
+  /* Reveal on scroll */
+  .reveal{opacity:0;transform:translateY(24px);transition:opacity .8s ease, transform .8s ease}
+  .reveal.in{opacity:1;transform:none}
+
+  /* Disclaimer */
+  .disclaimer{
+    max-width:1700px;margin:36px auto 0;padding:16px 8px;
+    font-family:var(--mono);font-size:11px;color:#52525b;line-height:1.6;
+  }
+  .disclaimer b{color:var(--accent);font-weight:400}
+</style>
+</head>
+<body>
+
+<div class="preview-header">
+  <div class="crumb">// rohitweb / redesign / preview</div>
+  <h1>Terminal/dev redesign — static visual mockup</h1>
+  <div class="sub">
+    Side-by-side preview of the <b>desktop (1280×800)</b> and <b>mobile (375×812)</b> layouts.
+    The actual build will use <b>React Three Fiber + drei + postprocessing</b> for the 3D wireframe background and per-project mini canvases,
+    <b>GSAP + ScrollTrigger</b> for scroll-scrubbed sequences, <b>Lenis</b> for smooth scroll, and keep <b>Framer Motion</b> for component transitions.
+    This HTML uses canvas 2D + CSS to approximate the look — final version will be considerably richer.
+  </div>
+</div>
+
+<div class="frames">
+
+  <!-- ════════════════ DESKTOP ════════════════ -->
+  <div>
+    <div class="frame-label"><span>desktop · 1280 × 800</span><span class="dim">scrollable ↓</span></div>
+    <div class="device desktop">
+      <div class="device-bar">
+        <div class="dot"></div><div class="dot r"></div><div class="dot r"></div>
+        <span class="url">rohitweb.me</span>
+      </div>
+      <div class="site" id="site-desktop">
+        <canvas class="bg-canvas"></canvas>
+        <div class="dot-grid"></div>
+        <div class="rail">
+          <b>▮</b><b>▮</b><span>▯</span><span>▯</span><span>▯</span><span>▯</span><span>▯</span><span>▯</span>
+        </div>
+
+        <nav class="nav">
+          <span class="brand"><span class="arrow">▸</span>rohit.bhatt</span>
+          <span class="links">
+            <a>work</a><a>writing</a><a>about</a><a>contact</a>
+          </span>
+          <span class="cmdk">⌘ K</span>
+        </nav>
+
+        <div class="container">
+          <section class="hero">
+            <div class="glyph">▸</div>
+            <div class="prompt"><span class="dollar">$</span>whoami<span class="cursor"></span></div>
+            <h1>ROHIT BHATT</h1>
+            <div class="rule"></div>
+            <p class="lead">Full-stack engineer building thoughtful web software with Ruby on Rails &amp; React.</p>
+            <div class="meta">── 2+ years &nbsp;·&nbsp; remote &nbsp;·&nbsp; <b>open to work</b></div>
+            <div class="ctas">
+              <a class="btn">[ view work → ]</a>
+              <a class="btn ghost">[ get in touch ]</a>
+            </div>
+          </section>
+
+          <section class="reveal">
+            <div class="label"><span class="num">// 01</span> — about</div>
+            <div class="label-rule"></div>
+            <div class="about-grid">
+              <div class="card about">
+                <p>I build software that feels considered. Currently working remote, shipping landing pages → full-stack apps. Early delivery is the secret to my workflow.</p>
+                <p>Off-screen: hiking trails and Erin Morgenstern novels.</p>
+              </div>
+              <div class="card stack">
+                <span class="label-h">stack/</span>
+                <div class="item"><span class="tree">├─</span>rails<span class="badge">◆ daily</span></div>
+                <div class="item"><span class="tree">├─</span>react<span class="badge">◆ daily</span></div>
+                <div class="item"><span class="tree">├─</span>postgres</div>
+                <div class="item"><span class="tree">├─</span>tailwind</div>
+                <div class="item"><span class="tree">├─</span>node</div>
+                <div class="item"><span class="tree">└─</span>...</div>
+              </div>
+            </div>
+          </section>
+
+          <section class="reveal">
+            <div class="label"><span class="num">// 02</span> — featured work</div>
+            <div class="label-rule"></div>
+
+            <div class="work-card">
+              <div class="work-head">
+                <div style="flex:1">
+                  <h3 class="work-title">stay_a_while/</h3>
+                  <div class="work-rule"></div>
+                  <p>Home-stay reservation app — booking flow, host dashboards, payments UI.</p>
+                  <div class="stack-line">rails <span>·</span> react <span>·</span> redux <span>·</span> postgres</div>
+                </div>
+                <div class="mini3d"><canvas data-shape="house"></canvas></div>
+                <a class="live">[ live ↗ ]</a>
+              </div>
+            </div>
+
+            <div class="work-card">
+              <div class="work-head">
+                <div style="flex:1">
+                  <h3 class="work-title">space_hub/</h3>
+                  <div class="work-rule"></div>
+                  <p>Mission selector for SpaceX flight data. Filter by status, drill into mission detail.</p>
+                  <div class="stack-line">react <span>·</span> redux <span>·</span> css</div>
+                </div>
+                <div class="mini3d"><canvas data-shape="sat"></canvas></div>
+                <a class="live">[ live ↗ ]</a>
+              </div>
+            </div>
+
+            <div class="more">
+              <span class="head">more/</span>
+              <div class="row"><span class="tree">├─</span>budget_app<span class="desc">— rails finance manager</span><a class="gh">[ github ↗ ]</a></div>
+              <div class="row"><span class="tree">├─</span>recipe_app<span class="desc">— cookbook + ingredients</span><a class="gh">[ github ↗ ]</a></div>
+              <div class="row"><span class="tree">├─</span>finance_app<span class="desc">— stock market analysis</span><a class="gh">[ github ↗ ]</a></div>
+              <div class="row"><span class="tree">└─</span>math_magician<span class="desc">— calculator + practice</span><a class="gh">[ github ↗ ]</a></div>
+            </div>
+          </section>
+
+          <section class="reveal">
+            <div class="label">
+              <span class="num">// 03</span> — writing
+              <span class="right"><a>read all on /blogs ↗</a></span>
+            </div>
+            <div class="label-rule"></div>
+            <a class="post"><span class="marker">▸</span><span class="title">building-with-rails-7.md</span><span class="date">2026-04-21</span><span class="read">[ read → ]</span></a>
+            <a class="post"><span class="marker">▸</span><span class="title">react-server-components-notes.md</span><span class="date">2026-03-12</span><span class="read">[ read → ]</span></a>
+            <a class="post"><span class="marker">▸</span><span class="title">remote-rituals.md</span><span class="date">2026-02-08</span><span class="read">[ read → ]</span></a>
+          </section>
+
+          <section class="reveal">
+            <div class="label"><span class="num">// 04</span> — contact</div>
+            <div class="label-rule"></div>
+            <div class="contact-wrap">
+              <div>
+                <div class="echo"><span class="dollar">$</span> echo "let's talk"</div>
+                <a class="email">rbhatt199924@gmail.com ↗</a>
+                <div class="socials">
+                  <a>github</a><a>linkedin</a><a>twitter</a><a>medium</a>
+                </div>
+              </div>
+              <div class="orbit">
+                <div class="icon">gh</div>
+                <div class="icon">in</div>
+                <div class="icon">𝕏</div>
+                <div class="icon">m</div>
+              </div>
+            </div>
+          </section>
+        </div>
+
+        <footer>
+          <span>© 2026 rohit bhatt</span>
+          <span>built with next.js · last push 2d ago<span class="pulse"></span></span>
+        </footer>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════ MOBILE ════════════════ -->
+  <div>
+    <div class="frame-label"><span>mobile · 375 × 812</span><span class="dim">scrollable ↓</span></div>
+    <div class="device mobile">
+      <div class="device-bar">
+        <div class="dot"></div><div class="dot r"></div><div class="dot r"></div>
+        <span class="url">rohitweb.me</span>
+      </div>
+      <div class="site mobile" id="site-mobile">
+        <canvas class="bg-canvas"></canvas>
+        <div class="dot-grid"></div>
+
+        <nav class="nav">
+          <span class="brand"><span class="arrow">▸</span>rohit.bhatt</span>
+          <span class="burger">☰</span>
+        </nav>
+
+        <div class="container">
+          <section class="hero">
+            <div class="prompt"><span class="dollar">$</span>whoami<span class="cursor"></span></div>
+            <h1>ROHIT<br>BHATT</h1>
+            <div class="rule"></div>
+            <p class="lead">Full-stack engineer building thoughtful web software with Rails &amp; React.</p>
+            <div class="meta">── 2+ yrs · remote<br><b>open to work</b></div>
+            <div class="ctas">
+              <a class="btn">[ view work → ]</a>
+              <a class="btn ghost">[ get in touch ]</a>
+            </div>
+          </section>
+
+          <section class="reveal">
+            <div class="label"><span class="num">// 01</span> — about</div>
+            <div class="label-rule"></div>
+            <div class="about-grid">
+              <div class="card about">
+                <p>I build software that feels considered. Currently working remote, shipping landing pages → full-stack apps.</p>
+                <p>Off-screen: hiking, Erin Morgenstern novels.</p>
+              </div>
+              <div class="card stack">
+                <span class="label-h">stack/</span>
+                <div class="item"><span class="tree">├─</span>rails<span class="badge">◆</span></div>
+                <div class="item"><span class="tree">├─</span>react<span class="badge">◆</span></div>
+                <div class="item"><span class="tree">├─</span>postgres</div>
+                <div class="item"><span class="tree">├─</span>tailwind</div>
+                <div class="item"><span class="tree">└─</span>node</div>
+              </div>
+            </div>
+          </section>
+
+          <section class="reveal">
+            <div class="label"><span class="num">// 02</span> — featured work</div>
+            <div class="label-rule"></div>
+
+            <div class="work-card">
+              <div class="work-head">
+                <div style="flex:1;width:100%">
+                  <div class="mini3d"><canvas data-shape="house"></canvas></div>
+                  <h3 class="work-title">stay_a_while/</h3>
+                  <div class="work-rule"></div>
+                  <p>Home-stay reservation app — booking flow, host dashboards.</p>
+                  <div class="stack-line">rails <span>·</span> react <span>·</span> redux <span>·</span> postgres</div>
+                  <a class="live" style="margin-top:14px;display:inline-block">[ live ↗ ]</a>
+                </div>
+              </div>
+            </div>
+
+            <div class="work-card">
+              <div class="work-head">
+                <div style="flex:1;width:100%">
+                  <div class="mini3d"><canvas data-shape="sat"></canvas></div>
+                  <h3 class="work-title">space_hub/</h3>
+                  <div class="work-rule"></div>
+                  <p>Mission selector for SpaceX flight data.</p>
+                  <div class="stack-line">react <span>·</span> redux <span>·</span> css</div>
+                  <a class="live" style="margin-top:14px;display:inline-block">[ live ↗ ]</a>
+                </div>
+              </div>
+            </div>
+
+            <div class="more">
+              <span class="head">more/</span>
+              <div class="row"><span class="tree">├─</span>budget_app<a class="gh">[↗]</a></div>
+              <div class="row"><span class="tree">├─</span>recipe_app<a class="gh">[↗]</a></div>
+              <div class="row"><span class="tree">├─</span>finance_app<a class="gh">[↗]</a></div>
+              <div class="row"><span class="tree">└─</span>math_magician<a class="gh">[↗]</a></div>
+            </div>
+          </section>
+
+          <section class="reveal">
+            <div class="label"><span class="num">// 03</span> — writing</div>
+            <div class="label-rule"></div>
+            <a class="post"><span class="marker">▸</span><span class="title">building-with-rails-7.md</span><span class="date">2026-04-21</span></a>
+            <a class="post"><span class="marker">▸</span><span class="title">react-server-components.md</span><span class="date">2026-03-12</span></a>
+            <a class="post"><span class="marker">▸</span><span class="title">remote-rituals.md</span><span class="date">2026-02-08</span></a>
+            <div style="margin-top:14px;font-family:var(--mono);font-size:12px;color:var(--muted)">read all on /blogs ↗</div>
+          </section>
+
+          <section class="reveal">
+            <div class="label"><span class="num">// 04</span> — contact</div>
+            <div class="label-rule"></div>
+            <div class="echo"><span class="dollar">$</span> echo "let's talk"</div>
+            <a class="email">rbhatt199924@<br>gmail.com ↗</a>
+            <div class="socials" style="flex-direction:column;gap:8px">
+              <a>github</a><a>linkedin</a><a>twitter</a><a>medium</a>
+            </div>
+          </section>
+        </div>
+
+        <footer>
+          <span>© 2026 rohit bhatt</span>
+          <span>built with next.js</span>
+          <span>last push 2d ago<span class="pulse"></span></span>
+        </footer>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="disclaimer">
+  // note: in the production build the wireframe plane, drifting glyphs, hero <b>▸</b> mesh, project mini-previews, and
+  contact icon orbit are all real <b>WebGL</b> via React Three Fiber w/ bloom postprocessing. This file uses canvas-2D
+  and CSS to convey the feel without pulling 3D deps. Heavy motion = real R3F + GSAP scroll-scrub in the actual build.
+</div>
+
+<script>
+  /* ────────── faux-3D wireframe canvas (per device) ────────── */
+  function startBg(canvas){
+    const ctx = canvas.getContext('2d');
+    let w,h,cols,rows,cell,t=0;
+    function resize(){
+      const r = canvas.getBoundingClientRect();
+      const dpr = Math.min(window.devicePixelRatio||1, 2);
+      canvas.width = r.width*dpr; canvas.height = r.height*dpr;
+      ctx.setTransform(dpr,0,0,dpr,0,0);
+      w = r.width; h = r.height;
+      cell = Math.max(28, Math.min(46, w/24));
+      cols = Math.ceil(w/cell)+2; rows = Math.ceil(h/cell)+2;
+    }
+    resize();
+    new ResizeObserver(resize).observe(canvas);
+    function loop(){
+      t += 0.012;
+      ctx.clearRect(0,0,w,h);
+      ctx.lineWidth = 1;
+      const cx = w/2, cy = h*0.55;
+      for(let j=0;j<rows;j++){
+        for(let i=0;i<cols;i++){
+          const x = i*cell - cell;
+          const y = j*cell - cell;
+          // wave displacement
+          const dx = Math.sin((x+t*60)*0.012 + j*0.4)*8;
+          const dy = Math.cos((y+t*40)*0.014 + i*0.4)*6;
+          // pseudo-perspective
+          const dist = Math.hypot(x-cx, y-cy);
+          const fade = Math.max(0, 1 - dist/(Math.max(w,h)*0.7));
+          const alpha = 0.05 + fade*0.18;
+          ctx.strokeStyle = `rgba(163,230,53,${alpha})`;
+          // horizontal segment
+          if(i<cols-1){
+            const x2 = (i+1)*cell - cell;
+            const dx2 = Math.sin((x2+t*60)*0.012 + j*0.4)*8;
+            ctx.beginPath();
+            ctx.moveTo(x+dx, y+dy);
+            ctx.lineTo(x2+dx2, y+dy);
+            ctx.stroke();
+          }
+          // vertical segment
+          if(j<rows-1){
+            const y2 = (j+1)*cell - cell;
+            const dy2 = Math.cos((y2+t*40)*0.014 + i*0.4)*6;
+            ctx.beginPath();
+            ctx.moveTo(x+dx, y+dy);
+            ctx.lineTo(x+dx, y2+dy2);
+            ctx.stroke();
+          }
+        }
+      }
+      // drifting glyphs
+      ctx.font = '11px JetBrains Mono, monospace';
+      ctx.fillStyle = 'rgba(163,230,53,0.35)';
+      const glyphs = ['>','_','{','}',';','/','(',')','#','$'];
+      for(let k=0;k<18;k++){
+        const seed = k*97;
+        const gx = ((seed*13.7 + t*30) % (w+40)) - 20;
+        const gy = ((seed*23.3 - t*40) % (h+40) + h+40) % (h+40) - 20;
+        const g = glyphs[k % glyphs.length];
+        ctx.fillText(g, gx, gy);
+      }
+      requestAnimationFrame(loop);
+    }
+    loop();
+  }
+  document.querySelectorAll('.bg-canvas').forEach(startBg);
+
+  /* ────────── per-card mini "3D" canvas (rotating wireframe) ────────── */
+  function startMini(canvas){
+    const ctx = canvas.getContext('2d');
+    const shape = canvas.dataset.shape;
+    let w,h;
+    function resize(){
+      const r = canvas.getBoundingClientRect();
+      const dpr = Math.min(window.devicePixelRatio||1, 2);
+      canvas.width = r.width*dpr; canvas.height = r.height*dpr;
+      ctx.setTransform(dpr,0,0,dpr,0,0);
+      w = r.width; h = r.height;
+    }
+    resize();
+    new ResizeObserver(resize).observe(canvas);
+
+    // primitive vertex sets
+    const verts = shape === 'house'
+      ? [ // simple house
+          [-1,-1, 1],[1,-1, 1],[1, 1, 1],[-1, 1, 1],
+          [-1,-1,-1],[1,-1,-1],[1, 1,-1],[-1, 1,-1],
+          [-1, 1, 1],[0, 1.8, 1],[1, 1, 1],
+          [-1, 1,-1],[0, 1.8,-1],[1, 1,-1]
+        ]
+      : [ // satellite (cross + dish)
+          [-1.6,0,0],[1.6,0,0],
+          [0,-0.4,-0.6],[0,0.4,-0.6],
+          [0,-0.4, 0.6],[0,0.4, 0.6],
+          [-0.6,0.6,0],[0.6,0.6,0],[0,1.2,0]
+        ];
+    const edges = shape === 'house'
+      ? [[0,1],[1,2],[2,3],[3,0],[4,5],[5,6],[6,7],[7,4],[0,4],[1,5],[2,6],[3,7],[8,9],[9,10],[11,12],[12,13],[9,12]]
+      : [[0,1],[2,3],[4,5],[6,7],[6,8],[7,8]];
+
+    let t = 0;
+    function loop(){
+      t += 0.014;
+      ctx.clearRect(0,0,w,h);
+      const cx = w/2, cy = h/2;
+      const scale = Math.min(w,h)*0.28;
+      const cosY = Math.cos(t), sinY = Math.sin(t);
+      const cosX = Math.cos(t*0.4), sinX = Math.sin(t*0.4);
+      const proj = verts.map(([x,y,z])=>{
+        // rotate Y
+        let xr = x*cosY - z*sinY;
+        let zr = x*sinY + z*cosY;
+        // rotate X
+        let yr = y*cosX - zr*sinX;
+        zr   = y*sinX + zr*cosX;
+        const persp = 3 / (3 - zr);
+        return [cx + xr*scale*persp, cy + yr*scale*persp, zr];
+      });
+      ctx.strokeStyle = 'rgba(163,230,53,0.85)';
+      ctx.lineWidth = 1.1;
+      ctx.beginPath();
+      for(const [a,b] of edges){
+        const pa = proj[a], pb = proj[b];
+        ctx.moveTo(pa[0], pa[1]); ctx.lineTo(pb[0], pb[1]);
+      }
+      ctx.stroke();
+      // glow points
+      ctx.fillStyle = 'rgba(163,230,53,0.95)';
+      for(const p of proj){
+        ctx.beginPath();
+        ctx.arc(p[0], p[1], 1.4, 0, Math.PI*2);
+        ctx.fill();
+      }
+      requestAnimationFrame(loop);
+    }
+    loop();
+  }
+  document.querySelectorAll('.mini3d canvas').forEach(startMini);
+
+  /* ────────── reveal-on-scroll (per scroll container) ────────── */
+  ['site-desktop','site-mobile'].forEach(id=>{
+    const root = document.getElementById(id);
+    const obs = new IntersectionObserver(entries=>{
+      for(const e of entries){
+        if(e.isIntersecting){ e.target.classList.add('in'); obs.unobserve(e.target); }
+      }
+    },{ root, threshold:.15 });
+    root.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
+  });
+
+  /* ────────── magnetic buttons (desktop only) ────────── */
+  document.querySelectorAll('#site-desktop .btn').forEach(btn=>{
+    btn.addEventListener('mousemove',e=>{
+      const r = btn.getBoundingClientRect();
+      const x = e.clientX - r.left - r.width/2;
+      const y = e.clientY - r.top - r.height/2;
+      btn.style.transform = `translate(${x*0.18}px, ${y*0.22 - 2}px)`;
+    });
+    btn.addEventListener('mouseleave',()=>{ btn.style.transform = ''; });
+  });
+
+  /* ────────── card tilt on hover (desktop only) ────────── */
+  document.querySelectorAll('#site-desktop .work-card').forEach(card=>{
+    card.addEventListener('mousemove',e=>{
+      const r = card.getBoundingClientRect();
+      const x = (e.clientX - r.left)/r.width - .5;
+      const y = (e.clientY - r.top)/r.height - .5;
+      card.style.transform = `perspective(900px) rotateY(${x*4}deg) rotateX(${-y*4}deg) translateY(-2px)`;
+    });
+    card.addEventListener('mouseleave',()=>{ card.style.transform=''; });
+  });
+</script>
+
+</body>
+</html>
