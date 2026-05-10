@@ -2523,6 +2523,439 @@ server.register_tool(FetchStagingLogsTool)
       title: `Building the Future: A Developer's Guide to Agentic AI Workflows in Ruby`,
       slug: `building-the-future-a-developers-guide-to-agentic-ai-workflows-in-ruby`,
     },
+  },
+  {
+    title: `Vectorless RAG: You Probably Don't Need a Vector Database`,
+    slug: `vectorless-rag-you-probably-dont-need-a-vector-database`,
+    id: 11,
+    category_id: 5,
+    description: `Discover vectorless RAG — retrieval-augmented generation without embeddings or vector databases. Learn BM25, PageIndex, and when to skip the vector stack entirely.`,
+    image: {
+      src: `https://res.cloudinary.com/dnxybxsdq/image/upload/v1778447711/IMG_2116_jdflsv.webp`,
+      alt: `Vectorless RAG: You Probably Don't Need a Vector Database`,
+    },
+    owner: `Rohit Bhatt`,
+    tags: [`RAG`, `LLMs`, `Vector Databases`, `BM25`, `AI Engineering`, `PostgreSQL`, `Ruby on Rails`],
+    date: '2026-05-10',
+    summary: `Everyone building AI features in 2026 seems to follow the same recipe: chunk your documents, push them through an embedding model, store vectors in Pinecone or Weaviate, and call it RAG. But the vector database is often the most expensive, fragile part of the stack — and you don't actually need it. Vectorless RAG is a family of retrieval approaches (BM25, PageIndex, knowledge graphs, text-to-SQL, agentic keyword search) that ground LLM answers in real documents without dense embeddings or approximate nearest-neighbour search. This deep dive covers when to skip the vector stack, the five core vectorless approaches with production Rails code, and the honest trade-offs based on the latest 2025–2026 research.`,
+    sections: [
+      {
+        h1: `Introduction`,
+        p: `Everyone building AI features in 2025–2026 seems to follow the same recipe: chunk your documents, push them through an embedding model, store vectors in Pinecone or Weaviate, and call it RAG. It works. But here's the uncomfortable question nobody in the tutorial pipeline is asking:<br/><br/><strong>What if the vector database is the most expensive, fragile part of your stack — and you don't actually need it?</strong><br/><br/>That's the premise behind <strong>Vectorless RAG</strong>: a family of retrieval approaches that ground LLM answers in real documents <em>without</em> dense embeddings or approximate nearest-neighbour search. Not because vectors are bad, but because the blanket assumption that you <em>need</em> them is often wrong.<br/><br/>In this post, we'll unpack what vectorless RAG actually means, why the problem exists, and what the five core approaches look like in practice — with real code for Rails developers and enough depth for AI engineers who've been doing this for years.`,
+      },
+      {
+        h1: `First, What Is RAG? (Quick Primer for Newcomers)`,
+        p: `<em>If you're already comfortable with RAG, skip ahead to the next section.</em><br/><br/>RAG stands for <strong>Retrieval-Augmented Generation</strong>. The idea is simple: LLMs have a knowledge cutoff and can't access your private documents, so instead of fine-tuning an expensive model, you retrieve relevant text at query time and inject it into the prompt.<br/><br/>A basic RAG pipeline looks like this: a user asks a question, a retrieval layer searches your docs for relevant sections, those sections are assembled into context, and an LLM generates an answer grounded in the retrieved text.<br/><br/>The <em>conventional</em> implementation uses <strong>vector embeddings</strong> for the retrieval layer:`,
+        list: [
+          { h1: `Embed`, p: `Convert every document chunk into a dense numerical vector (embedding).` },
+          { h1: `Store`, p: `Persist those vectors in a specialized database (Pinecone, Weaviate, Qdrant, etc.).` },
+          { h1: `Encode the query`, p: `At query time, convert the question into a vector.` },
+          { h1: `Search`, p: `Find the most semantically similar document vectors via cosine similarity / ANN search.` },
+          { h1: `Generate`, p: `Feed those chunks to the LLM.` },
+        ],
+      },
+      {
+        p: `This works surprisingly well for many use cases. But it comes with real costs — costs that are easy to ignore when you're building a demo but unavoidable in production.`,
+      },
+      {
+        h1: `The Problem: Why Vector RAG Falls Apart in the Real World`,
+        p: `Before we talk about alternatives, let's be honest about what's actually breaking. These are not theoretical concerns — they are patterns I've encountered repeatedly in production systems.`,
+        subSections: [
+          {
+            h2: `1. Chunking Destroys Context`,
+            p: `Every RAG tutorial starts with: "Split your documents into 512-token chunks." But documents have <em>structure</em>. A 200-page financial report has sections, subsections, tables, and cross-references. When you slice it into fixed-size chunks, you cut table headers from their rows, separate a disclaimer from the claim it qualifies, and fragment multi-step processes across chunks. The LLM receives a context window that looks like a shredded document — and hallucinates the rest.`,
+          },
+          {
+            h2: `2. "Vibe Retrieval" Misses Exact Answers`,
+            p: `Embeddings capture <em>semantic similarity</em>, not <em>factual relevance</em>. A query for <code>"NullPointerException in OrderService"</code> will retrieve chunks about error handling in general — because they're <em>semantically close</em> — rather than the one line in your codebase that actually throws the exception.<br/><br/>The same problem appears in finance, law, and medicine. A contract query about "clauses voiding the warranty" may surface the clause <em>establishing</em> the warranty because the vocabulary overlaps. This is what some researchers call <strong>vibe retrieval</strong>: the results feel right but aren't.`,
+          },
+          {
+            h2: `3. Infrastructure Overhead Is Significant`,
+            p: `A production vector RAG stack typically requires an embedding model (often GPU-backed, with API latency or infra cost), a vector database (Pinecone, Weaviate, Qdrant — all require ops overhead), re-indexing pipelines every time documents change, and duplicate infrastructure if you're already running Postgres or Elasticsearch. For a team already running Postgres, adding a vector DB for a single RAG feature is like buying a second kitchen because you need to make coffee.`,
+          },
+          {
+            h2: `4. Embeddings Fail in Niche Domains`,
+            p: `General-purpose embedding models are trained on general text. In specialised domains — Korean Traditional Medicine, legal Latin, financial regulations, medical SOAP notes — the embedding space doesn't reflect domain semantics. A 2024 paper on Korean medicine RAG (arXiv 2401.11246) showed that in niche corpora, embedding similarity correlated with <em>token overlap</em> rather than <em>domain relevance</em> — making general embeddings actively misleading.`,
+          },
+          {
+            h2: `5. Debugging Is Opaque`,
+            p: `When a chunk surfaces in your retrieval results, why did it surface? A cosine score of 0.73 is not an audit trail. In regulated industries — finance, healthcare, legal — you need to explain <em>why</em> a specific passage was retrieved. Lexical and structural retrieval systems give you that; vector similarity doesn't.`,
+          },
+        ],
+      },
+      {
+        h1: `So What Is Vectorless RAG?`,
+        p: `<strong>Vectorless RAG</strong> is any RAG architecture where the retrieval layer does not rely on dense vector embeddings or approximate nearest-neighbour search.<br/><br/>The original RAG paper by Lewis et al. (2020) never mandated vectors. It defined RAG as <em>"augmenting an LLM with retrieved external knowledge."</em> The vector assumption crept in later, driven by benchmark results on open-domain QA — a use case that happens to favour semantic similarity.<br/><br/>Vectorless RAG is the reassertion of a simple point: <strong>retrieval can be lexical, structural, symbolic, or LLM-driven — and for many real-world corpora, these approaches outperform vectors</strong>.`,
+      },
+      {
+        h1: `Approach 1: BM25 / Lexical Retrieval`,
+        p: `<strong>What it is:</strong> BM25 is a ranking algorithm from the 1990s. It scores documents based on term frequency, inverse document frequency, and document length normalization. No neural network. No GPU. No embeddings.<br/><br/>The simplified formula is roughly: <code>BM25 score ≈ Σ IDF(term) × TF(term in doc) / (TF + k₁ × (1 - b + b × doc_length/avg_length))</code>, where IDF (Inverse Document Frequency) gives rare terms a higher score, TF (Term Frequency) measures how often the term appears, and k₁ and b are tuning parameters (typically k₁=1.5, b=0.75).<br/><br/><strong>For newcomers:</strong> Think of BM25 as a very smart keyword search. If you search for <code>"warranty void clause"</code>, it finds documents that contain those exact words, with higher weight for documents where those words are rare and concentrated.`,
+        list: [
+          { h1: `Exact identifiers`, p: `error codes, SKUs, statute numbers, drug names.` },
+          { h1: `Code searches`, p: `function names, class names, exception types.` },
+          { h1: `Technical documentation`, p: `with precise terminology.` },
+          { h1: `Literal queries`, p: `any domain where the user means exactly what they typed.` },
+        ],
+      },
+      {
+        p: `Here is a Rails implementation using <code>pg_search</code>:`,
+        html: {
+          type: "code",
+          language: "ruby",
+          value: `# Gemfile
+gem "pg_search"
+
+# Migration - precomputed tsvector column + GIN index for fast search
+class AddSearchableToPosts < ActiveRecord::Migration[8.0]
+  def up
+    add_column :documents, :searchable, :tsvector
+
+    # Populate the searchable column from title + body
+    execute <<~SQL
+      UPDATE documents
+      SET searchable = to_tsvector('english', coalesce(title, '') || ' ' || coalesce(body, ''))
+    SQL
+
+    # GIN index = fast lookup. Without this, every search is a full table scan.
+    add_index :documents, :searchable, using: :gin
+  end
+end
+
+# Model
+class Document < ApplicationRecord
+  include PgSearch::Model
+
+  pg_search_scope :search_for_rag,
+    against: { title: "A", body: "B" },  # Title matches weighted higher
+    using: {
+      tsearch: {
+        dictionary: "english",
+        prefix: true,            # "refund" matches "refunding"
+        tsvector_column: "searchable"
+      },
+      trigram: { threshold: 0.3 }  # Handles typos gracefully
+    }
+end`,
+        },
+      },
+      {
+        p: `<strong>Pro Tip:</strong> <code>pg_search</code>'s default <code>ts_rank</code> is <strong>not</strong> true BM25 — it lacks IDF weighting and term-frequency saturation. For RAG-grade ranking, use <a href='https://www.paradedb.com/learn/search-in-postgresql/bm25' target='_blank' rel='noopener'>ParadeDB's pg_search extension</a> (BM25 via Tantivy) or Tiger Data's <code>pg_textsearch</code>.<br/><br/>For non-Rails teams, here's the Python equivalent using the much faster <code>bm25s</code> library:`,
+        html: {
+          type: "code",
+          language: "python",
+          value: `from bm25s import BM25  # bm25s: orders-of-magnitude faster than rank_bm25
+
+# Index your documents once
+corpus = [doc["text"] for doc in documents]
+retriever = BM25()
+retriever.index(BM25.tokenize(corpus))
+
+# Query at runtime - no GPU, no API calls, no embeddings
+results = retriever.retrieve(BM25.tokenize(["warranty void clause"]), k=8)`,
+        },
+      },
+      {
+        h1: `Approach 2: PageIndex — Reasoning-Based Tree Retrieval`,
+        p: `<strong>What it is:</strong> This is the approach that put "vectorless RAG" on the map in 2025. Developed by VectifyAI, PageIndex reframes retrieval as <strong>tree search over a generated table of contents</strong>.<br/><br/><strong>For newcomers:</strong> Imagine you're a lawyer reviewing a 300-page contract. You don't read every word — you flip to the table of contents, find "Termination Clauses," turn to page 187, and read that section. PageIndex teaches an LLM to do exactly that.<br/><br/>The pipeline has two phases. <strong>Phase 1 (Ingestion):</strong> an LLM walks the document and summarizes each section into a JSON tree of nodes (id, title, summary, page range). <strong>Phase 2 (Query):</strong> the LLM reads only the tree summaries (not the full document), picks the most relevant node IDs, and the system fetches raw text for only those nodes.<br/><br/><strong>The benchmark that made headlines:</strong> VectifyAI's Mafin 2.5, built on PageIndex, scored <strong>98.7% accuracy on FinanceBench</strong> — a financial QA benchmark — versus ~31% for standard GPT-4o RAG. That's a meaningful gap.<br/><br/><strong>Honest caveat:</strong> This benchmark is vendor-published on a single-document, hierarchically rich dataset. Independent research (arXiv 2511.18177) testing across 1,200 SEC filings found vector RAG with reranking <em>beat</em> tree-based approaches on noisy multi-document corpora. Both findings can be true — PageIndex wins on structured documents, vectors win on noisy large corpora.`,
+      },
+      {
+        p: `Here's how to integrate PageIndex into Rails by calling its API from a background job, then traversing the tree at query time:`,
+        html: {
+          type: "code",
+          language: "ruby",
+          value: `# Background job - build tree on document upload
+class BuildPageIndexJob < ApplicationJob
+  queue_as :default
+
+  def perform(document_id)
+    document = Document.find(document_id)
+
+    response = Faraday.post("https://api.vectify.ai/v1/index") do |req|
+      req.headers["Authorization"] = "Bearer #{ENV['VECTIFY_API_KEY']}"
+      req.body = {
+        document_url: document.file_url,
+        document_id: document.id.to_s
+      }.to_json
+    end
+
+    tree = JSON.parse(response.body)
+    # Store the tree in a jsonb column for fast query-time traversal
+    document.update!(page_index_tree: tree, indexed_at: Time.current)
+  end
+end
+
+# Query-time retrieval
+class PageIndexRetriever
+  def retrieve(document, question)
+    tree_json = document.page_index_tree.to_json
+
+    # Step 1: LLM selects relevant node IDs from the tree summaries
+    node_ids = select_nodes_from_tree(tree_json, question)
+
+    # Step 2: Fetch raw text for only those nodes
+    fetch_node_content(document, node_ids)
+  end
+
+  private
+
+  def select_nodes_from_tree(tree_json, question)
+    client = OpenAI::Client.new
+    response = client.chat(parameters: {
+      model: "gpt-4o-mini",
+      messages: [
+        { role: "system", content: "Given the document tree, return a JSON array of node IDs most relevant to the question. Return ONLY valid JSON." },
+        { role: "user", content: "Tree: #{tree_json}\\n\\nQuestion: #{question}" }
+      ]
+    })
+    JSON.parse(response.dig("choices", 0, "message", "content"))
+  end
+end`,
+        },
+      },
+      {
+        h1: `Approach 3: Knowledge Graph RAG`,
+        p: `<strong>What it is:</strong> Instead of chunks, your knowledge is stored as a <strong>graph of entities and relationships</strong>. Retrieval becomes graph traversal — no similarity search required.<br/><br/><strong>For newcomers:</strong> Instead of storing "The CEO of Acme Corp is Jane Smith, who previously worked at TechCorp," you store nodes (<code>Jane Smith</code>, <code>Acme Corp</code>, <code>TechCorp</code>) connected by typed edges (<code>IS_CEO_OF</code>, <code>PREVIOUSLY_WORKED_AT</code>). Now the question "Who leads Acme Corp?" is just a graph lookup, not a semantic search.`,
+        list: [
+          {
+            h1: `Microsoft GraphRAG (arXiv 2404.16130)`,
+            p: `Extracts entities and relationships with an LLM, runs community detection (Leiden algorithm) to find clusters of related entities, generates community summaries, and answers "global" questions by doing a map-reduce over those summaries. The key insight: vector RAG is great for "find the chunk about X" but terrible for "give me an overview of how all parts of this domain relate" — GraphRAG handles that second query type.`,
+          },
+          {
+            h1: `Schema-driven Knowledge Graphs (Neo4j, Amazon Neptune)`,
+            p: `When your data is already relational — products, customers, contracts, regulations — you can represent it as a knowledge graph and query with Cypher or SPARQL. The LLM converts the user's question to a graph query, no embeddings needed.`,
+          },
+        ],
+      },
+      {
+        p: `<strong>Best for:</strong> Enterprise knowledge management, multi-hop reasoning ("Which clients use the feature that depends on the deprecated API?"), regulatory compliance, drug interactions, organisational hierarchies.`,
+      },
+      {
+        h1: `Approach 4: Text-to-SQL (Structured Data RAG)`,
+        p: `<strong>What it is:</strong> The LLM generates SQL to query your relational database directly. If your "documents" are structured data — transactions, orders, CRM records — this is often strictly better than any retrieval approach.<br/><br/><strong>For newcomers:</strong> Instead of "retrieve chunks about Q1 revenue → feed to LLM → hope it gets the math right," you do: user asks "What was total Q1 churn by plan?" → LLM writes SQL → execute against Postgres → return precise numbers → LLM explains them.<br/><br/>Here's a Rails example with an LLM-generated query:`,
+        html: {
+          type: "code",
+          language: "ruby",
+          value: `class TextToSqlRag
+  SCHEMA_CONTEXT = <<~SQL
+    -- Tables available:
+    -- subscriptions(id, user_id, plan, status, cancelled_at, created_at)
+    -- users(id, email, company_name, created_at)
+    -- invoices(id, subscription_id, amount_cents, paid_at, period_start, period_end)
+  SQL
+
+  def answer(question)
+    # Step 1: LLM writes the SQL
+    sql = generate_sql(question)
+
+    # Step 2: Safety check - only allow SELECT statements
+    raise SecurityError, "Only SELECT queries permitted" unless sql.strip.upcase.start_with?("SELECT")
+
+    # Step 3: Execute and format results
+    results = ActiveRecord::Base.connection.execute(sql)
+    rows = results.map(&:to_h)
+
+    # Step 4: LLM explains the data
+    explain_results(question, rows)
+  end
+
+  private
+
+  def generate_sql(question)
+    client = OpenAI::Client.new
+    response = client.chat(parameters: {
+      model: "gpt-4o",
+      messages: [
+        { role: "system", content: "Generate PostgreSQL SELECT queries only. Schema:\\n#{SCHEMA_CONTEXT}\\nReturn ONLY the SQL. No explanation, no markdown." },
+        { role: "user", content: question }
+      ]
+    })
+    response.dig("choices", 0, "message", "content").strip
+  end
+end`,
+        },
+      },
+      {
+        p: `<strong>Best for:</strong> Quantitative questions over structured data, business intelligence queries, any use case where exact numbers matter (financial reporting, usage analytics, sales dashboards).`,
+      },
+      {
+        h1: `Approach 5: Agentic Keyword Search`,
+        p: `<strong>What it is:</strong> Expose keyword/BM25 search as a <strong>tool</strong> for the LLM. The model issues searches, reads results, refines its query, and iterates — just like a human researcher would.<br/><br/>This is the approach validated by AWS researchers in their 2026 paper "Keyword search is all you need" (arXiv 2602.23368). The finding: an agent with keyword search tools achieves <strong>&gt;90% of the answer quality of vector RAG</strong> — without a vector database.<br/><br/>The key insight is that the LLM compensates for lexical search's limitations (synonym gap, query dependency) through multi-step reasoning. It doesn't get the answer wrong because its search missed a synonym — it retries with a different keyword.`,
+        html: {
+          type: "code",
+          language: "ruby",
+          value: `# Define the search tool for your LLM
+SEARCH_TOOL = {
+  type: "function",
+  function: {
+    name: "search_documents",
+    description: "Search the knowledge base using keyword search. Use specific technical terms. You can call this multiple times with different keywords to find all relevant information.",
+    parameters: {
+      type: "object",
+      properties: {
+        query: { type: "string", description: "Keyword search query - be specific" },
+        limit: { type: "integer", description: "Number of results (1-10)", default: 5 }
+      },
+      required: ["query"]
+    }
+  }
+}.freeze
+
+class AgenticKeywordRag
+  MAX_ITERATIONS = 5  # Prevent infinite loops
+
+  def answer(question)
+    messages = [
+      { role: "system", content: "You are a helpful assistant. Use the search_documents tool to find relevant information before answering. Search multiple times with different keywords if needed." },
+      { role: "user", content: question }
+    ]
+
+    MAX_ITERATIONS.times do
+      response = call_llm(messages, tools: [SEARCH_TOOL])
+      choice = response.dig("choices", 0)
+
+      # If the LLM calls a tool, execute it and continue the loop
+      if choice.dig("message", "tool_calls")
+        tool_call = choice.dig("message", "tool_calls", 0)
+        args = JSON.parse(tool_call.dig("function", "arguments"))
+
+        # Execute the BM25 search
+        results = Document.search_for_rag(args["query"]).limit(args["limit"] || 5)
+        context = results.map { |d| "**#{d.title}**\\n#{d.body}" }.join("\\n\\n---\\n\\n")
+
+        # Feed results back to the LLM and continue
+        messages << choice["message"]
+        messages << {
+          role: "tool",
+          tool_call_id: tool_call["id"],
+          content: context
+        }
+      else
+        # LLM has finished - return the final answer
+        return choice.dig("message", "content")
+      end
+    end
+  end
+
+  private
+
+  def call_llm(messages, tools: [])
+    OpenAI::Client.new.chat(parameters: {
+      model: "gpt-4o-mini",
+      messages: messages,
+      tools: tools
+    })
+  end
+end`,
+        },
+      },
+      {
+        h1: `Vector vs. Vectorless: The Honest Comparison`,
+        p: `There is no universal winner. Here's the framework I use when architecting a RAG system — for each signal, lean one way or the other:`,
+        list: [
+          { h1: `Document structure`, p: `Hierarchical (contracts, reports, manuals) → vectorless. Flat, paragraph-based → vector.` },
+          { h1: `Query type`, p: `Exact terms, identifiers, codes → vectorless. Conceptual, synonym-heavy → vector.` },
+          { h1: `Corpus size`, p: `Single or few long documents → vectorless. Thousands of short documents → vector.` },
+          { h1: `Domain`, p: `Niche / specialised → vectorless. General / open-domain → vector.` },
+          { h1: `Update frequency`, p: `Frequent → vectorless. Infrequent → vector.` },
+          { h1: `Existing infra`, p: `Already on Postgres/ES → vectorless. Greenfield, vector DB acceptable → vector.` },
+          { h1: `Auditability needed`, p: `Yes → vectorless. Not required → vector.` },
+        ],
+      },
+      {
+        p: `<strong>The production default in most enterprises in 2026: hybrid.</strong> Run BM25 and dense retrieval in parallel, combine their rankings using Reciprocal Rank Fusion (RRF). Postgres now supports this natively with <code>pg_textsearch</code> (BM25) and <code>pgvector</code> (dense) in the same query:`,
+        html: {
+          type: "code",
+          language: "sql",
+          value: `-- Hybrid RAG retrieval: BM25 + dense, fused via RRF
+WITH bm25_results AS (
+  SELECT id,
+         row_number() OVER (ORDER BY paradedb.score(id) DESC) AS rank
+  FROM documents
+  WHERE body @@@ 'warranty void clause'   -- BM25 search (ParadeDB syntax)
+  LIMIT 50
+),
+vector_results AS (
+  SELECT id,
+         row_number() OVER (ORDER BY embedding <=> $1) AS rank  -- $1 = query embedding
+  FROM documents
+  LIMIT 50
+)
+SELECT
+  COALESCE(b.id, v.id)                                AS id,
+  (1.0 / (60 + COALESCE(b.rank, 1000))) +
+  (1.0 / (60 + COALESCE(v.rank, 1000)))              AS rrf_score
+FROM bm25_results b
+FULL OUTER JOIN vector_results v ON b.id = v.id
+ORDER BY rrf_score DESC
+LIMIT 10;`,
+        },
+      },
+      {
+        p: `<strong>For newcomers:</strong> RRF (Reciprocal Rank Fusion) is a simple formula: <code>1 / (60 + rank)</code>. If a document ranks 1st in BM25, it gets score <code>1/(60+1) ≈ 0.016</code>. If it also ranks 3rd in vector search, it gets an additional <code>1/(60+3) ≈ 0.016</code>. Sum both. The document that ranks well in <em>both</em> systems rises to the top. The constant 60 dampens the importance of rank differences at the top.`,
+      },
+      {
+        h1: `What the Research Says in 2026`,
+        p: `The research picture has become more nuanced in the past year.<br/><br/><strong>Supporting vectorless / lexical approaches:</strong>`,
+        list: [
+          { h1: `ELITE (arXiv 2505.11908, 2025)`, p: `Iterative LLM-based retrieval outperformed embedding baselines on long-context QA at &gt;10× lower storage overhead.` },
+          { h1: `"Keyword search is all you need" (AWS, arXiv 2602.23368, 2026)`, p: `Agentic keyword search achieves &gt;90% of vector RAG quality.` },
+          { h1: `Prompt-RAG (arXiv 2401.11246, 2024)`, p: `In niche domains, LLM-based section selection outperformed embedding retrieval.` },
+          { h1: `"The Semantic Illusion" (arXiv 2512.15068, 2025)`, p: `Embedding-based hallucination detectors had 88–100% false-positive rates on real RAG outputs; LLM reasoning-based judges dropped that to 7%.` },
+        ],
+      },
+      {
+        p: `<strong>Supporting vector / hybrid approaches:</strong>`,
+        list: [
+          { h1: `"Rethinking Retrieval" in Finance (arXiv 2511.18177, 2025)`, p: `Testing on 1,200 SEC filings, vector RAG with cross-encoder reranking achieved a 68% win rate over hierarchical tree-based approaches. On noisy, multi-document corpora — vectors still win.` },
+        ],
+      },
+      {
+        p: `<strong>The reconciliation:</strong> Both camps are right about different workloads. Single, structured, hierarchy-rich documents → vectorless. Noisy, large, multi-document corpora → vector + reranker. The industry is converging on hybrid as the safe default.`,
+      },
+      {
+        h1: `Common Misconceptions (Don't Get Caught Here)`,
+        list: [
+          { h1: `"Vectorless means cheaper per query"`, p: `Not necessarily. PageIndex-style tree traversal involves multiple sequential LLM calls per retrieval — which can cost more per query than a single embedding API call. The savings are in <em>infrastructure</em> (no vector DB), not always in <em>per-query token cost</em>.` },
+          { h1: `"BM25 is obsolete"`, p: `BM25 is the default ranking algorithm in Elasticsearch and OpenSearch <em>in 2026</em>. It is deployed at larger scale than any neural retrieval system on the planet. It is not obsolete.` },
+          { h1: `"tsvector in Postgres is BM25"`, p: `It isn't. Postgres's built-in <code>ts_rank</code> lacks proper IDF weighting and term-frequency saturation. For true BM25 in Postgres, you need ParadeDB's <code>pg_search</code>, Tiger Data's <code>pg_textsearch</code>, or VectorChord-BM25. The difference matters when document lengths vary significantly.` },
+          { h1: `"98.7% accuracy means vectorless is always better"`, p: `That number comes from a vendor's evaluation of their own product on a benchmark designed around a strength (single structured financial documents). On other benchmarks and corpus types, the results flip. Always evaluate on <em>your</em> data.` },
+          { h1: `"I need Elasticsearch for BM25"`, p: `If you're already on Postgres and your corpus is under ~500k documents, Postgres with a GIN-indexed tsvector or ParadeDB is competitive with Elasticsearch — without the operational overhead of a separate cluster.` },
+        ],
+      },
+      {
+        h1: `Practical Decision Guide: What to Build`,
+        p: `Here's what I'd actually recommend based on your situation:`,
+        list: [
+          { h1: `Starting a new AI feature on an existing Rails app`, p: `Start with <code>pg_search</code> (BM25 via Postgres) + agentic keyword tool. Get to 80% quality in days, not weeks. Evaluate before reaching for a vector DB.` },
+          { h1: `Building on structured enterprise data (contracts, financial reports, compliance docs)`, p: `Try PageIndex-style tree retrieval. The accuracy gains on hierarchy-rich documents are real and significant.` },
+          { h1: `Working with a large corpus (100k+ docs) with conceptual/synonym-heavy queries`, p: `Vector RAG or hybrid (BM25 + pgvector + RRF) is likely your best bet.` },
+          { h1: `Need precise answers from relational/tabular data`, p: `Text-to-SQL. Don't chunk your database — query it.` },
+          { h1: `Need to handle "find this specific clause" AND "summarise how all our contracts handle liability"`, p: `GraphRAG. It's the only approach that handles global sensemaking well.` },
+          { h1: `Unsure?`, p: `Build hybrid from day one. BM25 is almost free to add if you're on Postgres. Add <code>pgvector</code> alongside it. RRF is 10 lines of SQL.` },
+        ],
+      },
+      {
+        h1: `Conclusion`,
+        p: `The "you need a vector database for RAG" assumption is worth challenging — not because vectors are bad, but because the right tool depends entirely on your corpus, your queries, and your constraints.<br/><br/>Vectorless RAG is not a new technology. BM25 has been powering enterprise search for 30 years. What's new is the recognition that <strong>LLM-based reasoning can close the gap that lexical search leaves open</strong> — through iterative search, tree traversal, and multi-step reasoning — without dense embedding infrastructure.<br/><br/>For most Rails teams building their first RAG feature, the stack I'd reach for in 2026 is:`,
+        list: [
+          { h1: `PostgreSQL`, p: `with <code>pg_search</code> or ParadeDB for BM25.` },
+          { h1: `Agentic keyword search`, p: `as the retrieval pattern.` },
+          { h1: `pgvector`, p: `added when benchmarks show a semantic gap.` },
+          { h1: `RRF hybrid`, p: `as the production-hardened default.` },
+        ],
+      },
+      {
+        p: `The vector database stays optional until the data proves otherwise.`,
+      },
+    ],
+    advertisements: {
+      show: false,
+    },
+    referBlog: {
+      show: true,
+      title: `Building the Future: A Developer's Guide to Agentic AI Workflows in Ruby`,
+      slug: `building-the-future-a-developers-guide-to-agentic-ai-workflows-in-ruby`,
+    },
   }
 ];
 
