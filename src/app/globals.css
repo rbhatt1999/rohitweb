@@ -156,6 +156,82 @@ body {
   .nav-mobile  { display: block; }
 }
 
+/* Mobile menu — hamburger + portal overlay */
+.hamburger-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding: 4px;
+}
+.hamburger-bar {
+  display: block;
+  width: 22px;
+  height: 2px;
+  border-radius: 2px;
+  transition: background 0.2s;
+}
+
+.mobile-menu-overlay {
+  position: fixed;
+  inset: 0;
+  height: 100vh;
+  height: 100dvh;
+  width: 100vw;
+  z-index: 100;
+
+  /* Solid opaque background — no rgba, no backdrop-filter (iOS bleed) */
+  background: #06070a;
+
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+
+  /* Safe-area + top padding so the first menu item never sits behind the browser chrome */
+  padding:
+    calc(env(safe-area-inset-top, 0px) + 96px)
+    28px
+    calc(env(safe-area-inset-bottom, 0px) + 32px);
+
+  font-family: var(--font-jetbrains), ui-monospace, monospace;
+  font-size: 22px;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.mobile-menu-close {
+  position: absolute;
+  top: calc(env(safe-area-inset-top, 0px) + 18px);
+  right: 24px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #a1a1aa;
+  font-size: 14px;
+  font-family: inherit;
+  letter-spacing: 0.05em;
+  padding: 6px 10px;
+}
+.mobile-menu-close:hover { color: #a3e635; }
+
+.mobile-menu-list {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  width: 100%;
+}
+
+.mobile-menu-link {
+  color: #fafafa;
+  text-decoration: none;
+  padding: 4px 0;
+  transition: color 0.15s;
+}
+.mobile-menu-link:hover { color: #a3e635; }
+
 /* Hero dot grid */
 .hero-dotgrid {
   background-image: radial-gradient(rgba(163, 230, 53, 0.07) 1px, transparent 1px);
