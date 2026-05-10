@@ -2536,7 +2536,7 @@ server.register_tool(FetchStagingLogsTool)
     },
     owner: `Rohit Bhatt`,
     tags: [`RAG`, `LLMs`, `Vector Databases`, `BM25`, `AI Engineering`, `PostgreSQL`, `Ruby on Rails`],
-    date: '2026-05-10',
+    date: '2026-05-11',
     summary: `Everyone building AI features in 2026 seems to follow the same recipe: chunk your documents, push them through an embedding model, store vectors in Pinecone or Weaviate, and call it RAG. But the vector database is often the most expensive, fragile part of the stack — and you don't actually need it. Vectorless RAG is a family of retrieval approaches (BM25, PageIndex, knowledge graphs, text-to-SQL, agentic keyword search) that ground LLM answers in real documents without dense embeddings or approximate nearest-neighbour search. This deep dive covers when to skip the vector stack, the five core vectorless approaches with production Rails code, and the honest trade-offs based on the latest 2025–2026 research.`,
     sections: [
       {
