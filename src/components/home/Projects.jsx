@@ -1,196 +1,129 @@
 'use client'
-import React from 'react'
 import { motion } from 'framer-motion'
 import { useInView } from 'react-intersection-observer'
-import { SectionLabel, sectionStyle, containerStyle } from './About'
-
-const FEATURED = [
-  {
-    id: 'sadhak_ai',
-    tag: 'latest · ai',
-    title: 'sadhak_ai/',
-    desc: "Privacy-focused chat with Google's Gemini. Google OAuth login, per-user persisted threads in Postgres, and assistant responses streamed via Server-Sent Events. Rolling-summary context management for long conversations.",
-    stack: 'flask · langchain · gemini · postgres · oauth',
-    live: null,
-    github: 'https://github.com/rbhatt1999/sadhak-ai',
-  },
-  {
-    id: 'stay_a_while',
-    tag: null,
-    title: 'stay_a_while/',
-    desc: 'Home-stay reservation app — booking flow, host dashboards, payments UI.',
-    stack: 'rails · react · redux · postgres',
-    live: 'https://stay-a-while-front-end.vercel.app/',
-    github: 'https://github.com/rbhatt1999/stay-a-while-front-end',
-  },
-]
 
 const MORE = [
   { name: 'space_hub',          desc: '— spacex mission selector',     github: 'https://github.com/rbhatt1999/Space-Hub',     tree: '├─' },
   { name: 'langchain-learning', desc: '— llm exercises & experiments', github: 'https://github.com/rbhatt1999',               tree: '├─' },
-  { name: 'budget_app',         desc: '— rails finance manager',       github: 'https://github.com/rbhatt1999/budget-app',    tree: '├─' },
   { name: 'recipe_app',         desc: '— cookbook + ingredients',      github: 'https://github.com/rbhatt1999/recipe_app',    tree: '├─' },
-  { name: 'finance_app',        desc: '— stock market analysis',       github: 'https://github.com/rbhatt1999/finance-app',   tree: '├─' },
   { name: 'math_magician',      desc: '— calculator + practice',       github: 'https://github.com/rbhatt1999/math-magician', tree: '└─' },
 ]
 
 export default function Projects() {
-  const { ref, inView } = useInView({ threshold: 0.1, triggerOnce: true })
+  const { ref, inView } = useInView({ threshold: 0.08, triggerOnce: true })
 
   return (
-    <>
-      <div className="section-divider" />
-      <section id="work" ref={ref} className="section" style={sectionStyle}>
-        <div style={containerStyle}>
-          <SectionLabel num="02" label="featured work" />
+    <section id="work" ref={ref} className="sec" style={{ zIndex: 10, background: 'var(--bg)' }}>
+      <div className="sec-wrap">
+        <div className="sec-head">
+          <div>
+            <div className="sec-eyebrow">Selected Work / 2022—2025</div>
+            <h2 className="sec-title">Things I&apos;ve built <span className="a">recently</span></h2>
+          </div>
+          <p className="sec-desc">
+            A focused look at the projects I&apos;m most proud of — production apps, AI tooling, and experiments that taught me something.
+          </p>
+        </div>
 
-          {FEATURED.map((proj, i) => (
-            <FeaturedCard key={proj.id} proj={proj} inView={inView} delay={i * 0.15} />
-          ))}
-
-          {/* more/ list */}
+        <div className="bento">
+          {/* sadhak_ai — wide card */}
           <motion.div
+            className="b b-wide"
             initial={{ opacity: 0, y: 24 }}
             animate={inView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.6, delay: 0.4 }}
-            style={{
-              marginTop: '36px',
-              fontFamily: 'var(--font-jetbrains), ui-monospace, monospace',
-              fontSize: '13.5px',
-              color: '#a1a1aa',
-            }}
+            transition={{ duration: 0.6, delay: 0.1 }}
           >
-            <span style={{ color: '#fafafa', display: 'block', marginBottom: '10px', fontWeight: 500 }}>more/</span>
-            {MORE.map(({ name, desc, github, tree }) => (
-              <MoreRow key={name} name={name} desc={desc} github={github} tree={tree} />
-            ))}
+            <span className="b-tag">Featured · AI</span>
+            <h3 className="b-title" style={{ marginTop: '8px' }}>sadhak_ai — private chat with Gemini</h3>
+            <p className="b-desc">
+              Privacy-focused chat: Google OAuth, per-user threads in Postgres, SSE-streamed responses, rolling-summary context windows so long conversations don&apos;t blow the token budget.
+            </p>
+            <div className="b-stack">
+              <span>Flask</span><span>LangChain</span><span>Gemini</span><span>Postgres</span><span>SSE</span>
+            </div>
+            <a href="https://github.com/rbhatt1999/sadhak-ai" target="_blank" rel="noreferrer" className="b-arrow" aria-label="GitHub">↗</a>
+          </motion.div>
+
+          {/* Stat — years */}
+          <motion.div
+            className="b b-quarter"
+            initial={{ opacity: 0, y: 24 }}
+            animate={inView ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.6, delay: 0.2 }}
+            style={{ display: 'flex', flexDirection: 'column', justifyContent: 'flex-end' }}
+          >
+            <p className="stat-num">5<span className="a">+</span></p>
+            <p className="stat-label">Years shipping</p>
+          </motion.div>
+
+          {/* stay_a_while */}
+          <motion.div
+            className="b b-third"
+            initial={{ opacity: 0, y: 24 }}
+            animate={inView ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.6, delay: 0.25 }}
+          >
+            <span className="b-tag">SaaS</span>
+            <h3 className="b-title" style={{ marginTop: '8px' }}>stay_a_while</h3>
+            <p className="b-desc">Home-stay booking flow with host dashboards and a payments UI.</p>
+            <div className="b-stack"><span>Rails</span><span>React</span><span>Redux</span></div>
+            <a href="https://github.com/rbhatt1999/stay-a-while-front-end" target="_blank" rel="noreferrer" className="b-arrow" aria-label="GitHub">↗</a>
+          </motion.div>
+
+          {/* budget_app */}
+          <motion.div
+            className="b b-third"
+            initial={{ opacity: 0, y: 24 }}
+            animate={inView ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.6, delay: 0.3 }}
+          >
+            <span className="b-tag">Tools</span>
+            <h3 className="b-title" style={{ marginTop: '8px' }}>budget_app</h3>
+            <p className="b-desc">Rails finance manager — categorised spend, recurring bills, monthly summaries.</p>
+            <div className="b-stack"><span>Rails</span><span>Postgres</span></div>
+            <a href="https://github.com/rbhatt1999/budget-app" target="_blank" rel="noreferrer" className="b-arrow" aria-label="GitHub">↗</a>
+          </motion.div>
+
+          {/* finance_app */}
+          <motion.div
+            className="b b-third"
+            initial={{ opacity: 0, y: 24 }}
+            animate={inView ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.6, delay: 0.35 }}
+          >
+            <span className="b-tag">Data</span>
+            <h3 className="b-title" style={{ marginTop: '8px' }}>finance_app</h3>
+            <p className="b-desc">Stock market analysis dashboard, charts and trend signals.</p>
+            <div className="b-stack"><span>React</span><span>Node</span><span>Chart.js</span></div>
+            <a href="https://github.com/rbhatt1999/finance-app" target="_blank" rel="noreferrer" className="b-arrow" aria-label="GitHub">↗</a>
           </motion.div>
         </div>
-      </section>
-    </>
-  )
-}
 
-function FeaturedCard({ proj, inView, delay }) {
-  const { tag, title, desc, stack, live, github } = proj
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 30 }}
-      animate={inView ? { opacity: 1, y: 0 } : {}}
-      transition={{ duration: 0.6, delay }}
-      className={`work-card ${tag ? 'featured' : ''}`}
-      style={{ marginBottom: '20px' }}
-    >
-      {tag && (
-        <span
+        {/* more/ list */}
+        <motion.div
+          initial={{ opacity: 0, y: 24 }}
+          animate={inView ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.6, delay: 0.45 }}
           style={{
-            display: 'inline-block',
+            marginTop: '40px',
             fontFamily: 'var(--font-jetbrains), ui-monospace, monospace',
-            fontSize: '10px',
-            color: '#a3e635',
-            border: '1px solid rgba(163,230,53,0.45)',
-            padding: '3px 10px',
-            borderRadius: '3px',
-            marginBottom: '10px',
-            letterSpacing: '0.06em',
-            textTransform: 'uppercase',
+            fontSize: '13.5px',
+            color: 'var(--fg3)',
           }}
         >
-          {tag}
-        </span>
-      )}
-      <div style={{ display: 'flex', alignItems: 'flex-start', gap: '24px', flexWrap: 'wrap' }}>
-        <div style={{ flex: 1, minWidth: 0 }}>
-          <h3
-            style={{
-              fontFamily: 'var(--font-jetbrains), ui-monospace, monospace',
-              fontSize: 'clamp(20px, 2.4vw, 24px)',
-              color: '#fafafa',
-              margin: '0 0 10px',
-              fontWeight: 500,
-              wordBreak: 'break-word',
-            }}
-          >
-            {title}
-          </h3>
-          <div style={{ height: '1px', width: '80px', background: '#a3e635', opacity: 0.6, margin: '0 0 16px' }} />
-          <p
-            style={{
-              color: '#d4d4d8',
-              lineHeight: 1.7,
-              margin: '0 0 18px',
-              fontWeight: 400,
-              fontSize: '15px',
-              fontFamily: 'var(--font-inter), ui-sans-serif, sans-serif',
-            }}
-          >
-            {desc}
-          </p>
-          <div
-            style={{
-              fontFamily: 'var(--font-jetbrains), ui-monospace, monospace',
-              fontSize: '12.5px',
-              color: '#a1a1aa',
-              display: 'flex',
-              flexWrap: 'wrap',
-              alignItems: 'center',
-              rowGap: '4px',
-              columnGap: '10px',
-            }}
-          >
-            {stack.split(' · ').map((s, i, arr) => (
-              <React.Fragment key={s}>
-                <span>{s}</span>
-                {i < arr.length - 1 && <span style={{ color: '#52525b' }}>·</span>}
-              </React.Fragment>
-            ))}
-          </div>
-        </div>
-
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', flexShrink: 0 }}>
-          {live && <ExtLink href={live}>[ live ↗ ]</ExtLink>}
-          {github && <ExtLink href={github}>[ github ↗ ]</ExtLink>}
-        </div>
+          <span style={{ color: 'var(--fg1)', display: 'block', marginBottom: '10px', fontWeight: 500 }}>more/</span>
+          {MORE.map(({ name, desc, github, tree }) => (
+            <a key={name} href={github} target="_blank" rel="noreferrer" className="more-row">
+              <span style={{ color: 'var(--fg5)', marginRight: '12px' }}>{tree}</span>
+              <span style={{ color: 'var(--fg2)' }}>{name}</span>
+              <span style={{ color: 'var(--fg4)', margin: '0 12px' }}>{desc}</span>
+              <span className="gh-link" style={{ marginLeft: 'auto', fontSize: '12px', color: 'var(--fg4)' }}>
+                [ github ↗ ]
+              </span>
+            </a>
+          ))}
+        </motion.div>
       </div>
-    </motion.div>
-  )
-}
-
-function MoreRow({ name, desc, github, tree }) {
-  return (
-    <a href={github} target="_blank" rel="noreferrer" className="more-row">
-      <span style={{ color: '#52525b', marginRight: '12px' }}>{tree}</span>
-      <span style={{ color: '#d4d4d8' }}>{name}</span>
-      <span style={{ color: '#71717a', margin: '0 12px' }}>{desc}</span>
-      <span className="gh-link" style={{ marginLeft: 'auto', fontSize: '12px', color: '#71717a' }}>
-        [ github ↗ ]
-      </span>
-    </a>
-  )
-}
-
-function ExtLink({ href, children }) {
-  return (
-    <a
-      href={href}
-      target="_blank"
-      rel="noreferrer"
-      style={{
-        fontFamily: 'var(--font-jetbrains), ui-monospace, monospace',
-        fontSize: '12px',
-        color: '#a3e635',
-        border: '1px solid #a3e635',
-        padding: '7px 14px',
-        borderRadius: '4px',
-        textDecoration: 'none',
-        whiteSpace: 'nowrap',
-        background: 'rgba(163,230,53,0.04)',
-        transition: 'background 0.2s',
-      }}
-      onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(163,230,53,0.15)')}
-      onMouseLeave={(e) => (e.currentTarget.style.background = 'rgba(163,230,53,0.04)')}
-    >
-      {children}
-    </a>
+    </section>
   )
 }

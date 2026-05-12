@@ -1,7 +1,9 @@
 import HomeComponent from '@/components/home/HomeComponent'
-import About from '@/components/home/About'
+import Marquee from '@/components/home/Marquee'
 import Projects from '@/components/home/Projects'
+import Skills from '@/components/home/Skills'
 import Writing from '@/components/home/Writing'
+import About from '@/components/home/About'
 import Contact from '@/components/home/Contact'
 
 export const metadata = {
@@ -12,11 +14,13 @@ export const metadata = {
 
 export default function Home() {
   return (
-    <main style={{ background: '#06070a' }}>
+    <main>
       <HomeComponent />
-      <About />
+      <Marquee />
       <Projects />
+      <Skills />
       <Writing />
+      <About />
       <Contact />
     </main>
   )

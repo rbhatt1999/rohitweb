@@ -2,19 +2,11 @@
 import { motion } from 'framer-motion'
 import { useInView } from 'react-intersection-observer'
 import { useState } from 'react'
-import { SectionLabel, sectionStyle, containerStyle } from './About'
-
-const SOCIALS = [
-  { label: 'github',   href: 'https://github.com/rbhatt1999' },
-  { label: 'linkedin', href: 'https://www.linkedin.com/in/rohitbhatt-dev/' },
-  { label: 'twitter',  href: 'https://twitter.com/Rohit_Bhatt_' },
-  { label: 'medium',   href: 'https://medium.com/@rbhatt199924' },
-]
 
 const EMAIL = 'rohit.bhatt.dev@gmail.com'
 
 export default function Contact() {
-  const { ref, inView } = useInView({ threshold: 0.15, triggerOnce: true })
+  const { ref, inView } = useInView({ threshold: 0.1, triggerOnce: true })
   const [copied, setCopied] = useState(false)
 
   function copyEmail() {
@@ -25,77 +17,39 @@ export default function Contact() {
   }
 
   return (
-    <>
-      <div className="section-divider" />
-      <section id="contact" ref={ref} className="section" style={{ ...sectionStyle, paddingBottom: 'clamp(80px, 12vw, 140px)' }}>
-        <div style={containerStyle}>
-          <SectionLabel num="04" label="contact" />
-
-          <motion.div
-            initial={{ opacity: 0, y: 24 }}
-            animate={inView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.6 }}
-            style={{ maxWidth: '620px' }}
-          >
-            <div
-              style={{
-                fontFamily: 'var(--font-jetbrains), ui-monospace, monospace',
-                fontSize: '14px',
-                color: '#a1a1aa',
-                marginBottom: '24px',
-              }}
+    <section id="contact" ref={ref} className="sec" style={{ zIndex: 10, background: 'var(--bg)' }}>
+      <div className="sec-wrap">
+        <motion.div
+          className="cta-block"
+          initial={{ opacity: 0, y: 24 }}
+          animate={inView ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.7, delay: 0.1 }}
+        >
+          <div className="cta-eyebrow">◆ Now booking · available for Q3</div>
+          <h2 className="cta-h">Let&apos;s build something <span className="a">good</span>.</h2>
+          <p className="cta-p">
+            Drop a line about what you&apos;re working on. I&apos;ll reply within a day with honest
+            thoughts, a rough scope, and whether I&apos;m the right fit.
+          </p>
+          <div className="cta-row">
+            <button
+              onClick={copyEmail}
+              className="btn btn-primary"
+              style={{ border: 'none', cursor: 'pointer' }}
             >
-              <span style={{ color: '#a3e635' }}>$</span> echo &quot;let&apos;s talk&quot;
-            </div>
-
-            <div style={{ marginBottom: '32px' }}>
-              <button
-                onClick={copyEmail}
-                style={{
-                  fontFamily: 'var(--font-jetbrains), ui-monospace, monospace',
-                  fontSize: 'clamp(15px, 2.4vw, 22px)',
-                  color: copied ? '#a3e635' : '#fafafa',
-                  background: 'none',
-                  border: 'none',
-                  cursor: 'pointer',
-                  borderBottom: `1px solid ${copied ? '#a3e635' : '#3f3f46'}`,
-                  padding: '0 0 8px',
-                  transition: 'color 0.2s, border-color 0.2s',
-                  textShadow: copied ? '0 0 12px rgba(163,230,53,0.6)' : 'none',
-                  wordBreak: 'break-word',
-                  textAlign: 'left',
-                }}
-                title="Click to copy"
-              >
-                {EMAIL} {copied ? '✓ copied!' : '↗'}
-              </button>
-            </div>
-
-            <div
-              style={{
-                fontFamily: 'var(--font-jetbrains), ui-monospace, monospace',
-                fontSize: '13.5px',
-                display: 'flex',
-                flexWrap: 'wrap',
-                gap: '22px',
-              }}
+              {copied ? '✓ Copied!' : `${EMAIL} →`}
+            </button>
+            <a
+              href="https://calendly.com/rbhatt199924/30min"
+              target="_blank"
+              rel="noreferrer"
+              className="btn btn-ghost"
             >
-              {SOCIALS.map(({ label, href }) => (
-                <a
-                  key={label}
-                  href={href}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="social-link"
-                >
-                  <span style={{ color: '#a3e635', opacity: 0.85 }}>▸ </span>
-                  {label}
-                </a>
-              ))}
-            </div>
-          </motion.div>
-        </div>
-      </section>
-    </>
+              Book a 20-min call
+            </a>
+          </div>
+        </motion.div>
+      </div>
+    </section>
   )
 }
