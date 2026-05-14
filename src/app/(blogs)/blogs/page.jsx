@@ -75,14 +75,14 @@ export default async function page({ searchParams }) {
   const { data, totalPage } = await getBlogs(page, search);
   return (
     <main className={`relative flex flex-col items-center mt-16 ${dmSans.className}`}>
-      <section className="flex flex-col md:flex-row w-full bg-white/5 items-center justify-center px-2 py-12 md:py-24 md:px-20">
+      <section className="flex flex-col md:flex-row w-full blog-panel items-center justify-center px-2 py-12 md:py-24 md:px-20">
         <div className="flex flex-col justify-center items-center flex-1 gap-2 md:gap-5">
-          <h1 className="text-2xl md:text-4xl font-bold text-center text-blue-400">
+          <h1 className="text-2xl md:text-4xl font-bold text-center blog-title">
             Exploring the Latest Web Technology Trends and Innovations
           </h1>
           {
             search && (
-              <p className='text-base md:text-lg text-center md:text-left text-white'>Search Results for "{search}"</p>
+              <p className='text-base md:text-lg text-center md:text-left blog-body'>Search Results for "{search}"</p>
             )
           }
         </div>
@@ -92,7 +92,7 @@ export default async function page({ searchParams }) {
           {
             data.length === 0 ? (
               <div className='flex flex-col w-full gap-2 items-center justify-center'>
-                <h1 className='text-5xl font-bold pt-5 text-white'>No Blogs Found</h1>
+                <h1 className='text-5xl font-bold pt-5' style={{ color: 'var(--fg1)' }}>No Blogs Found</h1>
               </div>
             ) :
               <BlogsList data={data} totalPage={totalPage} page={page} search={search} afterurl='blogs' />

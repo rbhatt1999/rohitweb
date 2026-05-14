@@ -16,9 +16,9 @@ export default function Search({search = false, afterurl = false}) {
     }
     return (
         <>
-            <input type="text" placeholder="Search" className=" flex-1 px-2 py-1 rounded-md shadow-md drop-shadow-md bg-neutral-100/5 text-blue-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2" value={searchText} onChange={(e) => setSearchText(e.target.value)} onKeyUp={(e) => {if(e.key === 'Enter') handleSearch()}} />
-            <button type='button' className="w-10 h-10 px-2 py-1 rounded-md shadow-md drop-shadow-md bg-primary-100 text-primary-800 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2" onClick={handleSearch} >
-                <BsSearch className="text-xl md:text-2xl text-white" />
+            <input type="text" placeholder="Search" className=" flex-1 px-2 py-1 rounded-md shadow-md drop-shadow-md focus:outline-none" style={{ background: 'var(--surface)', color: 'var(--fg1)', border: '1px solid var(--border)' }} value={searchText} onChange={(e) => setSearchText(e.target.value)} onKeyUp={(e) => {if(e.key === 'Enter') handleSearch()}} />
+            <button type='button' className="w-10 h-10 px-2 py-1 rounded-md shadow-md drop-shadow-md focus:outline-none" style={{ background: 'var(--accent)', color: 'var(--bg)' }} onClick={handleSearch} >
+                <BsSearch className="text-xl md:text-2xl" style={{ color: 'var(--bg)' }} />
             </button>
         </>
     )

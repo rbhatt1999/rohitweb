@@ -77,12 +77,12 @@ export default async function page({params,searchParams}) {
   const data = await getBlogs(slug,page,search);
   return (
     <main className={`relative flex flex-col items-center mt-16 ${dmSans.className}`}>
-      <section className="flex flex-col md:flex-row w-full bg-neutral-200/5 items-center justify-center px-2 py-12 md:py-24 md:px-20">
+      <section className="flex flex-col md:flex-row w-full blog-panel items-center justify-center px-2 py-12 md:py-24 md:px-20">
         <div className="flex flex-col justify-center items-center flex-1 gap-2 md:gap-5">
-          <h1 className="text-3xl md:text-5xl font-bold text-center md:text-left text-blue-400">{data.category.name}</h1>
+          <h1 className="text-3xl md:text-5xl font-bold text-center md:text-left blog-title">{data.category.name}</h1>
           {
             search && (
-              <p className='text-base md:text-lg text-center md:text-left text-white'>Search Results for "{search}"</p>
+              <p className='text-base md:text-lg text-center md:text-left blog-body'>Search Results for "{search}"</p>
             )
           }
         </div>
@@ -90,7 +90,7 @@ export default async function page({params,searchParams}) {
       <div className='flex flex-col md:flex-row w-full gap-8 px-7 py-7 md:py-14 md:px-36'>
         <div className=' flex flex-col w-full md:w-8/12 gap-10'>
           {
-            data.blog.length === 0 ? <h1 className='text-5xl font-bold text-center text-neutral-700'>No Blogs Found</h1>:<BlogsList data={data.blog} totalPage={data.totalPage} page={page} search={search} afterurl={`social-awareness/categories/${slug}`} />
+            data.blog.length === 0 ? <h1 className='text-5xl font-bold text-center' style={{ color: 'var(--fg1)' }}>No Blogs Found</h1>:<BlogsList data={data.blog} totalPage={data.totalPage} page={page} search={search} afterurl={`social-awareness/categories/${slug}`} />
           }
         </div>
         <div className='flex flex-col w-full flex-1 relative'>
