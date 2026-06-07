@@ -9,15 +9,8 @@ export default function HomeFX() {
     const fine = window.matchMedia('(hover: hover) and (pointer: fine)').matches
     const cleanups = []
 
-    // Hero headline entrance
-    const h1 = document.querySelector('.hero-h1')
-    if (h1) {
-      if (reduce) h1.classList.add('in')
-      else {
-        const r = requestAnimationFrame(() => requestAnimationFrame(() => h1.classList.add('in')))
-        cleanups.push(() => cancelAnimationFrame(r))
-      }
-    }
+    // Note: the hero headline entrance is CSS-driven (see .hero-h1 in globals.css)
+    // so it never depends on JS/rAF — important under iOS Low Power Mode.
 
     if (!reduce && fine) {
       // Magnetic pull on CTAs

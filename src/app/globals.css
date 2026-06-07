@@ -304,17 +304,22 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
 }
 .hero-h1 .em { font-style: italic; color: var(--accent); }
 .hero-h1 .hl { display: block; overflow: hidden; padding-bottom: 0.06em; }
+/* CSS-driven entrance — resting state is visible (translateY 0), so the
+   headline never depends on JS/rAF to appear (rAF is throttled in Low Power
+   Mode). The animation only plays the rise in; it always ends visible. */
 html.js .hero-h1 .hl > span {
   display: block;
-  transform: translateY(116%);
-  transition: transform 0.92s var(--ease-out);
+  animation: heroRise 0.92s var(--ease-out) backwards;
   will-change: transform;
 }
-.hero-h1.in .hl > span { transform: none; }
-.hero-h1.in .hl:nth-child(2) > span { transition-delay: 0.09s; }
-.hero-h1.in .hl:nth-child(3) > span { transition-delay: 0.18s; }
+html.js .hero-h1 .hl:nth-child(2) > span { animation-delay: 0.09s; }
+html.js .hero-h1 .hl:nth-child(3) > span { animation-delay: 0.18s; }
+@keyframes heroRise {
+  from { transform: translateY(116%); }
+  to   { transform: translateY(0); }
+}
 @media (prefers-reduced-motion: reduce) {
-  .hero-h1 .hl > span { transform: none; transition: none; }
+  .hero-h1 .hl > span { animation: none; transform: none; }
 }
 .hero-lead {
   font-family: var(--sans);
