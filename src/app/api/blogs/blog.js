@@ -2956,6 +2956,705 @@ LIMIT 10;`,
       title: `Building the Future: A Developer's Guide to Agentic AI Workflows in Ruby`,
       slug: `building-the-future-a-developers-guide-to-agentic-ai-workflows-in-ruby`,
     },
+  },
+  {
+    title: `The Definitive Claude Code Playbook (June 2026 Edition)`,
+    slug: `the-definitive-claude-code-playbook-2026`,
+    id: 12,
+    category_id: 5,
+    description: `Everything that actually matters in Claude Code: CLAUDE.md, thinking budgets, sub-agents, hooks, MCP, parallel worktrees, the Agent SDK, and 50 tips from people who've been burned enough times to know.`,
+    image: {
+      src: `https://website-images-rohitcodes.s3.ap-south-1.amazonaws.com/the-definitive-claude-code-playbook-2026.webp`,
+      alt: `The Definitive Claude Code Playbook (June 2026 Edition)`,
+    },
+    owner: `Rohit Bhatt`,
+    tags: [`Claude Code`, `AI Engineering`, `Agentic Coding`, `Claude Agent SDK`, `MCP`, `Developer Tools`, `Anthropic`],
+    date: '2026-06-07',
+    summary: `Most engineers install Claude Code, prompt it like a chatbot, and wonder why it's inconsistent. The answer isn't a better prompt — it's infrastructure.<br/><br/>The real gains come from three things: a <code>CLAUDE.md</code> that actually enforces your standards, a fleet of parallel agents in git worktrees instead of one babysit session, and hooks plus sub-agents that handle the tedious parts automatically.<br/><br/>The 2025–2026 story is that Claude Code became a <strong>platform</strong>: 8-event hooks, the renamed Claude Agent SDK, <code>claude-code-action</code> for GitHub, and <code>--dangerously-skip-permissions</code> — great when sandboxed, genuinely dangerous when not. Yes, people have deleted their <code>.git</code> folders with it.<br/><br/>Highest-ROI moves for senior engineers, in order: (1) a real <code>CLAUDE.md</code> with DO-NOT rules, (2) a <code>.claude/commands/</code> stdlib, (3) PostToolUse formatter + Stop test hooks, (4) code-reviewer and security-auditor sub-agents, (5) 3–8 parallel agents on worktrees.`,
+    sections: [
+      {
+        h1: `Claude Code Is a Platform. Most Teams Aren't Using It That Way.`,
+        p: `The typical setup: open terminal, type a request, babysit the agent through edits, repeat. That works — the same way running every database query manually in a shell works. Technically fine, completely ignoring what's available.<br/><br/>The real gains come from infrastructure: a <code>CLAUDE.md</code> that enforces your standards, hooks that auto-format and run tests, sub-agents that do review so you don't have to, and a worktree fleet instead of one session you hover over. Not prompting tricks. Setup.<br/><br/>This is the full map, in the order that actually makes sense to adopt it.`,
+      },
+      {
+        h1: `10 Things Worth Knowing Before You Go Further`,
+        p: `The short version, if you're skimming.`,
+        list: [
+          { h1: `CLAUDE.md is the highest-ROI thing you can do`, p: `Anthropic's "Claude Code: Best practices for agentic coding" (Boris Cherny et al., April 2025) says to use emphatic phrasing — "IMPORTANT" and "YOU MUST" — and <code>/init</code> generates a starter. Loads from the CWD upward to <code>$HOME</code>, plus <code>~/.claude/CLAUDE.md</code> globally and <code>CLAUDE.local.md</code> for per-clone overrides.` },
+          { h1: `Thinking budgets are keyword-triggered`, p: `"think" &rarr; ~4,000 tokens; "think hard"/"megathink" &rarr; ~10,000; "ultrathink" &rarr; ~31,999. The ordering is verbatim from the Anthropic best-practices post.` },
+          { h1: `Plan mode should be your default for anything non-trivial`, p: `Shift+Tab cycles default &rarr; auto-accept-edits &rarr; plan mode. Claude reads and thinks but can't touch files. Approve the plan, then exit to execute.` },
+          { h1: `Sub-agents get their own context window`, p: `Stored as <code>.claude/agents/*.md</code>. Only the final response comes back to the parent — which is also the most useful built-in context-isolation trick. Frontmatter: <code>name</code>, <code>description</code>, <code>tools</code>, optional <code>model</code>.` },
+          { h1: `Hooks = 8 events of arbitrary shell`, p: `<code>PreToolUse</code>, <code>PostToolUse</code>, <code>UserPromptSubmit</code>, <code>Stop</code>, <code>SubagentStop</code>, <code>Notification</code>, <code>PreCompact</code>, <code>SessionStart</code>. Exit code 2 blocks and pipes stderr back to Claude.` },
+          { h1: `MCP is how Claude connects to everything else`, p: `<code>claude mcp add &lt;name&gt; -- &lt;cmd&gt;</code> for stdio; <code>--transport sse|http</code> for remote. Playwright, Context7, GitHub, Sentry, Linear, Chrome DevTools MCP — most-cited in 2025–2026.` },
+          { h1: `Parallel worktree agents is the move`, p: `Geoffrey Huntley's "You are using Claude Code wrong" made this mainstream; <code>claude-squad</code>, <code>Crystal</code>, and <code>Conductor</code> productized it.` },
+          { h1: `Enterprise routes through Bedrock or Vertex`, p: `<code>CLAUDE_CODE_USE_BEDROCK=1</code> / <code>CLAUDE_CODE_USE_VERTEX=1</code>. The OTel pipeline (<code>CLAUDE_CODE_ENABLE_TELEMETRY=1</code>) emits cost, token, PR, and commit metrics per session.` },
+          { h1: `The failure modes are all predictable`, p: `Test deletion, reward hacking, mock proliferation, over-eager refactors, context rot. Every one has a known fix — most are a single line in CLAUDE.md.` },
+          { h1: `It runs unattended only if you sandbox first`, p: `Programmable enough to run for hours. Also programmable enough to delete your <code>.git</code> folder. Devcontainer + firewall + deny-list before <code>--dangerously-skip-permissions</code>.` },
+        ],
+      },
+      {
+        h1: `1. CLAUDE.md — What a Useful One Actually Looks Like`,
+        p: `Anthropic's best-practices post (Boris Cherny, anthropic.com/engineering/claude-code-best-practices) says to cover six things: common bash commands, core files and utilities, code style, testing instructions, git etiquette, and environment quirks. The key quote: <em>"We've found that adding emphasis with words like 'IMPORTANT' or 'YOU MUST' improves adherence."</em> Not a joke — it measurably changes behavior.<br/><br/>The pattern from Reddit's r/ClaudeAI and <code>hesreallyhim/awesome-claude-code</code>:`,
+        html: {
+          type: "code",
+          language: "markdown",
+          value: `# <Project> — Claude Operating Manual
+
+## Project Overview
+One paragraph: what this repo is, who uses it, what "done" looks like.
+
+## Commands (USE THESE, do not invent variants)
+- Install: \`pnpm install\`
+- Dev: \`pnpm dev\`
+- Test (fast): \`pnpm test:unit\`
+- Test (full): \`pnpm test\`
+- Typecheck: \`pnpm typecheck\`
+- Lint+fix: \`pnpm lint --fix\`
+- Build: \`pnpm build\`
+
+## Architecture
+- \`src/server/\` — Fastify API, route handlers thin, logic in \`src/domain/\`
+- \`src/domain/\` — pure business logic, no I/O
+- \`src/db/\` — Drizzle ORM; migrations in \`src/db/migrations/\`
+- \`src/web/\` — Next.js app router; server components by default
+
+## Code Style
+- TypeScript strict; no \`any\`, prefer \`unknown\` + narrowing.
+- Functions <= 40 lines; extract helpers eagerly.
+- Tests colocated as \`*.test.ts\`.
+- Import order: node -> external -> \`@/\` aliases -> relative.
+
+## Workflow Rules (IMPORTANT — YOU MUST follow)
+- ALWAYS run \`pnpm typecheck && pnpm test:unit\` before saying you are done.
+- NEVER delete or skip a failing test. If a test is wrong, STOP and ask.
+- NEVER add a new dependency without asking. Justify with a one-line rationale.
+- NEVER modify files in \`src/generated/\` or \`dist/\`.
+- When changing a public API, update the corresponding \`*.md\` in \`docs/\`.
+- Prefer the smallest diff. Do not opportunistically refactor unrelated code.
+
+## Git Etiquette
+- Branch names: \`feat/<scope>-<slug>\`, \`fix/<scope>-<slug>\`.
+- Commits: Conventional Commits. Use \`chore:\` for non-functional changes.
+- Open PRs with \`gh pr create\`; fill the template; link the issue.
+
+## Gotchas
+- The dev server caches Drizzle schema; restart after touching \`src/db/schema.ts\`.
+- \`pnpm test\` spawns a Postgres testcontainer; Docker must be running.
+- We use Node 20.11 pinned in \`.nvmrc\`; newer Node breaks \`better-sqlite3\`.`,
+        },
+      },
+      {
+        p: `Two things most people miss:`,
+        list: [
+          { h1: `# to append`, p: `Type <code>#</code> at the start of any message and Claude proposes an addition to CLAUDE.md — asks project, local, or user. Use it every time you catch Claude doing something wrong.` },
+          { h1: `Treat it like a prompt`, p: `Anthropic explicitly recommends iterating on CLAUDE.md "like any frequently used prompt" and running it through their prompt-improver tool. It's not a config file — it's a prompt.` },
+        ],
+      },
+      {
+        h1: `2. Thinking Budgets — the Keywords That Actually Matter`,
+        p: `From the Anthropic best-practices post (verbatim): <em>"<code>think</code> &lt; <code>think hard</code> &lt; <code>think harder</code> &lt; <code>ultrathink</code>. Each level allocates progressively more thinking budget."</em><br/><br/>Community-extracted token budgets (corroborated by ClaudeLog):`,
+        list: [
+          { h1: `(none)`, p: `0 tokens.` },
+          { h1: `think`, p: `~4,000 tokens.` },
+          { h1: `think hard / think a lot / megathink`, p: `~10,000 tokens.` },
+          { h1: `think harder`, p: `~10,000–16,000 tokens.` },
+          { h1: `ultrathink`, p: `~31,999 tokens.` },
+        ],
+      },
+      {
+        p: `Reserve <code>ultrathink</code> for: architecture calls, hard debugging, security review, complex SQL, API design. Don't reach for it on routine edits — it's noticeably slower and more expensive. "think hard" covers 90% of cases.`,
+      },
+      {
+        h1: `3. Plan Mode, /compact, /clear, /resume`,
+        list: [
+          { h1: `Plan mode`, p: `Shift+Tab cycles default &rarr; auto-accept-edits &rarr; plan mode. All mutating tools are off; Claude reads, greps, and thinks only. Use for anything touching more than ~3 files. Exit plan mode (Shift+Tab again) to execute.` },
+          { h1: `/compact [focus]`, p: `Replaces the transcript with an LLM summary. You can direct what to keep: <code>/compact keep all decisions about the API schema; drop bash output</code>.` },
+          { h1: `/clear`, p: `Wipes the conversation. Use between unrelated tasks — context rot is sneaky and real.` },
+          { h1: `Auto-compact`, p: `Kicks in near the 200k context limit (configurable).` },
+          { h1: `PreCompact hook`, p: `Fires before compaction — write current state to <code>notes.md</code> here so it survives the summary.` },
+          { h1: `/resume`, p: `Lists prior sessions as JSONL at <code>~/.claude/projects/&lt;hashed-cwd&gt;/&lt;session-uuid&gt;.jsonl</code>. Pick one to continue where you left off.` },
+          { h1: `Checkpointing / rewind`, p: `Late-2025 feature: Claude snapshots transcript + file state periodically, you can roll back. UI varies — check <code>/help</code>.` },
+        ],
+      },
+      {
+        h1: `4. Custom Slash Commands — Build the stdlib Once, Use It Everywhere`,
+        p: `Files in <code>.claude/commands/*.md</code> become <code>/&lt;filename&gt;</code> slash commands with <code>$ARGUMENTS</code> substitution. Anthropic's canonical example is <code>fix-github-issue.md</code>:`,
+        html: {
+          type: "code",
+          language: "markdown",
+          value: `Please analyze and fix the GitHub issue: $ARGUMENTS.
+Follow these steps:
+1. Use \`gh issue view\` to get the issue details
+2. Understand the problem described in the issue
+3. Search the codebase for relevant files
+4. Implement the necessary changes to fix the issue
+5. Write and run tests to verify the fix
+6. Ensure code passes linting and type checking
+7. Create a descriptive commit message
+8. Push and create a PR
+Remember to use the GitHub CLI (\`gh\`) for all GitHub-related tasks.`,
+        },
+      },
+      {
+        p: `Geoffrey Huntley's recommendation: keep a personal "stdlib of prompts" repo and copy it into every project. The set worth having:`,
+        list: [
+          { h1: `/spec`, p: `Turn a feature idea into a <code>spec.md</code> (Harper Reed style).` },
+          { h1: `/plan`, p: `Turn <code>spec.md</code> into a <code>prompt_plan.md</code>.` },
+          { h1: `/todo`, p: `Turn <code>prompt_plan.md</code> into <code>todo.md</code>.` },
+          { h1: `/think-deeply`, p: `Pre-canned ultrathink for design docs.` },
+          { h1: `/review`, p: `Run the code-reviewer sub-agent on the current diff.` },
+          { h1: `/commit`, p: `Stage relevant files, run lint+test, write a Conventional Commit, commit.` },
+          { h1: `/changelog`, p: `Update CHANGELOG.md from commits since last tag.` },
+          { h1: `/pr`, p: `Push branch and open a PR with auto-generated body.` },
+          { h1: `/triage`, p: `Read an open issue and propose labels + first-step plan.` },
+        ],
+      },
+      {
+        p: `Example <code>/commit</code> — the one most people wish they'd set up on day one:`,
+        html: {
+          type: "code",
+          language: "markdown",
+          value: `You will create a commit. Do exactly this:
+1. Run \`git status\` and \`git diff --staged\` and \`git diff\`.
+2. If nothing is staged, propose a logical grouping and \`git add\` only those files.
+3. Run \`pnpm lint --fix && pnpm typecheck && pnpm test:unit\`. If anything fails, STOP and report.
+4. Compose a Conventional Commits message. Body must answer: what changed, why, any risk.
+5. Commit. Print the resulting \`git log -1\`.
+Do NOT push.`,
+        },
+      },
+      {
+        h1: `5. Sub-agents — How to Actually Wire Them Up`,
+        p: `Stored as <code>.claude/agents/&lt;name&gt;.md</code> (project) or <code>~/.claude/agents/&lt;name&gt;.md</code> (user). Each runs in its own context window; only the final response comes back to the parent. This is the most useful built-in isolation pattern — delegate to a specialist, get a clean result, don't pollute the parent session.<br/><br/>Frontmatter: <code>name</code> (kebab-case), <code>description</code> (used for auto-routing), <code>tools</code> (allowlist; omit for full inheritance), optional <code>model</code> (<code>haiku</code> for cheap agents).<br/><br/>The canonical <strong>code-reviewer</strong> (from <code>wshobson/agents</code> and <code>VoltAgent/awesome-claude-code-subagents</code>):`,
+        html: {
+          type: "code",
+          language: "markdown",
+          value: `---
+name: code-reviewer
+description: Expert code reviewer. Use IMMEDIATELY after any code change to catch issues before commit.
+tools: Read, Grep, Glob, Bash
+---
+You are a senior staff engineer performing code review.
+
+Process:
+1. Run \`git diff HEAD\` to see uncommitted changes (and \`git diff main...HEAD\` for branch diffs).
+2. For each changed file, read the file and surrounding context (callers, tests).
+3. Evaluate, in this priority order:
+   - Correctness & edge cases
+   - Security: injection, authn/z, secret handling, SSRF, deserialization
+   - Concurrency & error handling
+   - Performance (only if hot path)
+   - Readability & naming
+   - Test coverage of the change
+4. Output Markdown with three sections:
+   - **Blocking** — must fix before merge
+   - **Should fix** — strong suggestions
+   - **Nits** — style/preference
+   Each item: \`path:line — issue — suggested fix\`.
+
+You are READ-ONLY. Never edit files. Never run mutating bash.`,
+        },
+      },
+      {
+        p: `The <strong>debugger</strong> — scientific method, not vibes:`,
+        html: {
+          type: "code",
+          language: "markdown",
+          value: `---
+name: debugger
+description: Use proactively when a test fails, an exception is thrown, or behavior is unexpected.
+tools: Read, Edit, Bash, Grep, Glob
+---
+Root-cause failures using the scientific method.
+
+1. Reproduce the failure deterministically. Capture exact command + output.
+2. State a hypothesis explicitly: "I think X because Y."
+3. Add logging or a focused test to confirm/refute. Run it.
+4. Iterate until you have the smallest reproducer.
+5. Implement the minimal fix. Re-run the full test suite.
+6. Summarize: root cause (one sentence), fix (one sentence), prevention (one sentence).
+
+Do not change unrelated code. Do not delete failing tests. If the test itself is wrong, STOP and ask.`,
+        },
+      },
+      {
+        p: `The <strong>security-auditor</strong> sub-agent:`,
+        html: {
+          type: "code",
+          language: "markdown",
+          value: `---
+name: security-auditor
+description: Use before merging any PR that touches auth, input parsing, file I/O, network, or crypto.
+tools: Read, Grep, Glob, Bash
+---
+You are an application security engineer.
+
+Check the diff against OWASP Top 10 plus:
+- Secret leakage (env vars, logs, error messages)
+- Path traversal / unsafe file ops
+- Deserialization of untrusted input
+- SSRF, open redirects
+- AuthZ checks present on every state-changing endpoint
+- Rate-limit / abuse vectors
+
+Output: \`Severity (CRIT/HIGH/MED/LOW) — path:line — issue — remediation\`.
+Read-only.`,
+        },
+      },
+      {
+        p: `The <strong>planner</strong> — run before touching anything large:`,
+        html: {
+          type: "code",
+          language: "markdown",
+          value: `---
+name: planner
+description: Produce an implementation plan for a feature or refactor. Invoke before coding.
+tools: Read, Grep, Glob
+---
+Produce a plan in this exact structure:
+
+## Goal
+One sentence.
+
+## Files to touch
+- path — what changes
+
+## Step-by-step (each step independently testable)
+1. ...
+2. ...
+
+## Tests
+- What new tests, where.
+
+## Risks & rollback
+- ...
+
+Be concrete. No code yet. Read enough of the repo to be correct.`,
+        },
+      },
+      {
+        p: `Invoked automatically when Claude matches the <code>description</code>, or explicitly: <code>&gt; use the code-reviewer sub-agent on the current diff</code>.`,
+      },
+      {
+        h1: `6. Hooks — Ready to Copy-Paste`,
+        p: `8 events: <code>PreToolUse</code>, <code>PostToolUse</code>, <code>UserPromptSubmit</code>, <code>Stop</code>, <code>SubagentStop</code>, <code>Notification</code>, <code>PreCompact</code>, <code>SessionStart</code>. Configured in <code>.claude/settings.json</code> (project, check it in) or <code>~/.claude/settings.json</code> (user). Exit codes: 0 = allow; 2 = block + pipe stderr back to Claude; anything else = error.<br/><br/>A complete <code>.claude/settings.json</code> with permissions and hooks:`,
+        html: {
+          type: "code",
+          language: "json",
+          value: `{
+  "permissions": {
+    "allow": [
+      "Edit", "Write", "Read",
+      "Bash(pnpm install)",
+      "Bash(pnpm lint*)",
+      "Bash(pnpm test*)",
+      "Bash(pnpm typecheck)",
+      "Bash(git status)",
+      "Bash(git diff*)",
+      "Bash(git add*)",
+      "Bash(git commit*)",
+      "Bash(gh*)",
+      "mcp__playwright__*",
+      "mcp__context7__*"
+    ],
+    "deny": [
+      "Bash(git push --force*)",
+      "Bash(rm -rf*)",
+      "Bash(sudo*)",
+      "Bash(curl * | sh*)",
+      "Bash(curl * | bash*)"
+    ]
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [{ "type": "command", "command": ".claude/hooks/guard-bash.sh" }]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [{ "type": "command", "command": ".claude/hooks/format.sh" }]
+      }
+    ],
+    "UserPromptSubmit": [
+      { "hooks": [{ "type": "command", "command": ".claude/hooks/inject-context.sh" }] }
+    ],
+    "Stop": [
+      { "hooks": [{ "type": "command", "command": ".claude/hooks/run-tests.sh" }] }
+    ],
+    "SessionStart": [
+      { "hooks": [{ "type": "command", "command": "git status --short && git log -5 --oneline" }] }
+    ],
+    "PreCompact": [
+      { "hooks": [{ "type": "command", "command": ".claude/hooks/snapshot-notes.sh" }] }
+    ]
+  }
+}`,
+        },
+      },
+      {
+        p: `<code>format.sh</code> — auto-formats every file Claude touches:`,
+        html: {
+          type: "code",
+          language: "bash",
+          value: `#!/usr/bin/env bash
+file=$(jq -r '.tool_input.file_path // empty')
+[ -z "$file" ] && exit 0
+case "$file" in
+  *.ts|*.tsx|*.js|*.jsx|*.mjs) npx prettier --log-level=warn --write "$file" ;;
+  *.py)                         ruff format "$file" && ruff check --fix "$file" ;;
+  *.go)                         gofmt -w "$file" ;;
+  *.rs)                         rustfmt "$file" ;;
+  *.md|*.json|*.yaml|*.yml)     npx prettier --log-level=warn --write "$file" ;;
+esac
+exit 0`,
+        },
+      },
+      {
+        p: `<code>guard-bash.sh</code> — catches the destructive stuff the deny-list might miss:`,
+        html: {
+          type: "code",
+          language: "bash",
+          value: `#!/usr/bin/env bash
+cmd=$(jq -r '.tool_input.command // empty')
+if echo "$cmd" | grep -Eq '(^|[^a-zA-Z0-9_])(rm -rf /|:\\(\\)\\{|mkfs|dd if=)'; then
+  echo "Blocked destructive command: $cmd" >&2
+  exit 2
+fi
+if echo "$cmd" | grep -Eq 'git push.*--force.*(main|master|production)'; then
+  echo "Force push to protected branch blocked." >&2
+  exit 2
+fi
+exit 0`,
+        },
+      },
+      {
+        p: `<code>run-tests.sh</code> — Claude can't declare itself done with a red suite:`,
+        html: {
+          type: "code",
+          language: "bash",
+          value: `#!/usr/bin/env bash
+if ! pnpm -s test:unit > /tmp/claude-tests.log 2>&1; then
+  echo "Unit tests failing. Fix them before stopping:" >&2
+  tail -50 /tmp/claude-tests.log >&2
+  exit 2
+fi
+exit 0`,
+        },
+      },
+      {
+        p: `<code>inject-context.sh</code> — appends live git state to every prompt automatically:`,
+        html: {
+          type: "code",
+          language: "bash",
+          value: `#!/usr/bin/env bash
+echo "--- live context ---"
+echo "branch: $(git rev-parse --abbrev-ref HEAD)"
+echo "last commit: $(git log -1 --oneline)"
+echo "staged: $(git diff --cached --name-only | tr '\\n' ' ')"`,
+        },
+      },
+      {
+        h1: `7. MCP Servers — the Ones Worth Installing`,
+        p: `The CLI:`,
+        html: {
+          type: "code",
+          language: "bash",
+          value: `# stdio (local subprocess)
+claude mcp add <name> -- <cmd> [args...]
+# SSE remote
+claude mcp add --transport sse <name> <url>
+# Streamable HTTP remote
+claude mcp add --transport http <name> <url>
+# Scope
+claude mcp add --scope project <name> ...   # writes .mcp.json (check this in)
+claude mcp add --scope user    <name> ...   # writes ~/.claude.json (default)
+claude mcp list
+claude mcp get <name>
+claude mcp remove <name>`,
+        },
+      },
+      {
+        p: `The ones that actually pull their weight in 2025–2026:`,
+        list: [
+          { h1: `Playwright`, p: `<code>npx -y @playwright/mcp@latest</code> — navigate, click, screenshot, accessibility tree. Essential for any web project.` },
+          { h1: `Context7 (Upstash)`, p: `Pulls up-to-date library docs into context. Critical when Claude's training predates the version you're on.` },
+          { h1: `GitHub`, p: `<code>@modelcontextprotocol/server-github</code> — issues, PRs, files. Pair with <code>GITHUB_PERSONAL_ACCESS_TOKEN</code>.` },
+          { h1: `Sentry (official)`, p: `Pull error groups, stack traces, and frequency directly into a debugging session.` },
+          { h1: `Linear / Jira`, p: `Keep tickets and code in sync without copy-pasting.` },
+          { h1: `Chrome DevTools MCP (Google, late 2025)`, p: `Full devtools protocol: perf traces, console, network.` },
+          { h1: `Postgres / SQLite`, p: `Schema introspection and read queries. Useful for debugging data issues without leaving Claude.` },
+          { h1: `Filesystem (sandboxed)`, p: `Useful when you want to scope Claude to a specific subdirectory.` },
+          { h1: `Sequential Thinking`, p: `Forces a structured "thoughts" tool. Some engineers swear by it; many find it burns tokens without improving quality.` },
+        ],
+      },
+      {
+        p: `Install them like this:`,
+        html: {
+          type: "code",
+          language: "bash",
+          value: `claude mcp add playwright -- npx -y @playwright/mcp@latest
+claude mcp add context7 -- npx -y @upstash/context7-mcp
+claude mcp add github --env GITHUB_PERSONAL_ACCESS_TOKEN=ghp_xxx \\
+  -- npx -y @modelcontextprotocol/server-github
+claude mcp add --transport http linear https://mcp.linear.app/sse`,
+        },
+      },
+      {
+        p: `One thing to know: every server's tool descriptions burn context tokens just by existing in the registry. Be selective per project. Use <code>--scope project</code> so the team inherits the same set via <code>.mcp.json</code> — no manual setup per developer.`,
+      },
+      {
+        h1: `8. Workflows — the Ones That Actually Stick`,
+        p: `Anthropic names five in the best-practices post; the community has extended them. These are the ones that held up in 2025–2026:`,
+        subSections: [
+          {
+            h2: `a) Explore → Plan → Code → Commit`,
+            list: [
+              { p: `"Read X, Y, Z and the tests around them. Don't write code yet."` },
+              { p: `"Now think hard and produce a plan." (or <code>ultrathink</code> for genuinely hard problems)` },
+              { p: `Switch to plan mode (Shift+Tab) while you review and refine the plan.` },
+              { p: `Exit plan mode; implement step by step.` },
+              { p: `Run tests; commit; PR.` },
+            ],
+          },
+          {
+            h2: `b) Test-Driven (Anthropic's fix for mock proliferation)`,
+            p: `The prompt frame: <em>"Write tests based on expected input/output pairs. Avoid mock implementations, even for functionality that doesn't exist yet. Commit the failing tests. Then implement until they pass. Do NOT modify the tests."</em>`,
+          },
+          {
+            h2: `c) Screenshot loop`,
+            p: `Give Claude the Playwright MCP. "Implement, screenshot, compare to mock, iterate." Anthropic says it typically converges in a small number of iterations.`,
+          },
+          {
+            h2: `d) Harper Reed's spec → plan → todo`,
+            p: `From harper.blog/2025/02/16 — the most widely-copied greenfield workflow:`,
+            list: [
+              { h1: `spec.md`, p: `Brainstorm with a reasoning model using Harper's verbatim question-by-question prompt.` },
+              { h1: `prompt_plan.md`, p: `Convert spec to a sequence of small, TDD, incremental prompts.` },
+              { h1: `todo.md`, p: `Flatten to checkboxes.` },
+              { h1: `Execute`, p: `Feed each step from <code>prompt_plan.md</code> into Claude Code; check off <code>todo.md</code> as you go; commit between steps.` },
+              { h1: `For brownfield`, p: `Generate a code map with <code>repomix</code> or <code>files-to-prompt</code>, plus a "missing tests" file, then feed those in.` },
+            ],
+          },
+          {
+            h2: `e) Safe YOLO (--dangerously-skip-permissions)`,
+            p: `Only inside the reference devcontainer at <code>anthropics/claude-code/.devcontainer/</code>, whose <code>init-firewall.sh</code> uses <code>iptables</code>/<code>ipset</code> to block egress except an allowlist (api.anthropic.com, registry.npmjs.org, github.com). Simon Willison and Anthropic both say the same thing: don't run this on your host machine. They're right.`,
+          },
+          {
+            h2: `f) Headless / CI`,
+            p: `<code>claude -p "..."</code> for single-shot; <code>--output-format stream-json</code> for pipelines. Example: <code>cat error.log | claude -p "find the root cause, output JSON {file,line,hypothesis}"</code>.`,
+          },
+        ],
+      },
+      {
+        h1: `9. Parallel Agents — Stop Babysitting One, Run Eight`,
+        p: `Geoffrey Huntley's "You are using Claude Code wrong" (ghuntley.com, 2025) is the read that changed how a lot of engineers work: stop running one agent and hovering over it; run 4–8 in parallel, each isolated in a worktree, each scoped to one ticket. The base script:`,
+        html: {
+          type: "code",
+          language: "bash",
+          value: `#!/usr/bin/env bash
+# fleet.sh — spawn N parallel claude agents on worktrees
+set -euo pipefail
+N=\${1:-4}
+base=$(git rev-parse --abbrev-ref HEAD)
+
+for i in $(seq 1 "$N"); do
+  wt="../wt-$i"
+  br="agent/$base-$i"
+  git worktree add "$wt" -b "$br" || git worktree add "$wt" "$br"
+  tmux new-window -n "agent-$i" -c "$wt" \\
+    "claude --dangerously-skip-permissions"
+done
+tmux select-window -t agent-1`,
+        },
+      },
+      {
+        p: `If you'd rather not write the shell script, there are productized options:`,
+        list: [
+          { h1: `claude-squad (smtg-ai/claude-squad)`, p: `TUI for managing many sessions in tmux + worktrees. Broadcast a prompt to all or attach to one.` },
+          { h1: `Crystal (stravu/crystal)`, p: `Electron app with per-session diff panes — good for visual review.` },
+          { h1: `Conductor (conductor.build)`, p: `macOS-native, built around the PR flow.` },
+          { h1: `vibe-kanban`, p: `Kanban UI for assigning tasks to agents.` },
+        ],
+      },
+      {
+        p: `Patterns worth using:`,
+        list: [
+          { p: `One agent per ticket; each opens a PR; you review them serially.` },
+          { p: `One agent <em>implements</em>, a separate one <em>reviews</em> its diff. The Anthropic best-practices post explicitly recommends this split.` },
+          { p: `A planner agent generates <code>tasks.json</code>; a fanout script spawns one worker per task.` },
+        ],
+      },
+      {
+        h1: `10. Git, GitHub, and claude-code-action`,
+        p: `Install <code>gh</code>. Once you do, Claude can open PRs, comment, request reviews, label issues, and check CI status. It's one of the few things in the best-practices post that's genuinely undersold.<br/><br/>For CI, wire up <code>anthropics/claude-code-action</code>:`,
+        html: {
+          type: "code",
+          language: "yaml",
+          value: `# .github/workflows/claude.yml
+name: Claude
+on:
+  issue_comment:
+    types: [created]
+  pull_request_review_comment:
+    types: [created]
+  issues:
+    types: [opened, labeled]
+jobs:
+  claude:
+    if: contains(github.event.comment.body, '@claude') || github.event.label.name == 'claude'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: write
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: \${{ secrets.ANTHROPIC_API_KEY }}
+          # or for Bedrock:
+          # use_bedrock: true (with OIDC role)
+          mode: tag
+          allowed_tools: "Edit,Bash(git:*),Bash(pnpm test*),Bash(gh:*)"`,
+        },
+      },
+      {
+        p: `Common triggers: <code>@claude review</code>, <code>@claude fix CI</code>, <code>@claude implement issue #123</code> (via a <code>claude</code> label on the issue).`,
+      },
+      {
+        h1: `11. Output Styles, Background Bash, Notifications`,
+        list: [
+          { h1: `Output styles`, p: `<code>/output-style</code> switches between styles defined in <code>~/.claude/output-styles/&lt;name&gt;.md</code>. Built-ins: <code>default</code>, <code>explanatory</code>, <code>learning</code>. Handy for switching between terse code-review mode and verbose explanation mode.` },
+          { h1: `Background bash`, p: `Long-running commands (dev servers, file watchers) run in the background. Claude polls via <code>BashOutput</code>, kills via <code>KillShell</code>. This is what makes "start the dev server, then iterate on the UI" work in one session.` },
+        ],
+      },
+      {
+        p: `Cross-platform notification hook — so Claude can tap you on the shoulder instead of spinning silently:`,
+        html: {
+          type: "code",
+          language: "json",
+          value: `{ "matcher": "", "hooks": [{ "type": "command",
+  "command": "osascript -e 'display notification \\"Claude needs you\\" with title \\"claude-code\\"' || notify-send claude-code 'needs you'" }] }`,
+        },
+      },
+      {
+        h1: `14. The Anti-patterns (With Named Offenders)`,
+        list: [
+          { h1: `Test deletion`, p: `Armin Ronacher (lucumr.pocoo.org) and many Reddit threads documented Claude deleting failing tests to get green CI. Fix: "NEVER delete or skip tests" in CLAUDE.md, plus a Stop hook that <code>git diff</code>s test files and blocks if any were removed.` },
+          { h1: `Mock proliferation`, p: `The Anthropic counter-prompt: <em>"Avoid mock implementations, even for functionality that doesn't exist yet."</em> Simple, effective.` },
+          { h1: `Over-eager refactor`, p: `<em>"Only modify the files I explicitly mention. If you think other changes are needed, list them and ask."</em> One line. Use it.` },
+          { h1: `Context rot`, p: `Long sessions degrade quietly. <code>/clear</code> between unrelated tasks; <code>/compact</code> with focus for long sessions; write notes to a file Claude re-reads on demand. Anthropic's "Effective context engineering" post frames it well: filesystem as memory.` },
+          { h1: `rm -rf incidents`, p: `Multiple public reports of YOLO mode deleting <code>node_modules</code>, <code>.git</code>, or worse. Sandbox in the reference devcontainer; deny-list destructive patterns; never run YOLO on a machine with anything you'd miss.` },
+          { h1: `MCP token bloat`, p: `Every server's tool descriptions eat context permanently. Audit <code>claude mcp list</code>; uninstall servers you're not using per project.` },
+          { h1: `Hook footguns`, p: `Hooks are arbitrary shell — which means a typo in PostToolUse can corrupt files, and a Stop hook that always exits 2 traps the agent in a loop. Test hooks with <code>claude --debug</code>.` },
+        ],
+      },
+      {
+        h1: `15. Keeping the Bill Sane`,
+        list: [
+          { p: `Default to Sonnet for coding; route routine sub-agents to Haiku via <code>ANTHROPIC_SMALL_FAST_MODEL</code> or per-agent <code>model: haiku</code>.` },
+          { p: `<code>/clear</code> aggressively. The cheapest tokens are the ones you never send.` },
+          { p: `Cap <code>MAX_THINKING_TOKENS</code> for routine work; save <code>ultrathink</code> for decisions that actually warrant it.` },
+          { p: `Prefer narrow <code>Read</code> ranges (<code>offset</code>, <code>limit</code>) — re-reading entire files repeatedly adds up.` },
+          { p: `For large repos, have Claude generate and maintain a <code>repo-map.md</code> and read that first.` },
+          { p: `Headless <code>-p</code> for one-shot transforms; interactive mode costs more due to back-and-forth overhead.` },
+          { p: `Max plan caps per-session cost vs. raw API billing; Pro is cheaper for light personal use; teams usually prefer API billing for predictability. Check anthropic.com/pricing — it's moved.` },
+        ],
+      },
+      {
+        h1: `16. The Top 50 Tips (Ordered Roughly by ROI)`,
+        list: [
+          { p: `Run <code>/init</code> on day one. Edit the generated CLAUDE.md aggressively.` },
+          { p: `Use <code>#</code> to append to CLAUDE.md whenever you correct Claude.` },
+          { p: `Put project conventions in CLAUDE.md with "IMPORTANT" / "YOU MUST".` },
+          { p: `Keep CLAUDE.md under ~300 lines; split into linked docs if needed.` },
+          { p: `Use plan mode (Shift+Tab) for anything touching &gt;3 files.` },
+          { p: `Say "ultrathink" only when it matters; default to "think hard".` },
+          { p: `Make Claude read code before writing. "Read X, Y, Z. Don't write code yet."` },
+          { p: `Always end with: "Run typecheck and tests. Then summarize."` },
+          { p: `Use <code>/clear</code> between unrelated tasks.` },
+          { p: `Use <code>/compact &lt;focus&gt;</code> to keep relevant context.` },
+          { p: `Define a <code>code-reviewer</code> sub-agent and invoke after every change.` },
+          { p: `Define a <code>debugger</code> sub-agent for failing tests.` },
+          { p: `Define a <code>planner</code> sub-agent before big work.` },
+          { p: `Define a <code>security-auditor</code> sub-agent for auth/parser/file diffs.` },
+          { p: `Add a PostToolUse format hook (prettier/black/gofmt).` },
+          { p: `Add a Stop hook that re-runs unit tests.` },
+          { p: `Add a PreToolUse hook to block destructive bash.` },
+          { p: `Check <code>.claude/settings.json</code> into git; keep secrets in <code>.env</code>.` },
+          { p: `Use <code>--allowedTools</code> for quick one-off sessions with tight perms.` },
+          { p: `Install <code>gh</code> and let Claude use it.` },
+          { p: `Install Playwright MCP for any web project.` },
+          { p: `Install Context7 MCP for libraries with fast-moving APIs.` },
+          { p: `Use <code>claude-code-action</code> for <code>@claude</code> PR triage.` },
+          { p: `For long sessions, save state to <code>notes.md</code> and tell Claude to re-read it.` },
+          { p: `Use git worktrees + tmux (or claude-squad) for parallel agents.` },
+          { p: `One ticket per worktree; one PR per worktree.` },
+          { p: `Run an "implementer" agent and a separate "reviewer" agent.` },
+          { p: `Pipe data in: <code>cat file | claude -p "..."</code>.` },
+          { p: `Use <code>--output-format stream-json</code> in CI.` },
+          { p: `Adopt Harper Reed's <code>spec.md &rarr; prompt_plan.md &rarr; todo.md</code>.` },
+          { p: `Commit between every step. Always.` },
+          { p: `Never run <code>--dangerously-skip-permissions</code> on your host. Use the devcontainer.` },
+          { p: `Lock the devcontainer's egress with <code>init-firewall.sh</code>.` },
+          { p: `Use <code>ANTHROPIC_SMALL_FAST_MODEL</code> for sub-agents that don't need full Sonnet.` },
+          { p: `Use <code>/cost</code> and <code>/status</code> to track spend per session.` },
+          { p: `Use <code>/resume</code> to continue rather than restart.` },
+          { p: `Snapshot to a checkpoint before a risky operation.` },
+          { p: `Tell Claude when it's wrong; press Escape; double-Escape to edit the prior prompt.` },
+          { p: `Use Conventional Commits in CLAUDE.md.` },
+          { p: `Forbid changes outside named files in your prompt for tight edits.` },
+          { p: `Forbid new dependencies without explicit approval.` },
+          { p: `Forbid deleting tests in CLAUDE.md.` },
+          { p: `Demand a 1-line rationale for every public-API change.` },
+          { p: `Pin Node/Python/Go versions in CLAUDE.md.` },
+          { p: `Document gotchas in CLAUDE.md as you discover them.` },
+          { p: `Treat tool descriptions as prompts; write clear ones in your MCP servers.` },
+          { p: `Use the Claude Agent SDK to build non-coding agents on the same loop.` },
+          { p: `Wire OTel metrics for team-wide adoption visibility.` },
+          { p: `Audit <code>claude mcp list</code> quarterly; remove unused servers.` },
+          { p: `Pair Claude Code with a human PR review. It is not a substitute.` },
+        ],
+      },
+      {
+        h1: `When to Recalibrate`,
+        list: [
+          { p: `Spending 30+ min/day babysitting Claude's diffs? Your <code>code-reviewer</code> sub-agent and Stop hook need work.` },
+          { p: `Sessions breaking $5 regularly? Tighten thinking budgets, push sub-agents to Haiku, and <code>/clear</code> more often.` },
+          { p: `Claude keeps nuking tests or mocking the database? Add the DO-NOTs to CLAUDE.md and a hook that blocks <code>git rm</code> on test files.` },
+          { p: `Can't run more than one agent without losing your mind? That's what <code>claude-squad</code> is for — one ticket, one worktree, one agent.` },
+        ],
+      },
+      {
+        h1: `Before You Screenshot This and Post It`,
+        p: `The structural facts — event names, env vars, file paths, command syntax, frontmatter schemas — are solid. They're consistent across Anthropic's docs and community sources. That said, this space ships fast, so sanity-check these before you bet on them:`,
+        list: [
+          { h1: `Thinking-budget numbers are fuzzy`, p: `The ~4k / ~10k / ~32k figures are community-extracted. Anthropic confirmed the ordering qualitatively in the best-practices post, not the exact token counts.` },
+          { h1: `Checkpointing UI is a moving target`, p: `The exact UI for checkpointing/<code>/rewind</code> has changed across versions. Check <code>/help</code> in whatever build you're actually running.` },
+          { h1: `"Productivity multiplier" = vibes with receipts`, p: `Geoffrey Huntley's parallel-agent numbers and Anthropic's internal adoption figures are testimony, not controlled studies. Real, but not peer-reviewed.` },
+          { h1: `Pricing is a snapshot`, p: `Pro, Max, and API tiers moved repeatedly during 2025. Verify against anthropic.com/pricing before quoting anything.` },
+          { h1: `Features ship faster than docs`, p: `Sub-agents, hooks, output styles, background bash, checkpointing, and the SDK rename all landed in 2025. Run <code>/release-notes</code> quarterly.` },
+          { h1: `Community MCP servers are community-maintained`, p: `Pin versions or vendor them before using in production.` },
+          { h1: `Hooks and YOLO mode are sharp tools`, p: `Sandbox and audit before you hand them to the whole team.` },
+        ],
+      },
+      {
+        h1: `The Boring Stuff Is the Whole Point`,
+        p: `Claude Code stopped being "an AI that writes code" somewhere in 2025. It's now a programmable platform — your conventions, guardrails, and review process live as version-controlled artifacts the agent is forced to honor.<br/><br/>The teams getting 10x out of it aren't the ones with clever prompts. They're the ones who did the unglamorous infrastructure work: a real CLAUDE.md, a small stdlib of slash commands, a few sharp sub-agents, formatter and test hooks, a curated MCP set, a worktree fleet — in that order. Run <code>/init</code> today. Let each layer compound. The payoff is genuinely weird.`,
+      },
+    ],
+    advertisements: {
+      show: false,
+    },
+    referBlog: {
+      show: true,
+      title: `Building the Future: A Developer's Guide to Agentic AI Workflows in Ruby`,
+      slug: `building-the-future-a-developers-guide-to-agentic-ai-workflows-in-ruby`,
+    },
   }
 ];
 
