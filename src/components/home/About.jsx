@@ -1,112 +1,65 @@
-'use client'
-import Image from 'next/image'
-import { motion } from 'framer-motion'
-import { useInView } from 'react-intersection-observer'
-import TestimonialsCarousel from './TestimonialsCarousel'
+import Reveal from '@/components/Reveal'
+
+const ArrowUR = () => (
+  <svg className="ar" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M7 17L17 7M9 7h8v8" />
+  </svg>
+)
+
+const STACK = [
+  { name: 'Ruby on Rails',      badge: 'daily' },
+  { name: 'React · Redux',      badge: 'daily' },
+  { name: 'Python · Flask',     badge: '' },
+  { name: 'LangChain · Gemini', badge: '' },
+  { name: 'PostgreSQL',         badge: '' },
+  { name: 'Tailwind · Node',    badge: '' },
+]
 
 export default function About() {
-  const { ref, inView } = useInView({ threshold: 0.1, triggerOnce: true })
-
   return (
-    <section id="about" ref={ref} className="sec" style={{ zIndex: 10, background: 'var(--bg)' }}>
-      <div className="sec-wrap">
-        <div className="sec-head">
-          <div>
-            <div className="sec-eyebrow">About</div>
-            <h2 className="sec-title">Who&apos;s <span className="a">behind the code</span></h2>
-          </div>
-        </div>
+    <section className="section section-2" id="about">
+      <div className="wrap">
+        <Reveal className="sec-head">
+          <span className="lhs">
+            <span className="sec-num">02 —</span>
+            <h2 className="sec-title">About</h2>
+          </span>
+        </Reveal>
 
-        <div className="bento">
-          {/* Bio card */}
-          <motion.div
-            className="b b-half"
-            initial={{ opacity: 0, y: 24 }}
-            animate={inView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.6, delay: 0.1 }}
-            style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}
-          >
-            <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-              <Image
-                src="/assets/rohit-bhatt.jpg"
-                alt="Rohit Bhatt"
-                width={88}
-                height={88}
-                style={{
-                  borderRadius: '50%',
-                  border: '2px solid var(--accent)',
-                  boxShadow: '0 0 0 4px color-mix(in srgb, var(--accent) 18%, transparent)',
-                  objectFit: 'cover',
-                  flexShrink: 0,
-                  width: '88px',
-                  height: '88px',
-                }}
-              />
-              <div>
-                <div style={{ fontSize: '18px', fontWeight: 600, color: 'var(--fg1)', letterSpacing: '-0.02em' }}>Rohit Bhatt</div>
-                <div style={{
-                  fontFamily: 'var(--font-jetbrains), ui-monospace, monospace',
-                  fontSize: '12px',
-                  color: 'var(--fg4)',
-                  marginTop: '4px',
-                }}>Full-stack · Remote · Uttarakhand, IN</div>
-              </div>
-            </div>
-            <p className="b-desc" style={{ fontSize: '15px', color: 'var(--fg2)', lineHeight: 1.75 }}>
-              I build software that feels considered. Currently working remote, shipping landing pages
-              to full-stack apps, with a recent focus on LLM-backed tools.
+        <div className="about-grid">
+          <Reveal className="about-body">
+            <p className="about-lead">
+              I build software that feels <span className="em">considered</span> — where the
+              engineering disappears and the experience is all that&apos;s left.
             </p>
-            <p className="b-desc" style={{ fontSize: '15px', color: 'var(--fg2)', lineHeight: 1.75 }}>
-              Off-screen: hiking trails and Erin Morgenstern novels. I write infrequently but with conviction.
+            <p>
+              Currently working remote, shipping everything from landing pages to full-stack
+              applications, with a recent focus on LLM-backed tools built on LangChain and Gemini.
             </p>
-            <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
-              <a href="/assets/resume.pdf" target="_blank" rel="noreferrer" className="btn btn-ghost" style={{ fontSize: '13px', padding: '9px 16px' }}>
-                Download CV ↓
-              </a>
-              <a href="https://github.com/rbhatt1999" target="_blank" rel="noreferrer" className="btn btn-ghost" style={{ fontSize: '13px', padding: '9px 16px' }}>
-                GitHub ↗
-              </a>
-            </div>
-          </motion.div>
+            <p>
+              Five years in, I still care most about the small things: a transition that feels
+              right, an API that&apos;s a pleasure to use, a page that loads before you notice.
+              Off-screen, you&apos;ll find me on a hiking trail or inside an Erin Morgenstern novel.
+            </p>
+            <a className="ext" href="/assets/resume.pdf" target="_blank" rel="noreferrer" style={{ fontSize: '13px' }}>
+              download résumé <ArrowUR />
+            </a>
+          </Reveal>
 
-          {/* Testimonials carousel */}
-          <motion.div
-            className="b b-half"
-            initial={{ opacity: 0, y: 24 }}
-            animate={inView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            style={{ background: 'linear-gradient(135deg, var(--surface), var(--bg2))' }}
-          >
-            <div className="sec-eyebrow" style={{ marginBottom: '16px' }}>What colleagues say</div>
-            <TestimonialsCarousel />
-          </motion.div>
+          <Reveal delay={0.1}>
+            <div className="stack-card">
+              <div className="sc-head">stack <span className="ln" /></div>
+              {STACK.map((s) => (
+                <div key={s.name} className="stack-row">
+                  <span className="stack-bar" />
+                  <span className="sn">{s.name}</span>
+                  {s.badge && <span className="sb">{s.badge}</span>}
+                </div>
+              ))}
+            </div>
+          </Reveal>
         </div>
       </div>
     </section>
   )
-}
-
-// Keep legacy exports so existing imports don't break
-export function SectionLabel({ num, label, right }) {
-  return (
-    <>
-      <div style={{
-        fontFamily: 'var(--font-jetbrains), ui-monospace, monospace',
-        fontSize: '12px', color: 'var(--fg3)', marginBottom: '10px',
-        letterSpacing: '0.05em', display: 'flex', justifyContent: 'space-between', alignItems: 'baseline',
-      }}>
-        <span><span style={{ color: 'var(--accent)' }}>// {num}</span> — {label}</span>
-        {right && <span style={{ fontSize: '11px' }}>{right}</span>}
-      </div>
-      <div className="label-rule" style={{ marginBottom: '32px' }} />
-    </>
-  )
-}
-
-export const sectionStyle = { padding: 'clamp(64px, 10vw, 110px) 0', position: 'relative' }
-export const containerStyle = { maxWidth: '1180px', margin: '0 auto', padding: '0 clamp(24px, 6vw, 80px)' }
-export const paragraphStyle = {
-  color: 'var(--fg2)', lineHeight: 1.75, margin: '0 0 14px',
-  fontSize: '15.5px', fontWeight: 400,
-  fontFamily: 'var(--font-inter), ui-sans-serif, sans-serif',
 }

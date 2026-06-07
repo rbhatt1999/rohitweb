@@ -1,128 +1,169 @@
-'use client'
-import { motion } from 'framer-motion'
-import { useInView } from 'react-intersection-observer'
+import Reveal from '@/components/Reveal'
 
-const MORE = [
-  { name: 'space_hub',          desc: '— spacex mission selector',     github: 'https://github.com/rbhatt1999/Space-Hub',     tree: '├─' },
-  { name: 'langchain-learning', desc: '— llm exercises & experiments', github: 'https://github.com/rbhatt1999',               tree: '├─' },
-  { name: 'recipe_app',         desc: '— cookbook + ingredients',      github: 'https://github.com/rbhatt1999/recipe_app',    tree: '├─' },
-  { name: 'math_magician',      desc: '— calculator + practice',       github: 'https://github.com/rbhatt1999/math-magician', tree: '└─' },
+const ArrowUR = () => (
+  <svg className="ar" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M7 17L17 7M9 7h8v8" />
+  </svg>
+)
+
+const FEATURED = [
+  {
+    id: 'sadhak',
+    pill: 'ai · latest',
+    name: 'Sadhak AI',
+    year: '2025',
+    tag: "A privacy-first AI chat that streams Gemini's answers token by token.",
+    desc: 'Google OAuth, per-user threads persisted in Postgres, and a rolling-summary context window so long conversations stay coherent without blowing the token budget.',
+    stack: ['flask', 'langchain', 'gemini', 'postgres', 'sse'],
+    metrics: [
+      { v: 'Gemini', l: 'model' },
+      { v: 'SSE', l: 'transport' },
+      { v: 'Postgres', l: 'threads' },
+    ],
+    github: 'https://github.com/rbhatt1999/sadhak-ai',
+    panel: {
+      title: 'sadhak ~ chat',
+      stat: '● live',
+      lines: [
+        { h: '<span class="sym">▸</span> auth   <span class="ok">google · ok</span>' },
+        { h: '<span class="sym">▸</span> thread <span class="dim">#1f8a · postgres</span>' },
+        { h: '<span class="sym">▸</span> stream <span class="dim">gemini · sse</span> <span class="dots"><span>●</span><span>●</span><span>●</span></span>' },
+      ],
+      tail: [
+        { cls: 'q', h: '<span class="dim">user ›</span> "explain rolling-summary memory"' },
+        { cls: 'resp', h: '<span class="sym">└</span> Keeps the most recent turns verbatim, then folds older context into a compact recap — so the thread never overruns the model window.' },
+        { h: '<span class="dim">streaming</span><span class="cursor-blink"></span>' },
+      ],
+      foot: '<span class="ok">200 OK</span> · gemini-1.5 · 38ms',
+    },
+  },
+  {
+    id: 'stay',
+    pill: null,
+    name: 'Stay a While',
+    year: '2024',
+    tag: 'A home-stay marketplace — discovery, booking, and host dashboards end to end.',
+    desc: 'A Rails API feeding a React + Redux client: search and filtering, a multi-step booking flow, host management dashboards, and a clean payments UI.',
+    stack: ['rails', 'react', 'redux', 'postgres'],
+    metrics: [
+      { v: 'Rails', l: 'api' },
+      { v: 'React', l: 'client' },
+      { v: 'Stripe', l: 'payments' },
+    ],
+    live: 'https://stay-a-while-front-end.vercel.app/',
+    github: 'https://github.com/rbhatt1999/stay-a-while-front-end',
+    panel: {
+      title: 'stay_a_while ~ api',
+      stat: '● 200',
+      lines: [
+        { h: '<span class="sym">$</span> GET /api/v1/stays' },
+        { h: '<span class="sym">▸</span> <span class="key">142</span> listings · <span class="dim">12 hosts</span>' },
+        { h: '<span class="sym">▸</span> booking → <span class="ok">stripe ✓</span>' },
+        { h: '<span class="sym">▸</span> client <span class="dim">react · redux store</span>' },
+      ],
+      tail: [
+        { cls: 'resp', h: '<span class="sym">└</span> { "city": "manali", "nights": 3, "guests": 2, "total": "$420" }' },
+        { h: '<span class="dim">payment</span> → <span class="ok">confirmed ✓</span><span class="cursor-blink"></span>' },
+      ],
+      foot: '<span class="ok">build ✓</span> · deployed on vercel',
+    },
+  },
 ]
 
-export default function Projects() {
-  const { ref, inView } = useInView({ threshold: 0.08, triggerOnce: true })
+const MORE = [
+  { name: 'space_hub',     desc: 'spacex mission selector',   github: 'https://github.com/rbhatt1999/Space-Hub' },
+  { name: 'budget_app',    desc: 'rails finance manager',     github: 'https://github.com/rbhatt1999/budget-app' },
+  { name: 'recipe_app',    desc: 'cookbook + ingredients',    github: 'https://github.com/rbhatt1999/recipe_app' },
+  { name: 'finance_app',   desc: 'stock market analysis',     github: 'https://github.com/rbhatt1999/finance-app' },
+  { name: 'math_magician', desc: 'calculator + practice',     github: 'https://github.com/rbhatt1999/math-magician' },
+]
 
+function Panel({ data }) {
   return (
-    <section id="work" ref={ref} className="sec" style={{ zIndex: 10, background: 'var(--bg)' }}>
-      <div className="sec-wrap">
-        <div className="sec-head">
-          <div>
-            <div className="sec-eyebrow">Selected Work / 2022—2025</div>
-            <h2 className="sec-title">Things I&apos;ve built <span className="a">recently</span></h2>
-          </div>
-          <p className="sec-desc">
-            A focused look at the projects I&apos;m most proud of — production apps, AI tooling, and experiments that taught me something.
-          </p>
-        </div>
+    <div className="case-panel" aria-hidden>
+      <div className="panel-head">
+        <span className="pdot" />
+        <span className="ptitle">{data.title}</span>
+        <span className="pstat">{data.stat}</span>
+      </div>
+      {data.lines.map((l, i) => (
+        <div className={`pl${l.cls ? ' ' + l.cls : ''}`} key={i} dangerouslySetInnerHTML={{ __html: l.h }} />
+      ))}
+      <div className="panel-spacer" />
+      {data.tail.map((l, i) => (
+        <div className={`pl${l.cls ? ' ' + l.cls : ''}`} key={`t${i}`} dangerouslySetInnerHTML={{ __html: l.h }} />
+      ))}
+      <div className="panel-foot" dangerouslySetInnerHTML={{ __html: data.foot }} />
+    </div>
+  )
+}
 
-        <div className="bento">
-          {/* sadhak_ai — wide card */}
-          <motion.div
-            className="b b-wide"
-            initial={{ opacity: 0, y: 24 }}
-            animate={inView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.6, delay: 0.1 }}
-          >
-            <span className="b-tag">Featured · AI</span>
-            <h3 className="b-title" style={{ marginTop: '8px' }}>sadhak_ai — private chat with Gemini</h3>
-            <p className="b-desc">
-              Privacy-focused chat: Google OAuth, per-user threads in Postgres, SSE-streamed responses, rolling-summary context windows so long conversations don&apos;t blow the token budget.
-            </p>
-            <div className="b-stack">
-              <span>Flask</span><span>LangChain</span><span>Gemini</span><span>Postgres</span><span>SSE</span>
+function CaseCard({ proj, idx, flip }) {
+  return (
+    <article className={`case${flip ? ' flip' : ''}`}>
+      <div className="case-body">
+        <div className="case-eyebrow">
+          <span className="case-num">{String(idx + 1).padStart(2, '0')}</span>
+          <span className="ln" />
+          <span className="case-year">{proj.year}</span>
+        </div>
+        <h3 className="case-title" data-scramble>
+          {proj.name}
+          {proj.pill && <span className="pill">{proj.pill}</span>}
+        </h3>
+        <p className="case-tag">{proj.tag}</p>
+        <p className="case-desc">{proj.desc}</p>
+        <div className="case-metrics">
+          {proj.metrics.map((m, i) => (
+            <div className="metric" key={i}>
+              <div className="mv">{m.v}{m.u && <span className="u">{m.u}</span>}</div>
+              <div className="ml">{m.l}</div>
             </div>
-            <a href="https://github.com/rbhatt1999/sadhak-ai" target="_blank" rel="noreferrer" className="b-arrow" aria-label="GitHub">↗</a>
-          </motion.div>
+          ))}
+        </div>
+        <div className="case-stack">
+          {proj.stack.map((s) => <span key={s} className="chip">{s}</span>)}
+        </div>
+        <div className="case-foot">
+          {proj.live && <a className="ext" href={proj.live} target="_blank" rel="noreferrer">live demo <ArrowUR /></a>}
+          {proj.github && <a className="ext" href={proj.github} target="_blank" rel="noreferrer">source <ArrowUR /></a>}
+        </div>
+      </div>
+      <Panel data={proj.panel} />
+    </article>
+  )
+}
 
-          {/* Stat — years */}
-          <motion.div
-            className="b b-quarter"
-            initial={{ opacity: 0, y: 24 }}
-            animate={inView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            style={{ display: 'flex', flexDirection: 'column', justifyContent: 'flex-end' }}
-          >
-            <p className="stat-num">5<span className="a">+</span></p>
-            <p className="stat-label">Years shipping</p>
-          </motion.div>
+export default function Projects() {
+  return (
+    <section className="section" id="work">
+      <div className="wrap">
+        <Reveal className="sec-head">
+          <span className="lhs">
+            <span className="sec-num">01 —</span>
+            <h2 className="sec-title">Selected work</h2>
+          </span>
+          <a className="sec-link" href="https://github.com/rbhatt1999" target="_blank" rel="noreferrer">all projects on github <ArrowUR /></a>
+        </Reveal>
 
-          {/* stay_a_while */}
-          <motion.div
-            className="b b-third"
-            initial={{ opacity: 0, y: 24 }}
-            animate={inView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.6, delay: 0.25 }}
-          >
-            <span className="b-tag">SaaS</span>
-            <h3 className="b-title" style={{ marginTop: '8px' }}>stay_a_while</h3>
-            <p className="b-desc">Home-stay booking flow with host dashboards and a payments UI.</p>
-            <div className="b-stack"><span>Rails</span><span>React</span><span>Redux</span></div>
-            <a href="https://github.com/rbhatt1999/stay-a-while-front-end" target="_blank" rel="noreferrer" className="b-arrow" aria-label="GitHub">↗</a>
-          </motion.div>
-
-          {/* budget_app */}
-          <motion.div
-            className="b b-third"
-            initial={{ opacity: 0, y: 24 }}
-            animate={inView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.6, delay: 0.3 }}
-          >
-            <span className="b-tag">Tools</span>
-            <h3 className="b-title" style={{ marginTop: '8px' }}>budget_app</h3>
-            <p className="b-desc">Rails finance manager — categorised spend, recurring bills, monthly summaries.</p>
-            <div className="b-stack"><span>Rails</span><span>Postgres</span></div>
-            <a href="https://github.com/rbhatt1999/budget-app" target="_blank" rel="noreferrer" className="b-arrow" aria-label="GitHub">↗</a>
-          </motion.div>
-
-          {/* finance_app */}
-          <motion.div
-            className="b b-third"
-            initial={{ opacity: 0, y: 24 }}
-            animate={inView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.6, delay: 0.35 }}
-          >
-            <span className="b-tag">Data</span>
-            <h3 className="b-title" style={{ marginTop: '8px' }}>finance_app</h3>
-            <p className="b-desc">Stock market analysis dashboard, charts and trend signals.</p>
-            <div className="b-stack"><span>React</span><span>Node</span><span>Chart.js</span></div>
-            <a href="https://github.com/rbhatt1999/finance-app" target="_blank" rel="noreferrer" className="b-arrow" aria-label="GitHub">↗</a>
-          </motion.div>
+        <div className="cases">
+          {FEATURED.map((p, i) => (
+            <Reveal key={p.id} delay={i * 0.06}>
+              <CaseCard proj={p} idx={i} flip={i % 2 === 1} />
+            </Reveal>
+          ))}
         </div>
 
-        {/* more/ list */}
-        <motion.div
-          initial={{ opacity: 0, y: 24 }}
-          animate={inView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.6, delay: 0.45 }}
-          style={{
-            marginTop: '40px',
-            fontFamily: 'var(--font-jetbrains), ui-monospace, monospace',
-            fontSize: '13.5px',
-            color: 'var(--fg3)',
-          }}
-        >
-          <span style={{ color: 'var(--fg1)', display: 'block', marginBottom: '10px', fontWeight: 500 }}>more/</span>
-          {MORE.map(({ name, desc, github, tree }) => (
-            <a key={name} href={github} target="_blank" rel="noreferrer" className="more-row">
-              <span style={{ color: 'var(--fg5)', marginRight: '12px' }}>{tree}</span>
-              <span style={{ color: 'var(--fg2)' }}>{name}</span>
-              <span style={{ color: 'var(--fg4)', margin: '0 12px' }}>{desc}</span>
-              <span className="gh-link" style={{ marginLeft: 'auto', fontSize: '12px', color: 'var(--fg4)' }}>
-                [ github ↗ ]
-              </span>
+        <Reveal delay={0.1}>
+          <div className="more-head">more / open source</div>
+          {MORE.map((m) => (
+            <a key={m.name} className="more-row" href={m.github} target="_blank" rel="noreferrer">
+              <span className="mn">{m.name}</span>
+              <span className="md">— {m.desc}</span>
+              <span className="ma ext">github <ArrowUR /></span>
             </a>
           ))}
-        </motion.div>
+        </Reveal>
       </div>
     </section>
   )

@@ -1,47 +1,39 @@
-import React from 'react'
-import Image from 'next/image'
+'use client'
+import React, { useEffect, useState } from 'react'
 import Link from 'next/link'
 import NavigationBarMobile from './NavigationBarMobile'
 import ThemeToggle from '@/components/ThemeToggle'
 
+const SECTIONS = ['work', 'about', 'writing', 'contact']
+
 export default function NavigationBar() {
+  const [scrolled, setScrolled] = useState(false)
+
+  useEffect(() => {
+    const fn = () => setScrolled(window.scrollY > 24)
+    fn()
+    window.addEventListener('scroll', fn, { passive: true })
+    return () => window.removeEventListener('scroll', fn)
+  }, [])
+
   return (
-    <header className="nav-bar">
-      <nav className="nav-inner">
-        {/* Brand */}
+    <header className="nav" data-scrolled={scrolled}>
+      <nav className="wrap nav-in">
         <Link href="/" className="brand">
-          <Image
-            src="/assets/logo.png"
-            alt="Rohit Bhatt"
-            width={36}
-            height={36}
-            style={{ borderRadius: '50%', display: 'block', flexShrink: 0 }}
-          />
-          <span>rohit.bhatt</span>
+          <span className="mk">▸</span>rohit<span className="dim">.bhatt</span>
         </Link>
 
-        {/* Desktop pill nav */}
-        <div className="nav-desktop-group">
-          <div className="nav-pill-links">
-            <Link href="/#work"    className="nav-pill-link">Work</Link>
-            <Link href="/#skills"  className="nav-pill-link">Skills</Link>
-            <Link href="/#writing" className="nav-pill-link">Writing</Link>
-            <Link href="/#about"   className="nav-pill-link">About</Link>
-            <Link href="/blogs"    className="nav-pill-link blogs-pill">/blogs ↗</Link>
-          </div>
+        {/* Desktop */}
+        <div className="nav-r nav-desktop">
+          {SECTIONS.map((k) => (
+            <a key={k} href={`/#${k}`} className="nlink">{k}</a>
+          ))}
+          <Link href="/blogs" className="nav-blogs">/blogs ↗</Link>
           <ThemeToggle />
-          <a
-            href="https://calendly.com/rbhatt199924/30min"
-            target="_blank"
-            rel="noreferrer"
-            className="nav-cta-btn"
-          >
-            Book a call →
-          </a>
         </div>
 
         {/* Mobile */}
-        <div className="nav-mobile-group">
+        <div className="nav-mobile">
           <ThemeToggle />
           <NavigationBarMobile />
         </div>

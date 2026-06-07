@@ -1,20 +1,14 @@
-const ITEMS = [
-  'Indie startups', '·', 'SaaS teams', '·', 'Open source', '·',
-  'YC founders', '·', 'Design studios', '·', 'AI labs', '·',
+const TECH = [
+  'Ruby on Rails', 'React', 'Python', 'LangChain', 'Gemini', 'PostgreSQL',
+  'Flask', 'Redux', 'Tailwind', 'Node.js', 'SSE streaming', 'REST APIs',
 ]
 
 export default function Marquee() {
-  const doubled = [...ITEMS, ...ITEMS]
-
+  const items = [...TECH, ...TECH]
   return (
-    <div className="marquee-wrap">
-      <span className="marquee-label">Worked with</span>
-      <div className="marquee-overflow">
-        <div className="marquee-track">
-          {doubled.map((item, i) => (
-            <span key={i}>{item}</span>
-          ))}
-        </div>
+    <div className="marquee" aria-hidden>
+      <div className="marquee-track">
+        {items.map((tech, i) => <span className="marquee-item" key={i}>{tech}</span>)}
       </div>
     </div>
   )

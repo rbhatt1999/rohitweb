@@ -3,7 +3,7 @@ import { jetbrainsMono, inter } from '@/lib/fonts'
 import { Analytics } from '@vercel/analytics/react'
 import NavigationBar from '@/components/Navigation/NavigationBar'
 import Footer from '@/components/Footer'
-import CursorGlow from '@/components/CursorGlow'
+import SiteChrome from '@/components/SiteChrome'
 
 export const metadata = {
   title: 'Rohit Bhatt — Full-Stack Engineer',
@@ -28,24 +28,31 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en" className={`${jetbrainsMono.variable} ${inter.variable}`} suppressHydrationWarning>
-      {/* Prevent theme flash: read localStorage before React hydrates */}
+      {/* Prevent theme flash + enable scroll-reveal motion before React hydrates */}
       <head suppressHydrationWarning>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Hanken+Grotesk:wght@400;500;600;700&display=swap"
+          rel="stylesheet"
+        />
         <script dangerouslySetInnerHTML={{ __html: `
           try {
             var t = localStorage.getItem('rb-theme');
-            if (t) document.documentElement.setAttribute('data-theme', t);
-          } catch(e) {}
+            document.documentElement.setAttribute('data-theme', (t === 'light' || t === 'dark') ? t : 'dark');
+          } catch(e) { document.documentElement.setAttribute('data-theme', 'dark'); }
+          document.documentElement.classList.add('js');
         ` }} />
       </head>
       <body suppressHydrationWarning style={{
-        background: 'var(--bg)',
-        color: 'var(--fg2)',
-        fontFamily: 'var(--font-inter), ui-sans-serif, system-ui, sans-serif',
+        background: 'var(--paper)',
+        color: 'var(--ink-2)',
+        fontFamily: 'var(--sans)',
         margin: 0,
       }}>
         <Analytics />
-        <div className="grid-bg" aria-hidden />
-        <CursorGlow />
+        <div className="grain" aria-hidden />
+        <SiteChrome />
         <NavigationBar />
         {children}
         <Footer />

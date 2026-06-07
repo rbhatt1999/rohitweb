@@ -1,54 +1,42 @@
 'use client'
-import { motion } from 'framer-motion'
-import { useInView } from 'react-intersection-observer'
 import { useState } from 'react'
+import Reveal from '@/components/Reveal'
 
+const SOCIALS = [
+  { label: 'github',   href: 'https://github.com/rbhatt1999' },
+  { label: 'linkedin', href: 'https://www.linkedin.com/in/rohitbhatt-dev/' },
+  { label: 'twitter',  href: 'https://twitter.com/Rohit_Bhatt_' },
+  { label: 'medium',   href: 'https://medium.com/@rbhatt199924' },
+]
 const EMAIL = 'rohit.bhatt.dev@gmail.com'
 
 export default function Contact() {
-  const { ref, inView } = useInView({ threshold: 0.1, triggerOnce: true })
   const [copied, setCopied] = useState(false)
 
-  function copyEmail() {
-    navigator.clipboard.writeText(EMAIL).then(() => {
-      setCopied(true)
-      setTimeout(() => setCopied(false), 2000)
-    })
+  const copy = () => {
+    navigator.clipboard?.writeText(EMAIL)
+    setCopied(true)
+    setTimeout(() => setCopied(false), 1900)
   }
 
   return (
-    <section id="contact" ref={ref} className="sec" style={{ zIndex: 10, background: 'var(--bg)' }}>
-      <div className="sec-wrap">
-        <motion.div
-          className="cta-block"
-          initial={{ opacity: 0, y: 24 }}
-          animate={inView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.7, delay: 0.1 }}
-        >
-          <div className="cta-eyebrow">◆ Now booking · available for Q3</div>
-          <h2 className="cta-h">Let&apos;s build something <span className="a">good</span>.</h2>
-          <p className="cta-p">
-            Drop a line about what you&apos;re working on. I&apos;ll reply within a day with honest
-            thoughts, a rough scope, and whether I&apos;m the right fit.
-          </p>
-          <div className="cta-row">
-            <button
-              onClick={copyEmail}
-              className="btn btn-primary"
-              style={{ border: 'none', cursor: 'pointer' }}
-            >
-              {copied ? '✓ Copied!' : `${EMAIL} →`}
-            </button>
-            <a
-              href="https://calendly.com/rbhatt199924/30min"
-              target="_blank"
-              rel="noreferrer"
-              className="btn btn-ghost"
-            >
-              Book a 20-min call
-            </a>
-          </div>
-        </motion.div>
+    <section className="section section-2" id="contact" style={{ paddingBottom: 'clamp(80px,12vw,150px)' }}>
+      <div className="wrap contact">
+        <Reveal className="contact-pre"><span className="mk">$</span> echo &quot;let&apos;s build something&quot;</Reveal>
+        <Reveal as="h2" className="contact-h" delay={0.06}>
+          Let&apos;s make it <span className="em">real.</span>
+        </Reveal>
+        <Reveal delay={0.12}>
+          <button onClick={copy} className={`email-btn${copied ? ' copied' : ''}`}>
+            {copied ? 'copied to clipboard' : EMAIL}
+            <span className="ic">{copied ? '✓' : '⧉'}</span>
+          </button>
+        </Reveal>
+        <Reveal className="socials" delay={0.18}>
+          {SOCIALS.map((s) => (
+            <a key={s.label} className="social" href={s.href} target="_blank" rel="noreferrer">{s.label} ↗</a>
+          ))}
+        </Reveal>
       </div>
     </section>
   )
