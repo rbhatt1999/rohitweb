@@ -3542,6 +3542,19 @@ jobs:
         },
       },
       {
+        h1: `12. Ultracode — When Claude Goes Full Parallel`,
+        p: `Ultracode shipped May 28, 2026 (v2.1.154) alongside Claude Opus 4.8. It's not a model — it's a session setting that does two things at once: pins your per-request reasoning to <code>xhigh</code> effort, and flips on automatic Dynamic Workflow orchestration for every substantive task. Without ultracode, you get one agent doing one thing. With ultracode on, Claude decides whether to fan the task out across a fleet of parallel verifying subagents — without you typing the word "workflow."`,
+        list: [
+          { h1: `How to trigger it`, p: `<strong>Session-wide:</strong> run <code>/effort ultracode</code> and every substantive task in the session gets the treatment. <strong>One-off:</strong> include the word "ultracode" in a single prompt and just that task gets a workflow. As of v2.1.160, the bare word "workflow" no longer triggers a run — <code>ultracode</code> is now the keyword.` },
+          { h1: `What actually changes`, p: `Claude writes a JavaScript orchestration script for your task. That script decides how many subagents to spawn, how to partition work, when to run adversarial verification passes, and when results have converged enough to stop. Subagents run in <code>acceptEdits</code> mode with file mutations in isolated worktrees. Up to <strong>16 concurrent agents</strong>, <strong>1,000 total agents</strong> per run. The key thing: verifying subagents never wrote the original answer, so they actually push back.` },
+          { h1: `What problems it solves`, p: `Three failure modes of single-context-window work: (1) early quitting on large tasks, (2) generous self-grading ("looks right to me"), and (3) goal drift in long conversations. Ultracode addresses all three by routing verification to independent agents.` },
+          { h1: `The cost reality`, p: `No spending cap by default. The workflow runs until answers stabilize, not at a token limit. Community reports: 62+ subagents spawning on moderate tasks. Some Pro users hit their monthly cap in under an hour. Anthropic's own guidance: "Downgrade after the hard task." Run <code>/effort high</code> when you're back to routine work.` },
+          { h1: `When it's worth it`, p: `Codebase-wide audits, large migrations, adversarial stress-testing of a plan before you commit to it, anything where you genuinely need independent verification rather than self-review. "I need to refactor this auth module" — probably not worth it. "I need to find every SQL injection surface across 200 files" — worth it.` },
+          { h1: `When it's overkill`, p: `Routine edits, single-file fixes, well-defined refactors, anything where the path is already clear. Standard <code>high</code> or <code>xhigh</code> effort is cleaner and cheaper for these. Reaching for ultracode on a "fix this typo" task is like renting a crane to move a chair.` },
+          { h1: `Requirements`, p: `Claude Code v2.1.154 or later (<code>claude --version</code> to check). Opus 4.8 or Opus 4.7 only — other models don't support <code>xhigh</code> effort. Dynamic Workflows must be enabled: on Pro, toggle from the Dynamic workflows row in <code>/config</code>. Available on all paid plans.` },
+        ],
+      },
+      {
         h1: `14. The Anti-patterns (With Named Offenders)`,
         list: [
           { h1: `Test deletion`, p: `Armin Ronacher (lucumr.pocoo.org) and many Reddit threads documented Claude deleting failing tests to get green CI. Fix: "NEVER delete or skip tests" in CLAUDE.md, plus a Stop hook that <code>git diff</code>s test files and blocks if any were removed.` },
