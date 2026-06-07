@@ -46,6 +46,7 @@ export async function GET(req) {
       slug: item.slug,
       date: item.date,
       summary: item.summary,
+      tags: item.tags ?? [],
       image: {
         src: item.image.src,
         alt: item.image.alt,

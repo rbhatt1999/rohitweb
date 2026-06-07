@@ -5,14 +5,15 @@ import Link from 'next/link'
 import Reveal from '@/components/Reveal'
 import Search from '@/components/blogs/Search'
 import blogdata from '@/app/api/blogs/blog'
+import stripHtml from '@/utils/stripHtml'
 
 export const metadata = {
   title: `Notes on building software & AI — Rohit Bhatt`,
-  description: `Essays on shipping web products — Ruby on Rails, React, and the practical realities of putting large language models into production.`,
+  description: `Field notes on shipping web products — Ruby on Rails, React, and the practical realities of putting large language models into production.`,
   alternates: { canonical: `${url}/blogs` },
   openGraph: {
     title: `Notes on building software & AI — Rohit Bhatt`,
-    description: `Essays on shipping web products — Ruby on Rails, React, and the practical realities of putting large language models into production.`,
+    description: `Field notes on shipping web products — Ruby on Rails, React, and the practical realities of putting large language models into production.`,
     url: `${url}/blogs`,
     type: 'website',
     images: [{ url: 'https://i.ibb.co/BL54PXc/blogs.webp', width: 800, height: 500, alt: 'Rohit Bhatt' }],
@@ -20,7 +21,7 @@ export const metadata = {
   twitter: {
     card: 'summary_large_image',
     title: `Notes on building software & AI — Rohit Bhatt`,
-    description: `Essays on shipping web products — Ruby on Rails, React, and putting LLMs into production.`,
+    description: `Field notes on shipping web products — Ruby on Rails, React, and putting LLMs into production.`,
     images: ['https://i.ibb.co/BL54PXc/blogs.webp'],
     creator: '@Rohit__Bhatt_',
   },
@@ -40,12 +41,12 @@ function formatDate(dateStr) {
 
 function tagLabel(blog) {
   const t = blog.tags?.[0]
-  if (!t) return 'Essay'
+  if (!t) return 'Blog'
   return t.replace(/\b\w/g, (c) => c.toUpperCase())
 }
 
 function excerpt(blog) {
-  return blog.summary || blog.description || ''
+  return stripHtml(blog.summary || blog.description || '')
 }
 
 export async function getBlogs(page = false, search = false, all = false) {
@@ -76,7 +77,7 @@ function FeaturedPost({ post }) {
         </div>
         <div className="bf-aside" aria-hidden>
           <span className="mark">&ldquo;</span>
-          <span className="lbl">{tagLabel(post)}</span>
+          <span className="lbl">blog</span>
         </div>
       </Link>
     </Reveal>
@@ -143,11 +144,11 @@ export default async function page({ searchParams }) {
             Notes on building software &amp; <span className="em">AI.</span>
           </Reveal>
           <Reveal as="p" className="blog-sub" delay={0.1}>
-            Essays on shipping web products — Rails, React, and the practical realities
+            Field notes on shipping web products — Rails, React, and the practical realities
             of putting large language models into production.
           </Reveal>
           <Reveal className="blog-count" delay={0.15}>
-            <span>{String(blogdata.length).padStart(2, '0')} essays</span>
+            <span>{String(blogdata.length).padStart(2, '0')} blogs</span>
             <span className="ln" />
           </Reveal>
           <Reveal className="blog-search" delay={0.2}>
@@ -160,12 +161,12 @@ export default async function page({ searchParams }) {
         <div className="wrap">
           {search && (
             <Reveal as="p" className="blog-sub" style={{ marginBottom: 'clamp(28px,4vw,44px)' }}>
-              Search results for &ldquo;{search}&rdquo; — {data.length} {data.length === 1 ? 'post' : 'posts'}
+              Search results for &ldquo;{search}&rdquo; — {data.length} {data.length === 1 ? 'blog' : 'blogs'}
             </Reveal>
           )}
 
           {data.length === 0 ? (
-            <h2 className="sec-title" style={{ textAlign: 'center', padding: '40px 0' }}>No essays found</h2>
+            <h2 className="sec-title" style={{ textAlign: 'center', padding: '40px 0' }}>No blogs found</h2>
           ) : (
             <>
               {featured && <FeaturedPost post={featured} />}

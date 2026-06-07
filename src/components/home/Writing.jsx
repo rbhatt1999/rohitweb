@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import Reveal from '@/components/Reveal'
 import blogdata from '@/app/api/blogs/blog'
+import stripHtml from '@/utils/stripHtml'
 
 const ArrowUR = () => (
   <svg className="ar" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -16,7 +17,7 @@ function formatDate(dateStr) {
 
 function tagLabel(blog) {
   const t = blog.tags?.[0]
-  if (!t) return 'Post'
+  if (!t) return 'Blog'
   return t.replace(/\b\w/g, (c) => c.toUpperCase())
 }
 
@@ -50,7 +51,7 @@ export default function Writing() {
                     <span className="post-date">{formatDate(post.date)}</span>
                   </div>
                   <h3 className="post-title">{post.title}</h3>
-                  <p className="post-excerpt">{post.summary || post.description}</p>
+                  <p className="post-excerpt">{stripHtml(post.summary || post.description)}</p>
                 </div>
                 <span className="post-arr">read <ArrowUR /></span>
               </Link>
