@@ -1,10 +1,10 @@
 import HomeComponent from '@/components/home/HomeComponent'
 import Marquee from '@/components/home/Marquee'
 import Projects from '@/components/home/Projects'
-import Skills from '@/components/home/Skills'
-import Writing from '@/components/home/Writing'
 import About from '@/components/home/About'
+import Writing from '@/components/home/Writing'
 import Contact from '@/components/home/Contact'
+import HomeFX from '@/components/home/HomeFX'
 
 export const metadata = {
   title: 'Rohit Bhatt — Full-Stack Engineer',
@@ -18,10 +18,10 @@ export default function Home() {
       <HomeComponent />
       <Marquee />
       <Projects />
-      <Skills />
-      <Writing />
       <About />
+      <Writing />
       <Contact />
+      <HomeFX />
     </main>
   )
 }

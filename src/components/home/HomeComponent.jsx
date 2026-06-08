@@ -1,98 +1,55 @@
-'use client'
-import dynamic from 'next/dynamic'
-import { motion } from 'framer-motion'
-
-const CorridorCanvas = dynamic(() => import('@/components/three/CorridorCanvas'), { ssr: false, loading: () => null })
+import Reveal from '@/components/Reveal'
 
 export default function HomeComponent() {
   return (
-    <section
-      id="home"
-      style={{
-        position: 'relative',
-        minHeight: '100vh',
-        overflow: 'hidden',
-        background: 'var(--bg)',
-      }}
-    >
-      {/* 3D corridor — hidden in light mode via CSS */}
-      <div className="corridor-wrapper">
-        <CorridorCanvas />
-      </div>
+    <section className="hero" id="home">
+      <div className="hero-aura" aria-hidden />
+      <div className="wrap">
+        <div className="hero-grid">
+          <div>
+            <Reveal className="hero-status">
+              <span className="live-dot" />
+              <span className="hs-label">now building</span>
+              <span className="hs-val">Sadhak AI</span>
+              <span className="hs-chip">streaming gemini</span>
+            </Reveal>
 
-      {/* Scrim — dark mode only */}
-      <div aria-hidden className="hero-scrim" />
+            <h1 className="hero-h1">
+              <span className="hl"><span>Software</span></span>
+              <span className="hl"><span>that feels</span></span>
+              <span className="hl"><span><span className="em">considered.</span></span></span>
+            </h1>
 
-      {/* Content */}
-      <div className="hero-section" style={{ position: 'relative', zIndex: 5 }}>
-        <div className="hero-wrap">
+            <Reveal as="p" className="hero-lead" delay={0.14}>
+              I&apos;m <b>Rohit Bhatt</b>, a full-stack engineer shipping thoughtful web
+              products with Ruby&nbsp;on&nbsp;Rails, React, and AI&nbsp;integrations.
+            </Reveal>
 
-          {/* Status pill */}
-          <motion.div
-            className="status-pill"
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.1 }}
-          >
-            <span className="status-dot" />
-            Available for freelance · full-time roles
-          </motion.div>
+            <Reveal className="hero-meta" delay={0.2}>
+              <span>5+ years</span><span className="sep" />
+              <span>remote · India</span><span className="sep" />
+              <span className="avail"><span className="live-dot" />open to work</span>
+            </Reveal>
 
-          {/* Headline */}
-          <motion.h1
-            className="hero-h1"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.25 }}
-          >
-            Full-stack engineer<br />
-            shipping{' '}
-            <span className="a">thoughtful</span>
-            <br />
-            web software.
-          </motion.h1>
+            <Reveal className="hero-ctas" delay={0.26}>
+              <a href="#work" className="btn btn-primary" data-magnetic>
+                view work <span className="arr">→</span>
+              </a>
+              <a href="#contact" className="btn btn-ghost" data-magnetic>
+                get in touch
+              </a>
+            </Reveal>
+          </div>
 
-          {/* Hero row: lead + meta */}
-          <motion.div
-            className="hero-row"
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.45 }}
-          >
-            <p className="hero-lead">
-              I&apos;m <em>Rohit</em> — five years building production apps in Ruby on Rails, React,
-              and Python. Recently focused on <em>LLM-backed tools</em> (LangChain, Gemini,
-              streaming pipelines). I care about pace, polish, and writing software that ages well.
-            </p>
-            <div className="hero-meta">
-              <div>
-                <span>Based</span>
-                <b>Remote · Uttarakhand, IN</b>
-              </div>
-              <div>
-                <span>Open to</span>
-                <b>Full-time · contract</b>
-              </div>
-              <div>
-                <span>Reply time</span>
-                <b>&lt; 24 hours</b>
-              </div>
+          <Reveal className="hero-portrait" delay={0.18}>
+            <div className="frame">
+              <img src="/assets/rohit-bhatt.jpg" alt="Rohit Bhatt" />
             </div>
-          </motion.div>
-
-          {/* CTAs */}
-          <motion.div
-            className="hero-cta"
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.6 }}
-          >
-            <a href="#contact" className="btn btn-primary">Start a project →</a>
-            <a href="#work" className="btn btn-ghost">See work</a>
-          </motion.div>
-
+            <span className="tag">Uttarakhand, IN</span>
+          </Reveal>
         </div>
       </div>
+      <div className="hero-scroll"><span className="ln" />scroll</div>
     </section>
   )
 }

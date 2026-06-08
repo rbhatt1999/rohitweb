@@ -8,15 +8,16 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        accent: '#a3e635',
-        'accent-dim': '#65a30d',
+        accent: '#EE6A47',
+        'accent-dim': '#C8492A',
         zinc: {
-          950: '#06070a',
+          950: '#100E0B',
         },
       },
       fontFamily: {
         mono: ['var(--font-jetbrains)', 'ui-monospace', 'SFMono-Regular', 'monospace'],
-        sans: ['var(--font-inter)', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+        sans: ['Hanken Grotesk', 'var(--font-inter)', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+        serif: ['Instrument Serif', 'Georgia', 'serif'],
       },
       backgroundImage: {
         'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',

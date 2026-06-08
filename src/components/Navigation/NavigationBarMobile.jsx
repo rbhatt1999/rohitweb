@@ -5,11 +5,11 @@ import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
 
 const MENU_ITEMS = [
-  { label: '// work',    href: '/#work' },
-  { label: '// writing', href: '/#writing' },
-  { label: '// about',   href: '/#about' },
-  { label: '// contact', href: '/#contact' },
-  { label: '/blogs ↗',   href: '/blogs' },
+  { label: 'work',    href: '/#work' },
+  { label: 'about',   href: '/#about' },
+  { label: 'writing', href: '/#writing' },
+  { label: 'contact', href: '/#contact' },
+  { label: '/blogs',  href: '/blogs' },
 ]
 
 export default function NavigationBarMobile() {
@@ -18,7 +18,6 @@ export default function NavigationBarMobile() {
 
   useEffect(() => setMounted(true), [])
 
-  // Lock body scroll while overlay is open
   useEffect(() => {
     if (!open) return
     const prev = document.body.style.overflow
@@ -30,19 +29,12 @@ export default function NavigationBarMobile() {
 
   return (
     <>
-      {/* Hamburger */}
-      <button
-        onClick={() => setOpen(o => !o)}
-        aria-label="Toggle menu"
-        aria-expanded={open}
-        className="hamburger-btn"
-      >
+      <button onClick={() => setOpen(o => !o)} aria-label="Toggle menu" aria-expanded={open} className="hamburger-btn">
         {[0, 1, 2].map(i => (
-          <span key={i} className="hamburger-bar" style={{ background: open ? '#a3e635' : '#e4e4e7' }} />
+          <span key={i} className="hamburger-bar" style={open ? { background: 'var(--accent)' } : undefined} />
         ))}
       </button>
 
-      {/* Overlay rendered in a portal so it can't be affected by header's stacking context */}
       {mounted && createPortal(
         <AnimatePresence>
           {open && (
@@ -53,19 +45,11 @@ export default function NavigationBarMobile() {
               transition={{ duration: 0.2 }}
               className="mobile-menu-overlay"
             >
-              <button onClick={close} className="mobile-menu-close" aria-label="Close menu">
-                [ esc ]
-              </button>
-
+              <button onClick={close} className="mobile-menu-close" aria-label="Close menu">[ esc ]</button>
               <nav className="mobile-menu-list">
                 {MENU_ITEMS.map(({ label, href }) => (
-                  <Link
-                    key={href}
-                    href={href}
-                    onClick={close}
-                    className="mobile-menu-link"
-                  >
-                    <span style={{ color: '#a3e635' }}>▸ </span>{label}
+                  <Link key={href} href={href} onClick={close} className="mobile-menu-link">
+                    <span className="mk">▸</span>{label}
                   </Link>
                 ))}
               </nav>
