@@ -3668,6 +3668,133 @@ jobs:
       title: `Building the Future: A Developer's Guide to Agentic AI Workflows in Ruby`,
       slug: `building-the-future-a-developers-guide-to-agentic-ai-workflows-in-ruby`,
     },
+  },
+  {
+    title: `Claude Fable 5, Mythos 5, and the State of the Claude Ecosystem in Mid-2026`,
+    slug: `claude-fable-5-mythos-5-and-the-state-of-the-claude-ecosystem-mid-2026`,
+    id: 13,
+    category_id: 5,
+    description: `Anthropic just shipped Claude Fable 5 — a Mythos-class model above Opus. Here's what it is, the safeguard architecture behind it, and a verified map of everything Anthropic shipped on the way: Opus 4.8, Sonnet 4.6, Claude Cowork, and the agent stack.`,
+    image: {
+      src: `https://website-images-rohitcodes.s3.ap-south-1.amazonaws.com/claude-fable-5-mythos-5-and-the-state-of-the-claude-ecosystem-mid-2026.webp`,
+      alt: `Claude Fable 5, Mythos 5, and the State of the Claude Ecosystem in Mid-2026`,
+    },
+    owner: `Rohit Bhatt`,
+    tags: [`Anthropic`, `Claude Fable 5`, `Claude Mythos 5`, `Claude Opus 4.8`, `Claude Code`, `AI Safety`, `LLMs`, `AI Engineering`],
+    date: '2026-06-09',
+    summary: `On June 9, 2026, Anthropic broke its own naming convention for the first time since Claude 3: <strong>Claude Fable 5</strong> is a new "Mythos-class" tier above Opus, generally available at $10/$50 per million tokens, with a sibling — <strong>Claude Mythos 5</strong> — reserved for vetted cyberdefenders with some safeguards lifted.<br/><br/>This post does two things. First, it explains what Fable 5 and Mythos 5 actually are: the capability claims, the safeguard architecture (high-risk queries silently fall back to Opus 4.8), and what changes for you at the API level. Second, it maps the verified timeline that got us here — Opus 4.5 (Nov 2025), Sonnet 4.6 (Feb 2026), Opus 4.8 (May 2026), Claude Cowork (Jan 2026), Claude in PowerPoint (Feb 2026) — plus the agent stack (Claude Code, Agent SDK, Skills, MCP) that all of it runs on.<br/><br/>There's also a meta-lesson: this post started as a research doc in which half of these products were flagged as "probably hallucinated" because they broke known patterns. Every one of them turned out to be real. The takeaway for engineers working with LLMs is at the end.`,
+    sections: [
+      {
+        p: `Anthropic has been almost boring in its consistency. Three tiers — Haiku, Sonnet, Opus — across Claude 3, 3.5, 3.7, and the entire 4.x family. Same names, same ladder, for over two years.<br/><br/>On <strong>June 9, 2026</strong>, that streak ended. Anthropic announced <strong>Claude Fable 5</strong> and <strong>Claude Mythos 5</strong> — a new model class that sits <em>above</em> Opus, with mythology-themed naming, a two-track release strategy built around safety, and the strongest capability claims the company has ever made for a generally available model.<br/><br/>This post covers what Fable 5 and Mythos 5 are, why the release is structured the way it is, and — because the announcement only makes sense in context — a verified map of everything Anthropic shipped in the twelve months leading up to it.`,
+      },
+      {
+        h1: `What Claude Fable 5 Actually Is`,
+        p: `Fable 5 is Anthropic's most capable model made generally available — described in the announcement as "a Mythos-class model made safe for general use." Per Anthropic, it is state-of-the-art on nearly all tested benchmarks, with standout performance in software engineering, knowledge work, vision, and scientific research.<br/><br/>The headline numbers:`,
+        list: [
+          { h1: `Pricing`, p: `$10 per million input tokens, $50 per million output tokens — less than half the price of the earlier Mythos Preview, but 2x Opus 4.8 ($5/$25).` },
+          { h1: `Context`, p: `1M-token context window, in line with the recent Opus models.` },
+          { h1: `Availability`, p: `Generally available from day one — on the Claude API, in the Claude apps, and already live in third-party surfaces like GitHub Copilot.` },
+          { h1: `Early results`, p: `During early testing, Stripe reported that Fable 5 performed a codebase-wide migration in a day that would otherwise have taken a whole team over two months.` },
+        ],
+      },
+      {
+        h1: `The Mythos 5 Split: Two Models, One Brain`,
+        p: `The interesting part of this launch isn't the benchmarks — it's the release architecture.<br/><br/><strong>Claude Mythos 5 is the same underlying model as Fable 5</strong>, but with safeguards lifted in specific areas. Anthropic is making it available only to a small, vetted group of cyberdefenders and infrastructure providers, and describes it as having the strongest cybersecurity capabilities of any model in the world.<br/><br/>Fable 5, the public variant, ships with classifier-based safeguards that block responses in specific high-risk areas — notably cybersecurity and biology. When a query trips those safeguards, the response is silently served by <strong>Claude Opus 4.8</strong> instead. Anthropic says this fallback triggers in less than 5% of sessions on average.<br/><br/>This is the logical endpoint of Anthropic's Responsible Scaling Policy (RSP). The company activated <strong>AI Safety Level 3 (ASL-3)</strong> protections back on May 22, 2025 with Claude Opus 4 — deployment safeguards targeting dual-use and CBRN uplift risks, plus hardened security against model-weight theft. The Fable/Mythos split takes that idea further: instead of one model with one safety dial, you get a public tier where the riskiest capabilities are gated, and a restricted tier where approved organizations get the full capability surface for defensive work.<br/><br/>Expect other labs to copy this pattern. Capability-gated tiers with vetted access are a much more workable answer to "this model is too dangerous to release" than simply not releasing it.`,
+      },
+      {
+        h1: `What Changes at the API Level`,
+        p: `If you're building on the Claude API, Fable 5 slots in with the model ID <code>claude-fable-5</code>. It inherits the request surface introduced with Opus 4.7/4.8, with one extra quirk:`,
+        list: [
+          { h1: `Adaptive thinking only`, p: `<code>thinking: { type: "adaptive" }</code> is the only on-mode. The old <code>budget_tokens</code> extended thinking returns a 400.` },
+          { h1: `No explicit "disabled"`, p: `Unlike Opus 4.8, sending <code>thinking: { type: "disabled" }</code> on Fable 5 returns a 400 — if you want thinking off, omit the parameter entirely.` },
+          { h1: `No sampling parameters`, p: `<code>temperature</code>, <code>top_p</code>, and <code>top_k</code> are removed, as on Opus 4.7/4.8. Steer with prompting.` },
+          { h1: `Effort levels`, p: `The <code>output_config.effort</code> parameter (<code>low</code> through <code>max</code>) carries over for tuning the cost/intelligence trade-off.` },
+        ],
+      },
+      {
+        p: `A minimal call looks like this:`,
+        html: {
+          type: 'code',
+          language: 'javascript',
+          value: `import Anthropic from "@anthropic-ai/sdk";
+
+const client = new Anthropic();
+
+const response = await client.messages.create({
+  model: "claude-fable-5",
+  max_tokens: 16000,
+  thinking: { type: "adaptive" }, // the only thinking mode Fable 5 accepts
+  output_config: { effort: "high" },
+  messages: [
+    { role: "user", content: "Plan the migration of this monolith to services." },
+  ],
+});`,
+        },
+      },
+      {
+        h1: `The Road to Fable: A Verified Model Timeline`,
+        p: `Fable 5 didn't appear out of nowhere. Here is the shipping cadence that led to it — every date below checked against primary announcements and launch coverage:`,
+        list: [
+          { h1: `Claude Opus 4.1 — August 2025`, p: `Incremental flagship bump on the 4.x line.` },
+          { h1: `Claude Sonnet 4.5 — September 2025`, p: `The workhorse mid-tier for most of late 2025.` },
+          { h1: `Claude Haiku 4.5 — October 2025`, p: `The fast/cheap tier, still current in mid-2026.` },
+          { h1: `Claude Opus 4.5 — November 24, 2025`, p: `The frontier model going into 2026.` },
+          { h1: `Claude Sonnet 4.6 — February 17, 2026`, p: `Brought adaptive thinking and the 1M context window to the mid-tier.` },
+          { h1: `Claude Opus 4.8 — May 28, 2026`, p: `The most capable Opus, with an emphasis on honesty, reliability, and long-horizon agentic work. Now also serving as Fable 5's safety fallback.` },
+          { h1: `Claude Fable 5 + Mythos 5 — June 9, 2026`, p: `The new Mythos-class tier above Opus.` },
+        ],
+      },
+      {
+        h1: `The Agent Stack Underneath`,
+        p: `The models are only half the story. The reason a Fable-class model is immediately useful is that Anthropic spent 2025 building the agentic scaffolding around the API:`,
+        list: [
+          { h1: `Claude Code`, p: `Went GA in 2025 and accumulated subagents (purpose-scoped agents with their own context windows), lifecycle hooks, plan mode, checkpoints/rewind, background tasks, IDE extensions, and cloud-hosted web sessions. By 2026 it's a programmable platform, not a chatbot in a terminal.` },
+          { h1: `Claude Agent SDK`, p: `The renamed, expanded successor to the Claude Code SDK (late 2025) — build your own agents on the same harness Anthropic uses internally.` },
+          { h1: `Skills`, p: `Introduced October 2025: composable folders of instructions, scripts, and resources that Claude loads on demand, available across the apps, Claude Code, and the API.` },
+          { h1: `MCP`, p: `The Model Context Protocol, open-sourced November 25, 2024, became the de facto industry standard for tool connectivity through 2025 — adopted well beyond Anthropic.` },
+          { h1: `Memory + context management`, p: `API-level memory tooling and context editing/compaction (late 2025 betas) that let long-running agents persist state and prune stale context instead of drowning in it.` },
+        ],
+      },
+      {
+        h1: `Beyond the Terminal: Claude for Everyone Else`,
+        p: `2026 is also the year Anthropic aggressively moved agents out of the developer niche:`,
+        list: [
+          { h1: `Claude Cowork — January 12, 2026`, p: `The knowledge-worker sibling of Claude Code: an agentic desktop app that executes multi-step office work — research synthesis, document preparation, file management — across local files and everyday applications. Available on all paid plans via the desktop app, with enterprise connectors (Google Drive, Gmail, DocuSign, FactSet) and private plugin marketplaces added in February 2026.` },
+          { h1: `Claude for Chrome — August 26, 2025`, p: `A browser-extension agent that navigates pages and takes actions, launched as a research preview to 1,000 Max-plan users with heavy emphasis on prompt-injection defenses.` },
+          { h1: `Claude for Excel — October 27, 2025`, p: `A sidebar add-in that reads, edits, analyzes, and explains spreadsheets; research preview for Max, Enterprise, and Team users.` },
+          { h1: `Claude in PowerPoint — February 5, 2026`, p: `An AppSource add-in that generates and edits slides in-place, respecting the deck's existing master, layouts, fonts, and color schemes, and producing native editable charts rather than static images. Research preview for Pro, Max, Team, and Enterprise.` },
+        ],
+      },
+      {
+        h1: `The Money Behind the Compute`,
+        p: `None of this shipping cadence happens without an enormous capital base, and the late-2025 numbers explain how Anthropic is paying for a Mythos-class training run:`,
+        list: [
+          { h1: `September 2, 2025`, p: `Series F: $13B raised at a <strong>$183B post-money valuation</strong>.` },
+          { h1: `October 23, 2025`, p: `Expanded Google Cloud deal: access to up to <strong>one million TPUs</strong> and over a gigawatt of capacity in 2026.` },
+          { h1: `November 18, 2025`, p: `Microsoft (up to $5B) and NVIDIA (up to $10B) investments, with Anthropic committing <strong>$30B of Azure compute</strong>.` },
+        ],
+      },
+      {
+        h1: `A Meta-Lesson: When Your Model Calls Reality a Hallucination`,
+        p: `Here's the part I find genuinely instructive as an engineer.<br/><br/>This post started life as an AI-generated research report. That report — written by a model with a training cutoff in late 2025 — looked at the names "Fable 5" and "Mythos 5" and flagged the entire premise as <strong>unverified and probably fabricated</strong>. Its reasoning was actually good: Anthropic had used exactly three tier names for two-plus years, a brand-new mythology-themed tier above Opus would be a major break in pattern, and the model had no record of it. It applied the same skepticism to Opus 4.8, Sonnet 4.6, Claude Cowork, and Claude in PowerPoint — all real, all shipped after its cutoff.<br/><br/>Every single flagged item turned out to be real. The model wasn't being dumb — it was being <em>well-calibrated against stale data</em>. Pattern-based skepticism is exactly what you want from a model asked to verify claims; it just can't substitute for a live source check.<br/><br/>Three takeaways for anyone building with LLMs:`,
+        list: [
+          { h1: `Training cutoffs cut both ways`, p: `Models hallucinate things that don't exist, but they also confidently deny things that do. "I can't verify this" plus a plausibility argument is not the same as "this is false."` },
+          { h1: `Give research agents live tools`, p: `Any workflow that asserts facts about the current state of the world needs web search or fetch access. A model reasoning from priors will be systematically wrong about everything after its cutoff — and most wrong about the newest, most interesting developments.` },
+          { h1: `Reward flagging over guessing`, p: `The original report did the right thing: it separated "confirmed with dates" from "unverified, check before publishing" instead of blending them. That structure is what made it cheap to verify and fix. Build your prompts and rubrics to demand that separation.` },
+        ],
+      },
+      {
+        p: `The Claude ecosystem in mid-2026, then: a Mythos-class frontier model in public hands with capability-gated safeguards, an Opus tier doing fallback duty, an agent platform that spans the terminal, the browser, the office suite, and the desktop — and a release strategy where the safety architecture is as much a product as the model itself.<br/><br/>If the last twelve months are any indication, the next twelve will make this post look quaint. Verify against primary sources accordingly.`,
+      },
+    ],
+    advertisements: {
+      show: false,
+    },
+    referBlog: {
+      show: true,
+      title: `The Definitive Claude Code Playbook (June 2026 Edition)`,
+      slug: `the-definitive-claude-code-playbook-2026`,
+    },
   }
 ];
 
