@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import NavigationBarMobile from './NavigationBarMobile'
 import ThemeToggle from '@/components/ThemeToggle'
+import { NEURA_ROUTES } from '@/components/neura/routes'
 
 const SECTIONS = ['work', 'about', 'writing', 'contact']
 
@@ -18,8 +19,8 @@ export default function NavigationBar() {
     return () => window.removeEventListener('scroll', fn)
   }, [])
 
-  // Hide the site nav on the coming-soon home page; keep it everywhere else.
-  if (pathname === '/') return null
+  // Hide the personal-site nav on the NEURA product routes; keep it elsewhere.
+  if (NEURA_ROUTES.includes(pathname)) return null
 
   return (
     <header className="nav" data-scrolled={scrolled}>
