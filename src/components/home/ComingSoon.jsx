@@ -61,12 +61,35 @@ const STATS = [
 export default function ComingSoon() {
   const [email, setEmail] = useState('')
   const [joined, setJoined] = useState(false)
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
 
-  function onSubmit(e) {
+  async function onSubmit(e) {
     e.preventDefault()
     const value = email.trim()
-    if (!value || !value.includes('@')) return
-    setJoined(true)
+    if (!value || !value.includes('@')) {
+      setError('Please enter a valid email address.')
+      return
+    }
+    setError('')
+    setLoading(true)
+    try {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/waitlist`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: value }),
+      })
+      const data = await res.json().catch(() => ({}))
+      if (!res.ok || !data.ok) {
+        setError(data.error || 'Something went wrong. Please try again.')
+        return
+      }
+      setJoined(true)
+    } catch (err) {
+      setError('Network error. Please try again.')
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -109,20 +132,24 @@ export default function ComingSoon() {
               <span className="live-dot" /> You&apos;re on the list. We&apos;ll be in touch.
             </p>
           ) : (
-            <form className="soon-form" onSubmit={onSubmit}>
-              <input
-                type="email"
-                className="soon-input"
-                placeholder="you@example.com"
-                aria-label="Email address"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-              />
-              <button type="submit" className="btn btn-primary" data-magnetic>
-                join the waitlist <span className="arr">&rarr;</span>
-              </button>
-            </form>
+            <>
+              <form className="soon-form" onSubmit={onSubmit}>
+                <input
+                  type="email"
+                  className="soon-input"
+                  placeholder="you@example.com"
+                  aria-label="Email address"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  disabled={loading}
+                  required
+                />
+                <button type="submit" className="btn btn-primary" data-magnetic disabled={loading}>
+                  {loading ? 'joining…' : <>join the waitlist <span className="arr">&rarr;</span></>}
+                </button>
+              </form>
+              {error && <p className="soon-error">{error}</p>}
+            </>
           )}
 
           <div className="soon-meta">
@@ -219,20 +246,24 @@ export default function ComingSoon() {
             Join the waitlist and help shape what comes next.
           </p>
           {!joined && (
-            <form className="soon-form" onSubmit={onSubmit}>
-              <input
-                type="email"
-                className="soon-input"
-                placeholder="you@example.com"
-                aria-label="Email address"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-              />
-              <button type="submit" className="btn btn-primary" data-magnetic>
-                join the waitlist <span className="arr">&rarr;</span>
-              </button>
-            </form>
+            <>
+              <form className="soon-form" onSubmit={onSubmit}>
+                <input
+                  type="email"
+                  className="soon-input"
+                  placeholder="you@example.com"
+                  aria-label="Email address"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  disabled={loading}
+                  required
+                />
+                <button type="submit" className="btn btn-primary" data-magnetic disabled={loading}>
+                  {loading ? 'joining…' : <>join the waitlist <span className="arr">&rarr;</span></>}
+                </button>
+              </form>
+              {error && <p className="soon-error">{error}</p>}
+            </>
           )}
           {joined && (
             <p className="soon-thanks">
