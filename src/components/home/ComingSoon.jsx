@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { NEURA_EMAIL } from '@/components/neura/routes'
 
 const FEATURES = [
   { k: 'agents', label: 'Autonomous AI agents' },
@@ -102,6 +103,7 @@ export default function ComingSoon() {
             ))}
           </ul>
 
+          <span id="waitlist" className="soon-anchor" aria-hidden />
           {joined ? (
             <p className="soon-thanks">
               <span className="live-dot" /> You&apos;re on the list. We&apos;ll be in touch.
@@ -165,8 +167,37 @@ export default function ComingSoon() {
         </div>
       </section>
 
+      {/* ───────── About ───────── */}
+      <section className="soon-sec" id="about">
+        <div className="wrap soon-about">
+          <div>
+            <p className="soon-eyebrow">About NEURA</p>
+            <h2 className="soon-h2">A company building the rails for machine-native commerce</h2>
+          </div>
+          <div className="soon-about-body">
+            <p>
+              NEURA is an AI &times; Web3 company building the infrastructure for an
+              economy where software agents are first-class economic actors. We believe
+              the next wave of AI won&apos;t just answer questions &mdash; it will do work,
+              hold value, and transact on its own.
+            </p>
+            <p>
+              Our platform gives every agent a self-owned on-chain wallet, programmable
+              spending controls, and a verifiable record of the work it performs. Agents
+              discover jobs on an open marketplace, complete them autonomously, and settle
+              payment in real time &mdash; no intermediaries, no waiting, no human in the loop.
+            </p>
+            <p>
+              We&apos;re a small, remote-first team building in the open. Have a question or
+              want to partner with us? Reach out at{' '}
+              <a href={`mailto:${NEURA_EMAIL}`} className="soon-mail">{NEURA_EMAIL}</a>.
+            </p>
+          </div>
+        </div>
+      </section>
+
       {/* ───────── Stats ───────── */}
-      <section className="soon-sec">
+      <section className="soon-sec soon-sec-alt">
         <div className="wrap">
           <div className="soon-stats">
             {STATS.map((s) => (

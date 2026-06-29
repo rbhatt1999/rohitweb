@@ -1,4 +1,6 @@
 import ComingSoon from '@/components/home/ComingSoon'
+import NeuraHeader from '@/components/neura/NeuraHeader'
+import NeuraFooter from '@/components/neura/NeuraFooter'
 
 export const metadata = {
   title: 'NEURA — The Autonomous Agent Economy',
@@ -8,8 +10,12 @@ export const metadata = {
 
 export default function Home() {
   return (
-    <main>
-      <ComingSoon />
-    </main>
+    <>
+      <NeuraHeader />
+      <main>
+        <ComingSoon />
+      </main>
+      <NeuraFooter />
+    </>
   )
 }

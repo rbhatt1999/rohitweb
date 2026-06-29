@@ -26,6 +26,22 @@ export default async function sitemap() {
       priority: 1,
     },
     {
+      url: `${url}/features`,
+      lastModified: date,
+    },
+    {
+      url: `${url}/pricing`,
+      lastModified: date,
+    },
+    {
+      url: `${url}/privacy`,
+      lastModified: date,
+    },
+    {
+      url: `${url}/terms`,
+      lastModified: date,
+    },
+    {
       url: `${url}/blogs`,
     },
     ...blogUrls,

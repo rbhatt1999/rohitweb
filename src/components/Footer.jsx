@@ -1,4 +1,13 @@
+'use client'
+import { usePathname } from 'next/navigation'
+import { NEURA_ROUTES } from '@/components/neura/routes'
+
 export default function Footer() {
+  const pathname = usePathname()
+
+  // NEURA product routes render their own footer (NeuraFooter); hide this one.
+  if (NEURA_ROUTES.includes(pathname)) return null
+
   return (
     <div className="wrap">
       <footer className="footer">
