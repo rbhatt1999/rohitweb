@@ -1,12 +1,14 @@
 'use client'
 import React, { useEffect, useState } from 'react'
 import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 import NavigationBarMobile from './NavigationBarMobile'
 import ThemeToggle from '@/components/ThemeToggle'
 
 const SECTIONS = ['work', 'about', 'writing', 'contact']
 
 export default function NavigationBar() {
+  const pathname = usePathname()
   const [scrolled, setScrolled] = useState(false)
 
   useEffect(() => {
@@ -15,6 +17,9 @@ export default function NavigationBar() {
     window.addEventListener('scroll', fn, { passive: true })
     return () => window.removeEventListener('scroll', fn)
   }, [])
+
+  // Hide the site nav on the coming-soon home page; keep it everywhere else.
+  if (pathname === '/') return null
 
   return (
     <header className="nav" data-scrolled={scrolled}>
