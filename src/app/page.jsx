@@ -1,27 +1,15 @@
-import HomeComponent from '@/components/home/HomeComponent'
-import Marquee from '@/components/home/Marquee'
-import Projects from '@/components/home/Projects'
-import About from '@/components/home/About'
-import Writing from '@/components/home/Writing'
-import Contact from '@/components/home/Contact'
-import HomeFX from '@/components/home/HomeFX'
+import ComingSoon from '@/components/home/ComingSoon'
 
 export const metadata = {
-  title: 'Rohit Bhatt — Full-Stack Engineer',
-  description: 'Full-stack engineer building thoughtful web software with Ruby on Rails, React & AI integrations.',
+  title: 'NEURA — The Autonomous Agent Economy',
+  description: 'NEURA is building self-directed AI agents with native on-chain wallets — intelligence that works, earns, and settles value 24/7. Launching soon.',
   alternates: { canonical: 'https://www.rohitweb.me' },
 }
 
 export default function Home() {
   return (
     <main>
-      <HomeComponent />
-      <Marquee />
-      <Projects />
-      <About />
-      <Writing />
-      <Contact />
-      <HomeFX />
+      <ComingSoon />
     </main>
   )
 }
