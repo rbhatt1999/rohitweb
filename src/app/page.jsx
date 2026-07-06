@@ -1,21 +1,27 @@
-import ComingSoon from '@/components/home/ComingSoon'
-import NeuraHeader from '@/components/neura/NeuraHeader'
-import NeuraFooter from '@/components/neura/NeuraFooter'
+import HomeComponent from '@/components/home/HomeComponent'
+import Marquee from '@/components/home/Marquee'
+import Projects from '@/components/home/Projects'
+import About from '@/components/home/About'
+import Writing from '@/components/home/Writing'
+import Contact from '@/components/home/Contact'
+import HomeFX from '@/components/home/HomeFX'
 
 export const metadata = {
-  title: 'NEURA — The Autonomous Agent Economy',
-  description: 'NEURA is building self-directed AI agents with native on-chain wallets — intelligence that works, earns, and settles value 24/7. Launching soon.',
+  title: 'Rohit Bhatt — Full-Stack Engineer',
+  description: 'Full-stack engineer building thoughtful web software with Ruby on Rails, React & AI integrations.',
   alternates: { canonical: 'https://www.rohitweb.me' },
 }
 
 export default function Home() {
   return (
-    <>
-      <NeuraHeader />
-      <main>
-        <ComingSoon />
-      </main>
-      <NeuraFooter />
-    </>
+    <main>
+      <HomeComponent />
+      <Marquee />
+      <Projects />
+      <About />
+      <Writing />
+      <Contact />
+      <HomeFX />
+    </main>
   )
 }

@@ -1,15 +1,12 @@
 'use client'
 import React, { useEffect, useState } from 'react'
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
 import NavigationBarMobile from './NavigationBarMobile'
 import ThemeToggle from '@/components/ThemeToggle'
-import { NEURA_ROUTES } from '@/components/neura/routes'
 
 const SECTIONS = ['work', 'about', 'writing', 'contact']
 
 export default function NavigationBar() {
-  const pathname = usePathname()
   const [scrolled, setScrolled] = useState(false)
 
   useEffect(() => {
@@ -18,9 +15,6 @@ export default function NavigationBar() {
     window.addEventListener('scroll', fn, { passive: true })
     return () => window.removeEventListener('scroll', fn)
   }, [])
-
-  // Hide the personal-site nav on the NEURA product routes; keep it elsewhere.
-  if (NEURA_ROUTES.includes(pathname)) return null
 
   return (
     <header className="nav" data-scrolled={scrolled}>
