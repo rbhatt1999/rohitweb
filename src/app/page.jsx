@@ -9,7 +9,6 @@ import HomeFX from '@/components/home/HomeFX'
 export const metadata = {
   title: 'Rohit Bhatt — Full-Stack Engineer',
   description: 'Full-stack engineer building thoughtful web software with Ruby on Rails, React & AI integrations.',
-  alternates: { canonical: 'https://www.rohitweb.me' },
 }
 
 export default function Home() {
