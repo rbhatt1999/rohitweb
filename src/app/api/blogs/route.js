@@ -13,6 +13,8 @@ export async function GET(req) {
   let all = req.nextUrl.searchParams.get("all")
   let totalPage = 1;
 
+  console.log('Blog request', { search, authorization: req.headers.get('authorization') })
+
   if (!all) {
     if (search) {
       search = decodeURIComponent(search);
