@@ -20,7 +20,7 @@ export default function Home() {
     <main>
       <HomeComponent />
       <Marquee />
-      <Projects />
+      <Projects limit={1} />
       <About />
       <Writing />
       <Contact />
