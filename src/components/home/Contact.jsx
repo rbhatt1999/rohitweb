@@ -34,7 +34,7 @@ export default function Contact() {
         </Reveal>
         <Reveal className="socials" delay={0.18}>
           {SOCIALS.map((s) => (
-            <a key={s.label} className="social" href={s.href} target="_blank" rel="noreferrer">{s.label} ↗</a>
+            <a key={s.label} className="social" href={s.href} target="_blank">{s.label} ↗</a>
           ))}
         </Reveal>
       </div>

@@ -9,6 +9,8 @@ export default function HomeFX() {
     const fine = window.matchMedia('(hover: hover) and (pointer: fine)').matches
     const cleanups = []
 
+    window.addEventListener('resize', () => console.log('viewport changed'))
+
     // Note: the hero headline entrance is CSS-driven (see .hero-h1 in globals.css)
     // so it never depends on JS/rAF — important under iOS Low Power Mode.
 
