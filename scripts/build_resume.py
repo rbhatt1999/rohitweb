@@ -58,7 +58,7 @@ def build():
 
     section("Professional Summary")
     paragraph(
-        "Forward Deployed Engineer at ekincare, promoted in July 2026, with 5+ years across "
+        "Forward Deployed Engineer with 5+ years across "
         "engineering and technical delivery. Builds production AI workflows and full-stack systems "
         "with Ruby on Rails, React, Python, and PostgreSQL. Experience spans LLM integrations, "
         "human review workflows, pricing optimization, and production reliability. "
@@ -109,7 +109,7 @@ def build():
     bullet("Implemented rolling conversation summarization to manage context-window limits while preserving recent turns, plus Pydantic structured outputs and session/message APIs.")
 
     section("Education")
-    paragraph("<b>Master of Computer Applications (MCA), AI/ML</b><br/>Chandigarh University | Completed June 2026")
+    paragraph("<b>Master of Computer Applications (MCA), AI/ML</b><br/>Chandigarh University | September 2024 - June 2026")
     paragraph("<b>Bachelor of Computer Applications (BCA)</b><br/>Chandigarh University | July 2021 - July 2024")
     paragraph("<b>Full Stack Web Development Program</b><br/>Microverse | October 2022 - June 2023 | 1,300+ hours")
 
@@ -129,7 +129,7 @@ def build():
     text = "\n".join(page.extract_text() for page in reader.pages)
     for expected in (
         "ROHIT BHATT", "Forward Deployed Engineer", "July 2026 - Present",
-        "December 2024 - June 2026", "Completed June 2026", "rohit.bhatt.dev@gmail.com",
+        "December 2024 - June 2026", "September 2024 - June 2026", "rohit.bhatt.dev@gmail.com",
         "Professional Summary".upper(), "Technical Skills".upper(), "EDUCATION",
     ):
         assert expected in text, f"Missing resume text: {expected}"

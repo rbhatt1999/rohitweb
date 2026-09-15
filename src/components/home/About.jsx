@@ -33,7 +33,7 @@ export default function About() {
               engineering disappears and the experience is all that&apos;s left.
             </p>
             <p>
-              Promoted to Forward Deployed Engineer at ekincare in July 2026. Working remotely
+              I&apos;m a Forward Deployed Engineer at ekincare, working remotely
               on full-stack applications and production AI integrations, with a focus on
               LLM-backed tools built on LangChain and Gemini.
             </p>
