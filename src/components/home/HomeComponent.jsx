@@ -21,8 +21,8 @@ export default function HomeComponent() {
             </h1>
 
             <Reveal as="p" className="hero-lead" delay={0.14}>
-              I&apos;m <b>Rohit Bhatt</b>, a full-stack engineer shipping thoughtful web
-              products with Ruby&nbsp;on&nbsp;Rails, React, and AI&nbsp;integrations.
+              I&apos;m <b>Rohit Bhatt</b>, a Forward Deployed Engineer at ekincare building
+              full-stack products with Ruby&nbsp;on&nbsp;Rails, React, and production AI&nbsp;integrations.
             </Reveal>
 
             <Reveal className="hero-meta" delay={0.2}>

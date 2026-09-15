@@ -33,8 +33,9 @@ export default function About() {
               engineering disappears and the experience is all that&apos;s left.
             </p>
             <p>
-              Currently working remote, shipping everything from landing pages to full-stack
-              applications, with a recent focus on LLM-backed tools built on LangChain and Gemini.
+              Promoted to Forward Deployed Engineer at ekincare in July 2026. Working remotely
+              on full-stack applications and production AI integrations, with a focus on
+              LLM-backed tools built on LangChain and Gemini.
             </p>
             <p>
               Five years in, I still care most about the small things: a transition that feels

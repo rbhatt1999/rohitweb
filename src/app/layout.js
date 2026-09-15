@@ -6,20 +6,20 @@ import Footer from '@/components/Footer'
 import SiteChrome from '@/components/SiteChrome'
 
 export const metadata = {
-  title: 'Rohit Bhatt — Full-Stack Engineer',
-  description: 'Full-stack engineer building thoughtful web software with Ruby on Rails, React & AI integrations.',
-  keywords: ['Rohit Bhatt', 'Full Stack Web Developer', 'Ruby on Rails', 'React', 'JavaScript', 'AI', 'LangChain', 'Gemini'],
+  title: 'Rohit Bhatt — Forward Deployed Engineer',
+  description: 'Forward Deployed Engineer at ekincare building full-stack software with Ruby on Rails, React and production AI integrations.',
+  keywords: ['Rohit Bhatt', 'Forward Deployed Engineer', 'Full Stack Web Developer', 'Ruby on Rails', 'React', 'JavaScript', 'AI', 'LangChain', 'Gemini'],
   openGraph: {
-    title: 'Rohit Bhatt — Full-Stack Engineer',
-    description: 'Full-stack engineer building thoughtful web software with Ruby on Rails, React & AI integrations.',
+    title: 'Rohit Bhatt — Forward Deployed Engineer',
+    description: 'Forward Deployed Engineer at ekincare building full-stack software with Ruby on Rails, React and production AI integrations.',
     images: [{ url: '/assets/rohit-bhatt.jpg', width: 800, height: 500, alt: 'Rohit Bhatt' }],
     url: 'https://www.rohitweb.me',
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Rohit Bhatt — Full-Stack Engineer',
-    description: 'Full-stack engineer building thoughtful web software with Ruby on Rails, React & AI integrations.',
+    title: 'Rohit Bhatt — Forward Deployed Engineer',
+    description: 'Forward Deployed Engineer at ekincare building full-stack software with Ruby on Rails, React and production AI integrations.',
     images: ['/assets/rohit-bhatt.jpg'],
     creator: '@Rohit__Bhatt_',
   },

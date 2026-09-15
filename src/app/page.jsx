@@ -7,8 +7,8 @@ import Contact from '@/components/home/Contact'
 import HomeFX from '@/components/home/HomeFX'
 
 export const metadata = {
-  title: 'Rohit Bhatt — Full-Stack Engineer',
-  description: 'Full-stack engineer building thoughtful web software with Ruby on Rails, React & AI integrations.',
+  title: 'Rohit Bhatt — Forward Deployed Engineer',
+  description: 'Forward Deployed Engineer at ekincare building full-stack software with Ruby on Rails, React and production AI integrations.',
   alternates: { canonical: 'https://www.rohitweb.me' },
 }
 
