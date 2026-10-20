@@ -1,6 +1,6 @@
 # Architecture
 
-Next.js 13 App Router, JavaScript only (no TypeScript). Portfolio + blog site for Rohit Bhatt (`https://www.rohitweb.me`).
+Next.js 13 App Router, JavaScript only (no TypeScript). Portfolio + blog site for Rohit Bhatt. The custom domain is `rohitcodes.com`; Vercel serves it at `https://www.rohitcodes.com` (`https://rohitcodes.com` 308-redirects there).
 
 ## Directory Layout
 
@@ -66,12 +66,12 @@ All blog/category data lives in two static JS arrays — no database, no CMS:
 ```
 blog.js / category.js
        ↓
-api/blogs/** (Next.js Route Handlers)
+src/lib/blog-queries.js  (pages, sitemap, and the API routes)
        ↓
-Page components fetch via fetch(`${url}/api/...`, { cache: 'no-cache' })
+api/blogs/** still expose the same JSON for any external caller
 ```
 
-`url` (`NEXT_PUBLIC_URL`) must be set; all internal fetches use it. In development: `http://localhost:3001`. In production: `https://www.rohitweb.me`.
+Pages read the static arrays in-process. They do not HTTP-fetch the site's own API during render. Canonical URLs, the sitemap, and robots.txt use `https://www.rohitcodes.com` (`src/lib/site.js`). `https://rohitcodes.com` 308-redirects to that host.
 
 ## Server vs. Client Components
 

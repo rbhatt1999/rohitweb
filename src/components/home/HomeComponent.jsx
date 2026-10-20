@@ -43,7 +43,21 @@ export default function HomeComponent() {
 
           <Reveal className="hero-portrait" delay={0.18}>
             <div className="frame">
-              <img src="/assets/rohit-bhatt.jpg" alt="Rohit Bhatt" />
+              <picture>
+                <source
+                  type="image/webp"
+                  srcSet="/assets/rohit-bhatt-640.webp 640w, /assets/rohit-bhatt-800.webp 800w"
+                  sizes="(max-width: 720px) 78vw, 340px"
+                />
+                <img
+                  src="/assets/rohit-bhatt.jpg"
+                  alt="Rohit Bhatt"
+                  width={800}
+                  height={896}
+                  fetchPriority="high"
+                  decoding="async"
+                />
+              </picture>
             </div>
             <span className="tag">Uttarakhand, IN</span>
           </Reveal>

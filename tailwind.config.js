@@ -16,8 +16,8 @@ module.exports = {
       },
       fontFamily: {
         mono: ['var(--font-jetbrains)', 'ui-monospace', 'SFMono-Regular', 'monospace'],
-        sans: ['Hanken Grotesk', 'var(--font-inter)', 'ui-sans-serif', 'system-ui', 'sans-serif'],
-        serif: ['Instrument Serif', 'Georgia', 'serif'],
+        sans: ['var(--font-hanken)', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+        serif: ['var(--font-instrument)', 'Georgia', 'serif'],
       },
       backgroundImage: {
         'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',

@@ -1,6 +1,13 @@
 import Link from 'next/link'
 import React, { Fragment } from 'react';
-import url from '@/utils/url';
+
+function pageHref(afterurl, n, search) {
+  const params = new URLSearchParams()
+  if (n > 1) params.set('page', String(n))
+  if (search) params.set('search', search)
+  const qs = params.toString()
+  return `/${afterurl}${qs ? `?${qs}` : ''}`
+}
 
 const pageBtnInactive = {
   background: 'var(--surface)',
@@ -20,7 +27,7 @@ export default function BlogsList({ data, totalPage, page, search, afterurl }) {
         data.map((blog, index) => (
           <div key={index} className='flex flex-col md:flex-row w-full gap-8'>
             <div className='flex flex-col gap-2 w-full md:w-7/12 order-2 md:order-1'>
-              <Link href={`/blogs/${blog.slug}`}><h1 className='text-xl md:text-2xl font-bold blog-title'>{blog.title}</h1></Link>
+              <Link href={`/blogs/${blog.slug}`}><h2 className='text-xl md:text-2xl font-bold blog-title'>{blog.title}</h2></Link>
               {
                 blog.summary ? <p className='text-base md:text-lg blog-body line-clamp-3'>{blog.summary}</p> :
                   <p className='text-base md:text-lg blog-body line-clamp-3'>{blog.description}</p>
@@ -29,7 +36,7 @@ export default function BlogsList({ data, totalPage, page, search, afterurl }) {
             </div>
             <div className='flex flex-col w-full flex-1 order-1 md:order-2'>
               <Link href={`/blogs/${blog.slug}`} className='hover:scale-105 '>
-                <img src={blog.image.src} alt={blog.image.alt} className='w-full h-full rounded-xl' />
+                <img src={blog.image.src} alt={blog.image.alt || blog.title} className='w-full h-full rounded-xl' loading="lazy" decoding="async" />
               </Link>
             </div>
           </div>
@@ -40,7 +47,7 @@ export default function BlogsList({ data, totalPage, page, search, afterurl }) {
           <div className="flex flex-row items-center justify-center gap-2">
             {
               (page > 1) && (
-                <Link href={`${url}/${afterurl}?page=${page - 1}${search ? `&search=${search}` : ''}`} className='flex flex-row items-center justify-center gap-1 px-3 py-1.5 rounded-md shadow-sm transition-opacity duration-200 hover:opacity-80' style={pageBtnInactive}>
+                <Link href={pageHref(afterurl, page - 1, search)} className='flex flex-row items-center justify-center gap-1 px-3 py-1.5 rounded-md shadow-sm transition-opacity duration-200 hover:opacity-80' style={pageBtnInactive}>
                   <span className="text-sm font-medium">Prev</span>
                 </Link>
               )
@@ -50,7 +57,7 @@ export default function BlogsList({ data, totalPage, page, search, afterurl }) {
                 <Fragment key={index}>
                   {
                     (index < 2 || index > totalPage - 3 || index === page - 1) && (
-                      <Link href={`${url}/${afterurl}?page=${index + 1}${search ? `&search=${search}` : ''}`} className='flex flex-row items-center justify-center gap-1 px-3 py-1.5 rounded-md shadow-sm transition-opacity duration-200 hover:opacity-80' style={index === page - 1 ? pageBtnActive : pageBtnInactive}>
+                      <Link href={pageHref(afterurl, index + 1, search)} className='flex flex-row items-center justify-center gap-1 px-3 py-1.5 rounded-md shadow-sm transition-opacity duration-200 hover:opacity-80' style={index === page - 1 ? pageBtnActive : pageBtnInactive}>
                         <span className="text-sm font-medium">{index + 1}</span>
                       </Link>
                     )
@@ -71,7 +78,7 @@ export default function BlogsList({ data, totalPage, page, search, afterurl }) {
             }
             {
               (page < totalPage) && (
-                <Link href={`${url}/${afterurl}?page=${page + 1}${search ? `&search=${search}` : ''}`} className='flex flex-row items-center justify-center gap-1 px-3 py-1.5 rounded-md shadow-sm transition-opacity duration-200 hover:opacity-80' style={pageBtnInactive}>
+                <Link href={pageHref(afterurl, page + 1, search)} className='flex flex-row items-center justify-center gap-1 px-3 py-1.5 rounded-md shadow-sm transition-opacity duration-200 hover:opacity-80' style={pageBtnInactive}>
                   <span className="text-sm font-medium">Next</span>
                 </Link>
               )

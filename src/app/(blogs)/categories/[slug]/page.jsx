@@ -1,67 +1,33 @@
 import React from 'react'
-import { lato as dmSans } from '@/lib/fonts'
+import { lato as dmSans } from '@/lib/fonts-blog'
 import { notFound } from 'next/navigation'
-import url from '@/utils/url'
 import SideBar from '@/components/blogs/SideBar'
 import BlogsList from '@/components/blogs/BlogsList'
+import { allCategories, getCategory, listCategoryPosts } from '@/lib/blog-queries'
+import { listingMetadata } from '@/lib/site'
 
-export async function generateMetadata({ params }) {
-  const { slug } = params
-  const req = await fetch(`${url}/api/blogs/categories?cat=${slug}`)
-  const data = await req.json()
+export function generateStaticParams() {
+  return allCategories().map((category) => ({ slug: category.slug }))
+}
+
+export async function generateMetadata({ params, searchParams }) {
+  const data = getCategory(params.slug)
+  if (!data) return { title: 'Category', robots: { index: false, follow: false } }
   return {
-    title: data.title,
-    description: data.description,
-    images: [
-      {
-        url: data.image.src,
-        width: 800,
-        height: 500,
-        alt: data.image.alt,
-      },
-    ],
-    url: `${url}/categories/${data.slug}`,
-    type: 'website',
-    keywords: data.tags,
-    openGraph: {
+    ...listingMetadata({
+      path: `/categories/${data.slug}`,
+      page: searchParams?.page,
+      search: searchParams?.search,
       title: data.title,
       description: data.description,
-      images: [
-        {
-          url: data.image.src,
-          width: 730,
-          height: 410,
-          alt: data.image.alt,
-        },
-      ],
-      url: `${url}/categories/${data.slug}`,
-      type: 'website',
-    },
-    twitter: {
-      card: 'summary_large_image',
-      title: `${data.title}`,
-      description: data.description,
-      images: [data.image.src],
-      creator: '@Rohit_Bhatt_',
-    },
-    alternates: {
-      canonical: `${url}/categories/${data.slug}`,
-    },
+      image: data.image,
+    }),
+    keywords: data.tags,
   }
 }
 
-async function getBlogs(slug,page,search) {
-  let res
-  try {
-    res = await fetch(`${url}/api/blogs/categories/${slug}${page ? `?page=${page}` : ''}${search ? `&search=${search}` : ''}`, { cache: 'no-cache' })
-    if (!res.ok) {
-      throw new Error('Failed to fetch data')
-    }
-  }
-  catch (err) {
-    notFound()
-  }
-  return res.json()
+function getBlogs(slug, page, search) {
+  return listCategoryPosts(slug, page, search)
 }
 
 export default async function page({params,searchParams}) {
@@ -74,7 +40,8 @@ export default async function page({params,searchParams}) {
   if (searchParams.search) {
     search = decodeURIComponent(searchParams.search);
   }
-  const data = await getBlogs(slug,page,search);
+  const data = getBlogs(slug,page,search);
+  if (!data) notFound()
   return (
     <main className={`relative flex flex-col items-center mt-16 ${dmSans.className}`}>
       <section className="flex flex-col md:flex-row w-full blog-panel items-center justify-center px-2 py-12 md:py-24 md:px-20">
@@ -90,7 +57,7 @@ export default async function page({params,searchParams}) {
       <div className='flex flex-col md:flex-row w-full gap-8 px-7 py-7 md:py-14 md:px-36'>
         <div className=' flex flex-col w-full md:w-8/12 gap-10'>
           {
-            data.blog.length === 0 ? <h1 className='text-5xl font-bold text-center' style={{ color: 'var(--fg1)' }}>No Blogs Found</h1>:<BlogsList data={data.blog} totalPage={data.totalPage} page={page} search={search} afterurl={`social-awareness/categories/${slug}`} />
+            data.blog.length === 0 ? <h2 className='text-5xl font-bold text-center' style={{ color: 'var(--fg1)' }}>No Blogs Found</h2>:<BlogsList data={data.blog} totalPage={data.totalPage} page={page} search={search} afterurl={`categories/${slug}`} />
           }
         </div>
         <div className='flex flex-col w-full flex-1 relative'>
