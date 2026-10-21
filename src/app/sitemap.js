@@ -1,5 +1,6 @@
 import { SITE_URL } from '@/lib/site'
 import { sortedBlogs, allCategories, archiveSlugs } from '@/lib/blog-queries'
+import { FEATURED } from '@/lib/projects'
 
 export default function sitemap() {
   const blogs = sortedBlogs()
@@ -18,6 +19,21 @@ export default function sitemap() {
       changeFrequency: 'weekly',
       priority: 0.9,
     },
+    {
+      url: `${SITE_URL}/about`,
+      changeFrequency: 'monthly',
+      priority: 0.8,
+    },
+    {
+      url: `${SITE_URL}/work`,
+      changeFrequency: 'monthly',
+      priority: 0.8,
+    },
+    ...FEATURED.map((project) => ({
+      url: `${SITE_URL}/work/${project.slug}`,
+      changeFrequency: 'monthly',
+      priority: 0.7,
+    })),
     ...blogs.map((blog) => ({
       url: `${SITE_URL}/blogs/${blog.slug}`,
       lastModified: blog.date,

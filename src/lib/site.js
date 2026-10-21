@@ -10,9 +10,39 @@ const configured = process.env.NEXT_PUBLIC_SITE_URL
 export const SITE_URL = (configured || 'https://www.rohitcodes.com').replace(/\/$/, '')
 
 export const SITE_NAME = 'Rohit Bhatt'
-export const SITE_TITLE = 'Rohit Bhatt — Forward Deployed Engineer'
+export const SITE_TITLE = 'Rohit Bhatt — Software & Gen AI Developer'
 export const SITE_DESCRIPTION =
-  'Forward Deployed Engineer at ekincare building full-stack software with Ruby on Rails, React and production AI integrations.'
+  'Rohit Bhatt is a software developer in India building full-stack products and production generative AI with Ruby on Rails, React, LangChain, and Gemini.'
+
+export const JOB_TITLES = ['Forward Deployed Engineer', 'Software Developer']
+
+export const KNOWS_ABOUT = [
+  'Software development',
+  'Full-stack development',
+  'Generative AI',
+  'Ruby on Rails',
+  'React',
+  'Next.js',
+  'Python',
+  'PostgreSQL',
+  'LangChain',
+  'Gemini',
+  'Claude',
+  'Vertex AI',
+  'Model Context Protocol',
+]
+
+export const ALUMNI_OF = [
+  { '@type': 'CollegeOrUniversity', name: 'Chandigarh University' },
+  { '@type': 'EducationalOrganization', name: 'Microverse' },
+]
+
+export const OG_IMAGE = {
+  url: '/og',
+  width: 1200,
+  height: 630,
+  alt: 'Rohit Bhatt, software developer — full-stack products and generative AI',
+}
 
 export const TWITTER_HANDLE = '@Rohit_Bhatt_'
 
@@ -43,6 +73,30 @@ export function withBrand(title) {
   if (!title) return SITE_NAME
   if (/rohit bhatt/i.test(title)) return title
   return `${title} — ${SITE_NAME}`
+}
+
+export function pageMetadata({ title, description, path }) {
+  const url = absoluteUrl(path)
+  const desc = metaDescription(description)
+  return {
+    title,
+    description: desc,
+    alternates: { canonical: url },
+    openGraph: {
+      title,
+      description: desc,
+      url,
+      type: 'website',
+      images: [OG_IMAGE],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description: desc,
+      images: [OG_IMAGE.url],
+      creator: TWITTER_HANDLE,
+    },
+  }
 }
 
 export function listingMetadata({ path, page, search, title, description, image }) {

@@ -47,7 +47,7 @@ This app is build with React and Redux.
 
 ## 🚀 Live Demo <a name="live-demo"></a>
 
-- [Live Demo Link](https://www.rohitweb.me)
+- [Live Demo Link](https://www.rohitcodes.com)
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 

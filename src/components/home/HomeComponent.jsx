@@ -16,13 +16,13 @@ export default function HomeComponent() {
 
             <h1 className="hero-h1">
               <span className="hl"><span>Software</span></span>
-              <span className="hl"><span>that feels</span></span>
-              <span className="hl"><span><span className="em">considered.</span></span></span>
+              <span className="hl"><span>&amp; Gen AI</span></span>
+              <span className="hl"><span><span className="em">developer.</span></span></span>
             </h1>
 
             <Reveal as="p" className="hero-lead" delay={0.14}>
-              I&apos;m <b>Rohit Bhatt</b>, a Forward Deployed Engineer at ekincare building
-              full-stack products with Ruby&nbsp;on&nbsp;Rails, React, and production AI&nbsp;integrations.
+              I&apos;m <b>Rohit Bhatt</b>, a software developer and Forward Deployed Engineer at ekincare.
+              I build full-stack products and production generative AI with Rails, React, LangChain, and Gemini.
             </Reveal>
 
             <Reveal className="hero-meta" delay={0.2}>

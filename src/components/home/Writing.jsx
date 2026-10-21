@@ -39,6 +39,9 @@ export default function Writing() {
             <h2 className="sec-title">Writing</h2>
           </span>
           <Link className="sec-link" href="/blogs">read all on /blogs <ArrowUR /></Link>
+          <p className="sec-lede">
+            Field notes on <Link href="/categories/ruby-on-rails">Ruby on Rails</Link>, <Link href="/categories/postgres">PostgreSQL</Link>, and <Link href="/categories/artificial-intelligence">generative AI</Link>.
+          </p>
         </Reveal>
 
         <div className="post-list">
