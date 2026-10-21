@@ -1,76 +1,72 @@
 import React from 'react'
-import { sora } from '@/lib/fonts'
+import { sora } from '@/lib/fonts-blog'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import parse from 'html-react-parser'
-import url from '@/utils/url'
 import SideBar from '@/components/blogs/SideBar'
+import JsonLd from '@/components/JsonLd'
 import { AiFillFacebook, AiFillRedditCircle } from 'react-icons/ai'
 import { RiTwitterXFill } from 'react-icons/ri'
 import { BsLinkedin } from 'react-icons/bs'
 import { BiLogoWhatsapp } from 'react-icons/bi'
-import { redirect } from 'next/navigation'
 import CodeBlockViewer from '@/components/blogs/CodeBlockViewer'
+import { getPost, sortedBlogs } from '@/lib/blog-queries'
+import { SITE_URL, TWITTER_HANDLE, metaDescription, withBrand } from '@/lib/site'
+
+export function generateStaticParams() {
+  return sortedBlogs().map((blog) => ({ slug: blog.slug }))
+}
 
 export async function generateMetadata({ params }) {
-  const { slug } = params
-  const data = await fetchPosts(slug)
+  const data = getPost(params.slug)
+  if (!data) return { title: 'Not found', robots: { index: false, follow: false } }
+  const { blog } = data
+  const description = metaDescription(blog.description || blog.summary)
+  const title = withBrand(blog.title)
+  const canonical = `${SITE_URL}/blogs/${blog.slug}`
+  const image = blog.image?.src
+    ? [{ url: blog.image.src, alt: blog.image.alt || blog.title }]
+    : undefined
   return {
-    title: `${data.blog.title}`,
-    description: data.blog.description,
-    images: [
-      {
-        url: data.blog.image.src,
-        width: 800,
-        height: 500,
-        alt: data.blog.image.alt,
-      },
-    ],
-    url: `${url}/blogs/${data.blog.slug}`,
-    type: 'article',
-    keywords: data.blog.tags,
+    title,
+    description,
+    keywords: blog.tags,
+    alternates: { canonical },
     openGraph: {
-      title: `${data.blog.title}`,
-      description: data.blog.description,
-      images: [
-        {
-          url: data.blog.image.src,
-          width: 730,
-          height: 410,
-          alt: data.blog.image.alt,
-        },
-      ],
-      url: `${url}/blogs/${data.blog.slug}`,
+      title,
+      description,
+      images: image,
+      url: canonical,
       type: 'article',
-      article: {
-        publishedTime: new Date(data.blog.date).toISOString(),
-      }
+      publishedTime: new Date(blog.date).toISOString(),
+      authors: [blog.owner || 'Rohit Bhatt'],
     },
     twitter: {
       card: 'summary_large_image',
-      title: `${data.blog.title}`,
-      description: data.blog.description,
-      images: [data.blog.image.src],
-      creator: '@Rohit_Bhatt_'
-    },
-    alternates: {
-      canonical: `${url}/blogs/${data.blog.slug}`,
+      title,
+      description,
+      images: image ? [blog.image.src] : undefined,
+      creator: TWITTER_HANDLE,
     },
   }
 }
 
-export const fetchPosts = async (slug) => {
-  let res;
-  try {
-    res = await fetch(`${url}/api/blogs/${slug}`, { cache: 'no-cache' })
-    if (!res.ok) {
-      throw new Error('Failed to fetch data')
-    }
-  }
-  catch (err) {
-    redirect('/blogs')
-  }
-  return res.json()
+function fetchPosts(slug) {
+  return getPost(slug)
+}
+
+function BlogImage({ src, alt, priority = false, className = 'w-full rounded-lg h-auto' }) {
+  return (
+    <img
+      src={src}
+      alt={alt || ''}
+      className={className}
+      draggable={false}
+      loading={priority ? 'eager' : 'lazy'}
+      decoding="async"
+      fetchPriority={priority ? 'high' : 'low'}
+    />
+  )
 }
 
 const longdateConvert = (date) => {
@@ -81,18 +77,47 @@ const longdateConvert = (date) => {
 
 export default async function page({ params }) {
   const { slug } = params
-  const data = await fetchPosts(slug)
+  const data = fetchPosts(slug)
+  if (!data) notFound()
+  const canonical = `${SITE_URL}/blogs/${data.blog.slug}`
+  const shareUrl = encodeURIComponent(canonical)
+  const shareTitle = encodeURIComponent(data.blog.title)
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@type': 'BlogPosting',
+        headline: data.blog.title,
+        description: metaDescription(data.blog.description || data.blog.summary),
+        image: data.blog.image?.src,
+        datePublished: data.blog.date,
+        author: { '@id': `${SITE_URL}/#person`, name: data.blog.owner || 'Rohit Bhatt' },
+        publisher: { '@id': `${SITE_URL}/#person` },
+        mainEntityOfPage: canonical,
+        keywords: (data.blog.tags || []).join(', '),
+      },
+      {
+        '@type': 'BreadcrumbList',
+        itemListElement: [
+          { '@type': 'ListItem', position: 1, name: 'Blogs', item: `${SITE_URL}/blogs` },
+          ...(data.category ? [{ '@type': 'ListItem', position: 2, name: data.category.name, item: `${SITE_URL}/categories/${data.category.slug}` }] : []),
+          { '@type': 'ListItem', position: data.category ? 3 : 2, name: data.blog.title, item: canonical },
+        ],
+      },
+    ],
+  }
   return (
     <>
+      <JsonLd data={jsonLd} />
       <main className={`relative flex min-h-screen blog-section flex-col items-center mt-16 ${sora.className}`}>
         <div className='flex flex-col md:flex-row w-full gap-8 px-2 py-12 md:px-10 lg:px-20 xl:px-40'>
           <section className="flex flex-col w-full gap-5 justify-center md:w-8/12 overflow-x-hidden break-words">
             <div className="flex flex-col justify-center w-full border-y-2 py-2 flex-1 gap-2 md:gap-5" style={{ borderColor: 'var(--border)' }}>
-              <span className='text-left text-base' style={{ color: 'var(--fg3)' }}>
+              <nav aria-label="Breadcrumb" className='text-left text-base' style={{ color: 'var(--fg3)' }}>
                 <Link href={`/blogs`}>Blogs</Link>
                 {data.category && <> / <Link href={`/categories/${data.category.slug}`}>{data.category.name}</Link></>}
                 {' / '}<Link href={`/blogs/${data.blog.slug}`}>{data.blog.title}</Link>
-              </span>
+              </nav>
             </div>
             <div className="flex flex-col justify-center flex-1 gap-2">
               <h1 className="text-xl md:text-3xl font-bold text-left blog-title">{data.blog.title}</h1>
@@ -100,7 +125,7 @@ export default async function page({ params }) {
             </div>
             <div className="flex flex-col justify-center flex-1 gap-2">
               <div className="flex flex-col justify-center flex-1 gap-2">
-                <img src={data.blog.image.src} alt={data.blog.image.alt} className="w-full rounded-lg h-auto" draggable={false} />
+                <BlogImage src={data.blog.image.src} alt={data.blog.image.alt || data.blog.title} priority />
               </div>
               {data.blog.summary &&
                 <div className="flex flex-col justify-center flex-1 gap-2 rounded-lg blog-panel p-4">
@@ -138,7 +163,7 @@ export default async function page({ params }) {
                       }
                       {
                         section.image && <div className="flex flex-col justify-center self-center gap-1 pt-5">
-                          <img src={section.image.src} alt={section.image.alt} className="w-full rounded-lg h-auto" draggable={false} />
+                          <BlogImage src={section.image.src} alt={section.image.alt || section.image.caption || ''} />
                           {
                             section.image.caption && <p className="text-xs md:text-sm font-thin text-center anchor-tag" style={{ color: 'var(--fg3)' }}>“ {parse(section.image.caption)} ”</p>
                           }
@@ -190,7 +215,7 @@ export default async function page({ params }) {
                                   }
                                   {
                                     subSection.image && <div className="flex flex-col justify-center self-center gap-1 pt-5">
-                                      <img src={subSection.image.src} alt={subSection.image.alt} className="w-full rounded-lg h-auto" draggable={false} />
+                                      <BlogImage src={subSection.image.src} alt={subSection.image.alt || subSection.image.caption || ''} />
                                       {
                                         subSection.image.caption && <p className="text-xs md:text-sm font-thin text-center anchor-tag" style={{ color: 'var(--fg3)' }}>“ {parse(subSection.image.caption)} ”</p>
                                       }
@@ -220,19 +245,19 @@ export default async function page({ params }) {
               <div className="flex flex-col justify-center flex-1 gap-2 border-y-2 py-5" style={{ borderColor: 'var(--border)' }}>
                 <h2 className="text-lg md:text-xl font-bold text-center" style={{ color: 'var(--fg2)' }}>To share this blog on social media click on the icons below :</h2>
                 <div className="flex flex-row justify-center gap-2">
-                  <Link href={`https://www.facebook.com/sharer/sharer.php?u=${url}/blogs/${data.blog.slug}`} target="_blank" rel="noopener noreferrer">
+                  <Link href={`https://www.facebook.com/sharer/sharer.php?u=${shareUrl}`} target="_blank" rel="noopener noreferrer" aria-label="Share on Facebook">
                     <AiFillFacebook className="w-8 h-8 rounded-lg hover:opacity-80" style={{ color: 'var(--fg2)' }} />
                   </Link>
-                  <Link href={`https://twitter.com/intent/tweet?url=${url}/blogs/${data.blog.slug}&text=${data.blog.title}`} target="_blank" rel="noopener noreferrer">
+                  <Link href={`https://twitter.com/intent/tweet?url=${shareUrl}&text=${shareTitle}`} target="_blank" rel="noopener noreferrer" aria-label="Share on X">
                     <RiTwitterXFill className="w-8 h-8 rounded-lg hover:opacity-80" style={{ color: 'var(--fg2)' }} />
                   </Link>
-                  <Link href={`https://www.linkedin.com/shareArticle?mini=true&url=${url}/blogs/${data.blog.slug}&title=${data.blog.title}&summary=${data.blog.summary}&source=Peepoye`} target="_blank" rel="noopener noreferrer">
+                  <Link href={`https://www.linkedin.com/shareArticle?mini=true&url=${shareUrl}&title=${shareTitle}`} target="_blank" rel="noopener noreferrer" aria-label="Share on LinkedIn">
                     <BsLinkedin className="w-8 h-8 rounded-lg hover:opacity-80" style={{ color: 'var(--fg2)' }} />
                   </Link>
-                  <Link href={`https://api.whatsapp.com/send?text=${url}/blogs/${data.blog.slug}`} target="_blank" rel="noopener noreferrer">
+                  <Link href={`https://api.whatsapp.com/send?text=${shareUrl}`} target="_blank" rel="noopener noreferrer" aria-label="Share on WhatsApp">
                     <BiLogoWhatsapp className="w-8 h-8 rounded-lg hover:opacity-80" style={{ color: 'var(--fg2)' }} />
                   </Link>
-                  <Link href={`https://www.reddit.com/submit?url=${url}/blogs/${data.blog.slug}&title=${data.blog.title}`} target="_blank" rel="noopener noreferrer">
+                  <Link href={`https://www.reddit.com/submit?url=${shareUrl}&title=${shareTitle}`} target="_blank" rel="noopener noreferrer" aria-label="Share on Reddit">
                     <AiFillRedditCircle className="w-8 h-8 rounded-lg hover:opacity-80" style={{ color: 'var(--fg2)' }} />
                   </Link>
                 </div>
@@ -244,7 +269,7 @@ export default async function page({ params }) {
                   {data.blog.advertisements?.image?.src && (
                     <div className="flex flex-col justify-center self-center gap-2 rounded-lg w-full p-4">
                       <Link href={data.blog.advertisements.image.link ?? '#'} target="_blank" rel="noopener noreferrer">
-                        <img src={data.blog.advertisements.image.src} alt={data.blog.advertisements.image.alt ?? ''} className="w-full rounded-lg h-auto" draggable={false} />
+                        <BlogImage src={data.blog.advertisements.image.src} alt={data.blog.advertisements.image.alt ?? ''} />
                       </Link>
                     </div>
                   )}

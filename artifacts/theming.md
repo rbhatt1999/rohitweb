@@ -45,7 +45,8 @@ Tailwind is configured (`tailwind.config.js`) with:
 - `colors.accent`: `#a3e635`
 - `colors.accent-dim`: `#65a30d`
 - `fontFamily.mono`: `var(--font-jetbrains)`
-- `fontFamily.sans`: `var(--font-inter)`
+- `fontFamily.sans`: `var(--font-hanken)`
+- `fontFamily.serif`: `var(--font-instrument)`
 
 Use Tailwind classes where possible; use CSS vars via `style={}` props when Tailwind can't express the value.
 

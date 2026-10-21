@@ -17,6 +17,7 @@ export default function Search({ search = false, afterurl = false }) {
       <input
         type="text"
         placeholder="Search blogs…"
+        aria-label="Search blogs"
         className="bs-input"
         value={searchText}
         onChange={(e) => setSearchText(e.target.value)}

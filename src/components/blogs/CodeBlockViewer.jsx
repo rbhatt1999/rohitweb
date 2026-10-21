@@ -1,13 +1,8 @@
 'use client'
-import React, { useEffect } from 'react'
-import SyntaxHighlighter from 'react-syntax-highlighter'
-import { atelierDuneDark } from 'react-syntax-highlighter/dist/esm/styles/hljs'
+import dynamic from 'next/dynamic'
 
-export default function CodeBlockViewer({code, language}) {
+const Highlighter = dynamic(() => import('./Highlighter'), { ssr: true })
 
-    return (
-        <SyntaxHighlighter language= {language} style={atelierDuneDark} wrapLines={true} showLineNumbers={true} >
-            {code}
-        </SyntaxHighlighter>
-    )
+export default function CodeBlockViewer({ code, language }) {
+  return <Highlighter code={code} language={language} />
 }

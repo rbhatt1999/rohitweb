@@ -1,30 +1,25 @@
 import React from 'react'
-import { notFound } from 'next/navigation'
-import url from '@/utils/url'
 import Link from 'next/link'
 import Reveal from '@/components/Reveal'
 import Search from '@/components/blogs/Search'
 import blogdata from '@/app/api/blogs/blog'
 import stripHtml from '@/utils/stripHtml'
+import { listPosts } from '@/lib/blog-queries'
+import { listingMetadata } from '@/lib/site'
 
-export const metadata = {
-  title: `Notes on building software & AI — Rohit Bhatt`,
-  description: `Field notes on shipping web products — Ruby on Rails, React, and the practical realities of putting large language models into production.`,
-  alternates: { canonical: `${url}/blogs` },
-  openGraph: {
-    title: `Notes on building software & AI — Rohit Bhatt`,
-    description: `Field notes on shipping web products — Ruby on Rails, React, and the practical realities of putting large language models into production.`,
-    url: `${url}/blogs`,
-    type: 'website',
-    images: [{ url: 'https://i.ibb.co/BL54PXc/blogs.webp', width: 800, height: 500, alt: 'Rohit Bhatt' }],
-  },
-  twitter: {
-    card: 'summary_large_image',
-    title: `Notes on building software & AI — Rohit Bhatt`,
-    description: `Field notes on shipping web products — Ruby on Rails, React, and putting LLMs into production.`,
-    images: ['https://i.ibb.co/BL54PXc/blogs.webp'],
-    creator: '@Rohit__Bhatt_',
-  },
+const BLOGS_TITLE = 'Notes on building software & AI — Rohit Bhatt'
+const BLOGS_DESCRIPTION = 'Field notes on shipping web products — Ruby on Rails, React, and the practical realities of putting large language models into production.'
+const BLOGS_IMAGE = { src: 'https://i.ibb.co/BL54PXc/blogs.webp', alt: 'Rohit Bhatt' }
+
+export async function generateMetadata({ searchParams }) {
+  return listingMetadata({
+    path: '/blogs',
+    page: searchParams?.page,
+    search: searchParams?.search,
+    title: BLOGS_TITLE,
+    description: BLOGS_DESCRIPTION,
+    image: BLOGS_IMAGE,
+  })
 }
 
 const ArrowUR = () => (
@@ -49,15 +44,8 @@ function excerpt(blog) {
   return stripHtml(blog.summary || blog.description || '')
 }
 
-export async function getBlogs(page = false, search = false, all = false) {
-  let res
-  try {
-    res = await fetch(`${url}/api/blogs${page ? `?page=${page}` : ''}${search ? `&search=${search}` : ''}${all ? `?all=${true}` : ''}`, { cache: 'no-cache' })
-    if (!res.ok) throw new Error('Failed to fetch data')
-  } catch (err) {
-    notFound()
-  }
-  return res.json()
+function getBlogs(page = false, search = false, all = false) {
+  return listPosts({ page: page || undefined, search: search || undefined, all })
 }
 
 function FeaturedPost({ post }) {
@@ -104,7 +92,13 @@ function PostCard({ post, delay }) {
 
 function Pager({ page, totalPage, search }) {
   if (totalPage <= 1) return null
-  const q = (n) => `${url}/blogs?page=${n}${search ? `&search=${search}` : ''}`
+  const q = (n) => {
+    const params = new URLSearchParams()
+    if (n > 1) params.set('page', String(n))
+    if (search) params.set('search', search)
+    const qs = params.toString()
+    return qs ? `/blogs?${qs}` : '/blogs'
+  }
   const nums = []
   for (let i = 1; i <= totalPage; i++) {
     if (i <= 2 || i > totalPage - 2 || i === page) nums.push(i)

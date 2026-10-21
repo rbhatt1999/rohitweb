@@ -1,34 +1,39 @@
-import url from "@/utils/url";
-import { getBlogs } from "./(blogs)/blogs/page";
+import { SITE_URL } from '@/lib/site'
+import { sortedBlogs, allCategories, archiveSlugs } from '@/lib/blog-queries'
 
-export default async function sitemap() {
-  const blogs = await getBlogs(false,false,true);
-  const req = await fetch(`${url}/api/blogs/categories`)
-  const categoryData = await req.json()
-  const blogUrls = blogs.data.map(blog => {
-    return {
-      url: `${url}/blogs/${blog.slug}`,
-      lastModified: new Date(blog.date),
-    }
-  })
-  const categoryUrls = categoryData.map(category => {
-    return {
-      url: `${url}/categories/${category.slug}`,
-      lastModified: new Date(),
-    }
-  })
+export default function sitemap() {
+  const blogs = sortedBlogs()
+  const latest = blogs[0]?.date
 
-  const date = new Date();
   return [
     {
-      url: `${url}`,
-      lastModified: date,
+      url: SITE_URL,
+      lastModified: latest,
+      changeFrequency: 'weekly',
       priority: 1,
     },
     {
-      url: `${url}/blogs`,
+      url: `${SITE_URL}/blogs`,
+      lastModified: latest,
+      changeFrequency: 'weekly',
+      priority: 0.9,
     },
-    ...blogUrls,
-    ...categoryUrls,
+    ...blogs.map((blog) => ({
+      url: `${SITE_URL}/blogs/${blog.slug}`,
+      lastModified: blog.date,
+      changeFrequency: 'monthly',
+      priority: 0.8,
+    })),
+    ...allCategories().map((category) => ({
+      url: `${SITE_URL}/categories/${category.slug}`,
+      lastModified: latest,
+      changeFrequency: 'weekly',
+      priority: 0.6,
+    })),
+    ...archiveSlugs().map((slug) => ({
+      url: `${SITE_URL}/archive/${slug}`,
+      changeFrequency: 'yearly',
+      priority: 0.3,
+    })),
   ]
 }
