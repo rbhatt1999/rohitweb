@@ -177,6 +177,9 @@ export default async function page({ params }) {
                               <CodeBlockViewer code={section.html.value} language={section.html.language} />
                             </div>
                           }
+                          {
+                            section.html.type === 'html' && <div className="blog-html anchor-tag blog-body w-full">{parse(section.html.value)}</div>
+                          }
                         </>
                       }
                       {
@@ -228,6 +231,9 @@ export default async function page({ params }) {
                                         subSection.html.type === 'code' && <div className="flex flex-col justify-center self-center gap-1 w-full">
                                           <CodeBlockViewer code={subSection.html.value} language={subSection.html.language} />
                                         </div>
+                                      }
+                                      {
+                                        subSection.html.type === 'html' && <div className="blog-html anchor-tag blog-body w-full">{parse(subSection.html.value)}</div>
                                       }
                                     </>
                                   }

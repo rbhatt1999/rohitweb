@@ -50,9 +50,9 @@ Each element of `sections[]` can have any combination of these keys (all optiona
     caption: `Optional caption shown below image`,  // optional
   },
   html: {
-    type: 'code',
-    language: 'javascript',   // any react-syntax-highlighter language string
-    value: `const x = 1;`,
+    type: 'code',             // 'code' for a highlighted block, 'html' for a raw fragment (for example a table)
+    language: 'javascript',   // react-syntax-highlighter language; omit for type 'html'
+    value: `const x = 1;`,    // source for 'code', or an HTML string for 'html'
   },
   subSections: [ /* same shape as section, nested one level */ ],
 }
@@ -76,6 +76,7 @@ Each element of `sections[]` can have any combination of these keys (all optiona
 - `date` controls display order — posts are sorted descending by date.
 - HTML in `p` fields is parsed via `html-react-parser`. Use HTML entities for `<` / `>` in content: `&#60;` / `&#62;`.
 - Code blocks require `{ html: { type: 'code', language, value } }` — use `CodeBlockViewer` in the renderer.
+- Raw HTML fragments (tables) use `{ html: { type: 'html', value } }`. The post page parses `value` with `html-react-parser` inside `.blog-html`.
 - Blog images should be uploaded to S3 bucket `website-images-rohitcodes` in the `ap-south-1` region as `.webp`.
 
 ## API Query Params
