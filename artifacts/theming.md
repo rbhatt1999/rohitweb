@@ -71,8 +71,9 @@ When building new dark-mode-specific visual effects (glows, neon borders, bloom)
 | `.blog-panel` | Surface card used in blog posts (`background: var(--surface)`) |
 | `.blog-title` | Heading color (`color: var(--accent)`) |
 | `.blog-body` | Body text color (`color: var(--fg2)`) |
-| `.anchor-tag` | Applied to parsed HTML sections; links inside get accent color + underline |
+| `.anchor-tag` | Applied to parsed HTML sections; links inside get accent color + underline. Inline `code` uses `var(--mono)`. |
 | `.sectionAnchor` | Wrapper for blog sections |
+| `.blog-html` | Wrapper for raw HTML fragments (tables). Borders use `var(--border)`; cell text uses `var(--fg2)` / `var(--fg1)`. |
 
 ## Adding New Component Styles
 

@@ -3795,6 +3795,334 @@ const response = await client.messages.create({
       title: `The Definitive Claude Code Playbook (June 2026 Edition)`,
       slug: `the-definitive-claude-code-playbook-2026`,
     },
+  },
+  {
+    title: `Agent Evals 101: Test Your Agent's Trajectory, Not Just Its Answer`,
+    slug: `agent-evals-101-test-agent-trajectory`,
+    id: 14,
+    category_id: 5,
+    description: `A hands-on guide to agent evals for AI developers: test your LangGraph agent's tool calls with AgentEvals trajectory matching, cheap code checks, and LLM judges in Python.`,
+    image: {
+      src: `https://www.rohitcodes.com/og`,
+      alt: `Rohit Bhatt, software developer — full-stack products and generative AI`,
+    },
+    owner: `Rohit Bhatt`,
+    tags: [`AI developer`, `Gen AI developer`, `agent evals`, `how to evaluate AI agents`, `trajectory evaluation LangGraph`, `agentevals python tutorial`, `LLM agent testing`],
+    date: '2026-10-21',
+    summary: `A hands-on guide to agent evals for AI developers: test your LangGraph agent's tool calls with AgentEvals trajectory matching, cheap code checks, and LLM judges in Python.`,
+    sections: [
+      {
+        p: `Here's a scenario that is easy to miss. You ask your agent, "Can I get a refund for order 1042?" It answers "Yes, it's eligible." The answer is correct, so the test passes.<br/><br/>But the agent never checked the refund policy. It looked up the order, saw the word "delivered", and guessed. It got lucky this time. Next time it might approve a refund that should have been refused.<br/><br/>If you only test the final answer, you will never see this. That's why "agent evals" are everywhere in AI developer feeds this month, and it's what this tutorial covers.`,
+      },
+      {
+        h1: `Why everyone is talking about this right now`,
+        p: `Two things landed in the same week:`,
+        list: [
+          { p: `On <strong>15 October 2026</strong>, the Google Developers Blog published <a href="https://developers.googleblog.com/evaluating-ai-agents-moving-past-the-vibe-check/" target="_blank" rel="noopener noreferrer"><em>Evaluating AI agents: moving past the vibe check</em></a>. Its opening line sums up the problem: your agent "can loop, burn tokens, or give a completely hallucinated answer and still look fine." The post walks through building an eval pipeline for a LangGraph agent.` },
+          { p: `The same day, LangChain published <a href="https://www.langchain.com/blog/common-questions-about-agent-evals" target="_blank" rel="noopener noreferrer"><em>The Most Common Questions About Agent Evals, Answered</em></a>. Its advice is simple: use code evaluators where you can, LLM judges where you can't, and for multi-step agents, "evaluate full threads, trajectories, and final state." LangChain also recently added a <a href="https://www.langchain.com/blog/langsmith-trajectories-tracing" target="_blank" rel="noopener noreferrer">Trajectories view to LangSmith</a>.` },
+        ],
+      },
+      {
+        p: `The common message: a "vibe check" (run it a few times, read the output, ship it) doesn't scale once your agent calls tools.`,
+      },
+      {
+        h1: `What is a trajectory?`,
+        p: `A <strong>trajectory</strong> is the full list of steps an agent took to reach its answer: the user message, every tool call (with arguments), every tool result, and the final reply.<br/><br/>For our refund agent, a good trajectory looks like this:`,
+        list: [
+          { p: `User asks about order 1042` },
+          { p: `Agent calls <code>get_order(order_id="1042")</code>` },
+          { p: `Tool returns <code>delivered, 5 days ago</code>` },
+          { p: `Agent calls <code>check_refund_policy(days_since_delivery=5)</code>` },
+          { p: `Tool returns <code>eligible: true</code>` },
+          { p: `Agent replies "Yes, it's eligible."` },
+        ],
+      },
+      {
+        p: `The "lucky" run skips steps 4 and 5. Its final answer is the same, but the path is wrong. Trajectory evals compare the path.`,
+      },
+      {
+        h1: `Three layers of agent evals`,
+        p: `Think of agent testing as three layers, from cheapest to most expensive:`,
+        html: {
+          type: 'html',
+          value: `<table><thead><tr><th>Layer</th><th>What it checks</th><th>Cost</th><th>Deterministic?</th></tr></thead><tbody><tr><td><strong>Trajectory match</strong></td><td>Did the agent call the right tools, in the right order?</td><td>Free</td><td>Yes</td></tr><tr><td><strong>Code checks</strong></td><td>Loops, step budgets, forbidden tools, argument formats</td><td>Free</td><td>Yes</td></tr><tr><td><strong>LLM-as-judge</strong></td><td>Was the reasoning sensible? Was the reply helpful?</td><td>One LLM call per run</td><td>No</td></tr></tbody></table>`,
+        },
+      },
+      {
+        p: `Start at the top. Only reach for an LLM judge when a rule can't express what "good" means.`,
+      },
+      {
+        h1: `Setup`,
+        p: `We'll use LangChain's open-source <a href="https://docs.langchain.com/oss/python/langchain/test/evals" target="_blank" rel="noopener noreferrer"><code>agentevals</code></a> package. You don't need an API key for the first two layers.`,
+        html: {
+          type: 'code',
+          language: 'bash',
+          value: `python3 -m venv .venv
+source .venv/bin/activate
+pip install -U agentevals pytest`,
+        },
+      },
+      {
+        h1: `Layer 1: Trajectory matching with AgentEvals`,
+        p: `AgentEvals accepts trajectories as a list of OpenAI-style message dicts (it also accepts LangChain message objects, so you can pass the <code>messages</code> from a LangGraph run directly).<br/><br/>Let's write the reference trajectory for our refund agent, plus the "lucky" run that skipped the policy check:`,
+        html: {
+          type: 'code',
+          language: 'python',
+          value: `import json
+from agentevals.trajectory.match import create_trajectory_match_evaluator
+
+
+def tool_call(name, args, id_):
+    return {
+        "id": id_,
+        "type": "function",
+        "function": {"name": name, "arguments": json.dumps(args)},
+    }
+
+
+reference = [
+    {"role": "user", "content": "Can I get a refund for order 1042?"},
+    {"role": "assistant", "content": "",
+     "tool_calls": [tool_call("get_order", {"order_id": "1042"}, "c1")]},
+    {"role": "tool", "content": '{"status": "delivered", "days_ago": 5}',
+     "tool_call_id": "c1"},
+    {"role": "assistant", "content": "",
+     "tool_calls": [tool_call("check_refund_policy", {"days_since_delivery": 5}, "c2")]},
+    {"role": "tool", "content": '{"eligible": true}', "tool_call_id": "c2"},
+    {"role": "assistant", "content": "Yes, order 1042 is eligible for a refund."},
+]
+
+# Same final answer, but the agent never checked the policy.
+lucky_run = reference[:3] + [
+    {"role": "assistant", "content": "Yes, order 1042 is eligible for a refund."},
+]
+
+strict = create_trajectory_match_evaluator(trajectory_match_mode="strict")
+superset = create_trajectory_match_evaluator(trajectory_match_mode="superset")
+
+print(strict(outputs=reference, reference_outputs=reference))
+print(strict(outputs=lucky_run, reference_outputs=reference))
+print(superset(outputs=lucky_run, reference_outputs=reference))`,
+        },
+      },
+      {
+        p: `Output (I ran this with <code>agentevals</code> on Python 3):`,
+        html: {
+          type: 'code',
+          language: 'text',
+          value: `{'key': 'trajectory_strict_match', 'score': True, 'comment': None, 'metadata': None}
+{'key': 'trajectory_strict_match', 'score': False, 'comment': None, 'metadata': None}
+{'key': 'trajectory_superset_match', 'score': False, 'comment': None, 'metadata': None}`,
+        },
+      },
+      {
+        p: `A final-answer test would pass both runs. The trajectory evaluator catches the lucky one.`,
+        subSections: [
+          {
+            h2: `Picking the right match mode`,
+            p: `The <a href="https://docs.langchain.com/langsmith/trajectory-evals" target="_blank" rel="noopener noreferrer">LangChain docs</a> describe four modes. Here's when to use each:`,
+            list: [
+              { h1: `<code>strict</code>`, p: `same tools, same order. Use it when order is a rule, like "check the policy <em>before</em> approving."` },
+              { h1: `<code>unordered</code>`, p: `same tools, any order. Good for fetching several pieces of information where order doesn't matter.` },
+              { h1: `<code>subset</code>`, p: `the agent may only call tools from the reference. Use it to catch an agent that wanders off and calls tools it shouldn't.` },
+              { h1: `<code>superset</code>`, p: `the agent must call <em>at least</em> the reference tools; extras are fine. Use it for "it must check the policy, whatever else it does."` },
+            ],
+          },
+          {
+            p: `A tip: <code>strict</code> breaks easily when you improve your agent. For most tests, <code>superset</code> (for must-do steps) plus <code>subset</code> (for scope) is a more stable pair.`,
+          },
+        ],
+      },
+      {
+        h1: `Layer 2: Cheap code checks for common agent failures`,
+        p: `The Google post lists looping and burning tokens as failures a vibe check misses. You don't need an LLM to catch those. A few plain Python functions will do:`,
+        html: {
+          type: 'code',
+          language: 'python',
+          value: `def tool_names(trajectory):
+    return [
+        tc["function"]["name"]
+        for m in trajectory
+        if m["role"] == "assistant"
+        for tc in m.get("tool_calls", [])
+    ]
+
+
+def check_tool_budget(trajectory, max_tool_calls=4):
+    n = len(tool_names(trajectory))
+    return {"key": "tool_budget", "score": n <= max_tool_calls,
+            "comment": f"{n} tool calls"}
+
+
+def check_no_loops(trajectory):
+    """Fail if the agent makes the exact same tool call twice."""
+    seen = set()
+    for m in trajectory:
+        if m["role"] != "assistant":
+            continue
+        for tc in m.get("tool_calls", []):
+            signature = (tc["function"]["name"], tc["function"]["arguments"])
+            if signature in seen:
+                return {"key": "no_loops", "score": False,
+                        "comment": f"repeated {signature[0]}"}
+            seen.add(signature)
+    return {"key": "no_loops", "score": True, "comment": None}
+
+
+def check_forbidden_tools(trajectory, forbidden=("issue_refund",)):
+    used = set(tool_names(trajectory)) & set(forbidden)
+    return {"key": "no_forbidden_tools", "score": not used,
+            "comment": f"used {sorted(used)}" if used else None}`,
+        },
+      },
+      {
+        p: `Let's test the loop check with a run that looks up the same order twice:`,
+        html: {
+          type: 'code',
+          language: 'python',
+          value: `looping_run = reference[:3] + reference[1:3] + reference[3:]
+
+print(check_tool_budget(reference))
+print(check_no_loops(reference))
+print(check_no_loops(looping_run))`,
+        },
+      },
+      {
+        html: {
+          type: 'code',
+          language: 'text',
+          value: `{'key': 'tool_budget', 'score': True, 'comment': '2 tool calls'}
+{'key': 'no_loops', 'score': True, 'comment': None}
+{'key': 'no_loops', 'score': False, 'comment': 'repeated get_order'}`,
+        },
+      },
+      {
+        p: `These functions return the same <code>{"key", "score", "comment"}</code> shape as AgentEvals, so you can log them all together in LangSmith or anywhere else.`,
+      },
+      {
+        h1: `Layer 3: LLM-as-judge for the fuzzy parts`,
+        p: `Some things don't fit a rule: "Was the reply polite and clear?" or "Did the agent take a sensible path, even though it differs from my reference?" For these, AgentEvals has an LLM judge:`,
+        html: {
+          type: 'code',
+          language: 'python',
+          value: `from agentevals.trajectory.llm import (
+    create_trajectory_llm_as_judge,
+    TRAJECTORY_ACCURACY_PROMPT,
+)
+
+judge = create_trajectory_llm_as_judge(
+    prompt=TRAJECTORY_ACCURACY_PROMPT,
+    model="openai:o3-mini",  # any chat model string supported by your setup
+)
+
+result = judge(outputs=lucky_run)
+print(result["score"], result["comment"])`,
+        },
+      },
+      {
+        p: `This one needs an API key for whichever model you use, so I haven't shown output. Check the <a href="https://docs.langchain.com/oss/python/langchain/test/evals" target="_blank" rel="noopener noreferrer">AgentEvals docs</a> for the current list of prompts and supported model strings.<br/><br/>Two rules for judges:`,
+        list: [
+          { p: `<strong>Keep them for what code can't check.</strong> They cost money and can give different scores on the same run.` },
+          { p: `<strong>Check the judge.</strong> LangChain's guide recommends human review of both code and LLM evaluators. Read a sample of the judge's scores yourself before you trust it.` },
+        ],
+      },
+      {
+        h1: `Putting it into pytest`,
+        p: `Evals are most useful when they run on every change. Here's how to wire them into a normal test suite. In a real project, <code>run_agent</code> invokes your LangGraph agent and returns its messages, something like <code>graph.invoke({"messages": [...]})["messages"]</code>:`,
+        html: {
+          type: 'code',
+          language: 'python',
+          value: `# test_refund_agent.py
+import pytest
+from agentevals.trajectory.match import create_trajectory_match_evaluator
+
+from my_agent import run_agent          # your LangGraph agent
+from evals import (reference, check_no_loops,
+                   check_tool_budget, check_forbidden_tools)
+
+must_check_policy = create_trajectory_match_evaluator(
+    trajectory_match_mode="superset")
+stays_in_scope = create_trajectory_match_evaluator(
+    trajectory_match_mode="subset")
+
+
+@pytest.fixture(scope="module")
+def run():
+    return run_agent("Can I get a refund for order 1042?")
+
+
+def test_checks_policy(run):
+    assert must_check_policy(outputs=run, reference_outputs=reference)["score"]
+
+
+def test_stays_in_scope(run):
+    assert stays_in_scope(outputs=run, reference_outputs=reference)["score"]
+
+
+@pytest.mark.parametrize("check", [check_no_loops, check_tool_budget,
+                                   check_forbidden_tools])
+def test_guardrails(run, check):
+    result = check(run)
+    assert result["score"], result["comment"]`,
+        },
+      },
+      {
+        p: `Because a real model is involved, these tests can be flaky. A common approach is to run each case a few times and require a pass rate (say 4 out of 5) instead of a single pass.`,
+      },
+      {
+        h1: `Where do test cases come from?`,
+        p: `Don't try to write 200 test cases on day one. LangChain's advice is to start small:`,
+        list: [
+          { p: `<strong>Pick one behaviour</strong> that matters, like "always checks the policy before answering a refund question."` },
+          { p: `<strong>Build a small dataset from real traces.</strong> Ten real conversations beat a hundred invented ones.` },
+          { p: `<strong>Run a baseline</strong> and write down the score.` },
+          { p: `<strong>Turn every new failure into a test case.</strong> When a user hits a bug in production, its trajectory becomes your next reference.` },
+        ],
+      },
+      {
+        p: `That last step is the one that makes evals pay off. LangChain separates <strong>offline evals</strong> (a fixed dataset, run before you ship) from <strong>online evals</strong> (scoring live traces in production). Online evals find new problems; offline evals make sure they stay fixed.`,
+      },
+      {
+        h1: `Common mistakes`,
+        list: [
+          { p: `<strong>Only testing the final string.</strong> That's exactly what lets lucky runs through.` },
+          { p: `<strong>Using <code>strict</code> everywhere.</strong> Your tests will fail every time you make the agent smarter. Use it only where order is a real rule.` },
+          { p: `<strong>Starting with LLM judges.</strong> They're slower, cost money and vary between runs. Use code first.` },
+          { p: `<strong>Exact-matching tool arguments that don't matter.</strong> Dates and free-text queries change from run to run. Check the important arguments (like <code>order_id</code>) and leave the rest flexible.` },
+          { p: `<strong>Never reading traces.</strong> Scores tell you <em>that</em> something broke. The trajectory tells you <em>why</em>.` },
+        ],
+      },
+      {
+        h1: `Wrapping up`,
+        p: `The move from "it seems fine" to "it's tested" is the same move we made with regular software years ago. With agents, the extra step is testing the <strong>path</strong>, not just the result.<br/><br/>Your homework for this week:`,
+        list: [
+          { p: `Install <code>agentevals</code>.` },
+          { p: `Write one reference trajectory for your agent's most important task.` },
+          { p: `Add a <code>superset</code> check and a <code>no_loops</code> check to your test suite.` },
+        ],
+      },
+      {
+        p: `That's maybe an hour of work, and it will catch the lucky runs that a vibe check never would.<br/><br/>If you want to see the kind of AI and full-stack projects I build, take a look at <a href="/work">my work</a>. To learn more about me and what I do as a Gen AI developer, see the <a href="/about">about page</a>.`,
+      },
+      {
+        h1: `Sources`,
+        list: [
+          { p: `Google Developers Blog, <em>Evaluating AI agents: moving past the vibe check</em> (15 Oct 2026): <a href="https://developers.googleblog.com/evaluating-ai-agents-moving-past-the-vibe-check/" target="_blank" rel="noopener noreferrer">https://developers.googleblog.com/evaluating-ai-agents-moving-past-the-vibe-check/</a>` },
+          { p: `LangChain, <em>The Most Common Questions About Agent Evals, Answered</em> (15 Oct 2026): <a href="https://www.langchain.com/blog/common-questions-about-agent-evals" target="_blank" rel="noopener noreferrer">https://www.langchain.com/blog/common-questions-about-agent-evals</a>` },
+          { p: `LangChain docs, <em>Agent Evals</em>: <a href="https://docs.langchain.com/oss/python/langchain/test/evals" target="_blank" rel="noopener noreferrer">https://docs.langchain.com/oss/python/langchain/test/evals</a>` },
+          { p: `LangSmith docs, <em>How to evaluate your agent with trajectory evaluations</em>: <a href="https://docs.langchain.com/langsmith/trajectory-evals" target="_blank" rel="noopener noreferrer">https://docs.langchain.com/langsmith/trajectory-evals</a>` },
+          { p: `LangChain, <em>Trajectories now in LangSmith</em>: <a href="https://www.langchain.com/blog/langsmith-trajectories-tracing" target="_blank" rel="noopener noreferrer">https://www.langchain.com/blog/langsmith-trajectories-tracing</a>` },
+        ],
+      },
+    ],
+    advertisements: {
+      show: false,
+    },
+    referBlog: {
+      show: true,
+      title: `The Agentic Shift: A Comprehensive Analysis of the Artificial Intelligence Landscape in 2026`,
+      slug: `the-agentic-shift-artificial-intelligence-landscape-2026`,
+    },
   }
 ];
 
