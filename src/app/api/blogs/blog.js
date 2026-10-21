@@ -3803,8 +3803,9 @@ const response = await client.messages.create({
     category_id: 5,
     description: `A hands-on guide to agent evals for AI developers: test your LangGraph agent's tool calls with AgentEvals trajectory matching, cheap code checks, and LLM judges in Python.`,
     image: {
-      src: `https://www.rohitcodes.com/og`,
-      alt: `Rohit Bhatt, software developer — full-stack products and generative AI`,
+      src: `/assets/blogs/agent-evals-101-test-agent-trajectory.webp`,
+      fallback: `/assets/blogs/agent-evals-101-test-agent-trajectory.jpg`,
+      alt: `Agent Evals 101: test the trajectory, not just the answer`,
     },
     owner: `Rohit Bhatt`,
     tags: [`AI developer`, `Gen AI developer`, `agent evals`, `how to evaluate AI agents`, `trajectory evaluation LangGraph`, `agentevals python tutorial`, `LLM agent testing`],

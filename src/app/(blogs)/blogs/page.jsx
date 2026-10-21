@@ -6,6 +6,7 @@ import blogdata from '@/app/api/blogs/blog'
 import stripHtml from '@/utils/stripHtml'
 import { listPosts } from '@/lib/blog-queries'
 import { listingMetadata } from '@/lib/site'
+import BlogCover from '@/components/blogs/BlogCover'
 
 const BLOGS_TITLE = 'Notes on building software & AI — Rohit Bhatt'
 const BLOGS_DESCRIPTION = 'Field notes on shipping web products — Ruby on Rails, React, and the practical realities of putting large language models into production.'
@@ -63,10 +64,16 @@ function FeaturedPost({ post }) {
             <span className="bf-read">read article <ArrowUR /></span>
           </div>
         </div>
-        <div className="bf-aside" aria-hidden>
-          <span className="mark">&ldquo;</span>
-          <span className="lbl">blog</span>
-        </div>
+        {post.image?.src ? (
+          <div className="bf-aside bf-cover">
+            <BlogCover src={post.image.src} fallback={post.image.fallback} alt={post.image.alt || post.title} priority />
+          </div>
+        ) : (
+          <div className="bf-aside" aria-hidden>
+            <span className="mark">&ldquo;</span>
+            <span className="lbl">blog</span>
+          </div>
+        )}
       </Link>
     </Reveal>
   )
@@ -76,14 +83,21 @@ function PostCard({ post, delay }) {
   return (
     <Reveal delay={delay}>
       <Link className="post-card" href={`/blogs/${post.slug}`}>
-        <div className="pc-eyebrow">
-          <span className="post-tag">{tagLabel(post)}</span>
-          <span className="post-date">{formatDate(post.date)}</span>
-        </div>
-        <h3 className="pc-title">{post.title}</h3>
-        <p className="pc-excerpt">{excerpt(post)}</p>
-        <div className="pc-foot">
-          <span className="pc-read">read <ArrowUR /></span>
+        {post.image?.src && (
+          <div className="pc-media">
+            <BlogCover src={post.image.src} fallback={post.image.fallback} alt={post.image.alt || post.title} />
+          </div>
+        )}
+        <div className="pc-body">
+          <div className="pc-eyebrow">
+            <span className="post-tag">{tagLabel(post)}</span>
+            <span className="post-date">{formatDate(post.date)}</span>
+          </div>
+          <h3 className="pc-title">{post.title}</h3>
+          <p className="pc-excerpt">{excerpt(post)}</p>
+          <div className="pc-foot">
+            <span className="pc-read">read <ArrowUR /></span>
+          </div>
         </div>
       </Link>
     </Reveal>

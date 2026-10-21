@@ -10,6 +10,7 @@ import { RiTwitterXFill } from 'react-icons/ri'
 import { BsLinkedin } from 'react-icons/bs'
 import { BiLogoWhatsapp } from 'react-icons/bi'
 import CodeBlockViewer from '@/components/blogs/CodeBlockViewer'
+import BlogCover from '@/components/blogs/BlogCover'
 import { getPost, sortedBlogs } from '@/lib/blog-queries'
 import { SITE_URL, TWITTER_HANDLE, metaDescription, withBrand } from '@/lib/site'
 
@@ -24,8 +25,9 @@ export async function generateMetadata({ params }) {
   const description = metaDescription(blog.description || blog.summary)
   const title = withBrand(blog.title)
   const canonical = `${SITE_URL}/blogs/${blog.slug}`
-  const image = blog.image?.src
-    ? [{ url: blog.image.src, alt: blog.image.alt || blog.title }]
+  const imageUrl = coverSrc(blog.image?.src)
+  const image = imageUrl
+    ? [{ url: imageUrl, alt: blog.image.alt || blog.title }]
     : undefined
   return {
     title,
@@ -45,7 +47,7 @@ export async function generateMetadata({ params }) {
       card: 'summary_large_image',
       title,
       description,
-      images: image ? [blog.image.src] : undefined,
+      images: imageUrl ? [imageUrl] : undefined,
       creator: TWITTER_HANDLE,
     },
   }
@@ -55,18 +57,14 @@ function fetchPosts(slug) {
   return getPost(slug)
 }
 
-function BlogImage({ src, alt, priority = false, className = 'w-full rounded-lg h-auto' }) {
-  return (
-    <img
-      src={src}
-      alt={alt || ''}
-      className={className}
-      draggable={false}
-      loading={priority ? 'eager' : 'lazy'}
-      decoding="async"
-      fetchPriority={priority ? 'high' : 'low'}
-    />
-  )
+function coverSrc(src) {
+  if (!src) return undefined
+  if (/^https?:\/\//i.test(src)) return src
+  return `${SITE_URL}${src.startsWith('/') ? src : `/${src}`}`
+}
+
+function BlogImage({ src, fallback, alt, priority = false, className = 'w-full rounded-lg h-auto' }) {
+  return <BlogCover src={src} fallback={fallback} alt={alt} priority={priority} className={className} />
 }
 
 const longdateConvert = (date) => {
@@ -89,7 +87,7 @@ export default async function page({ params }) {
         '@type': 'BlogPosting',
         headline: data.blog.title,
         description: metaDescription(data.blog.description || data.blog.summary),
-        image: data.blog.image?.src,
+        image: coverSrc(data.blog.image?.src),
         datePublished: data.blog.date,
         author: { '@id': `${SITE_URL}/#person`, name: data.blog.owner || 'Rohit Bhatt' },
         publisher: { '@id': `${SITE_URL}/#person` },
@@ -125,7 +123,7 @@ export default async function page({ params }) {
             </div>
             <div className="flex flex-col justify-center flex-1 gap-2">
               <div className="flex flex-col justify-center flex-1 gap-2">
-                <BlogImage src={data.blog.image.src} alt={data.blog.image.alt || data.blog.title} priority />
+                <BlogImage src={data.blog.image.src} fallback={data.blog.image.fallback} alt={data.blog.image.alt || data.blog.title} priority />
               </div>
               {data.blog.summary &&
                 <div className="flex flex-col justify-center flex-1 gap-2 rounded-lg blog-panel p-4">

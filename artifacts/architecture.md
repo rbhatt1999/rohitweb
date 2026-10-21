@@ -89,5 +89,5 @@ Pages read the static arrays in-process. They do not HTTP-fetch the site's own A
 
 - **Section IDs for scroll nav**: `id="home"`, `id="work"`, `id="skills"`, `id="writing"`, `id="about"` — nav links use `href="/#work"` etc.
 - **Framer Motion**: all home sections animate in on scroll via `useInView` + `motion` components.
-- **Blog images**: hosted on S3 (`https://website-images-rohitcodes.s3.ap-south-1.amazonaws.com/`) — not in the repo.
+- **Blog images**: usually hosted on S3 (`https://website-images-rohitcodes.s3.ap-south-1.amazonaws.com/`). A cover can also live in `public/assets/blogs/` as WebP plus a JPEG fallback.
 - **No test suite** — validate by running dev server.

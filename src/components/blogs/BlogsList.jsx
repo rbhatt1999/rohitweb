@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import React, { Fragment } from 'react';
+import BlogCover from '@/components/blogs/BlogCover'
 
 function pageHref(afterurl, n, search) {
   const params = new URLSearchParams()
@@ -36,7 +37,7 @@ export default function BlogsList({ data, totalPage, page, search, afterurl }) {
             </div>
             <div className='flex flex-col w-full flex-1 order-1 md:order-2'>
               <Link href={`/blogs/${blog.slug}`} className='hover:scale-105 '>
-                <img src={blog.image.src} alt={blog.image.alt || blog.title} className='w-full h-full rounded-xl' loading="lazy" decoding="async" />
+                <BlogCover src={blog.image.src} fallback={blog.image.fallback} alt={blog.image.alt || blog.title} className='w-full h-full rounded-xl' />
               </Link>
             </div>
           </div>

@@ -49,6 +49,7 @@ function card(item, includeTags) {
     image: {
       src: item.image.src,
       alt: item.image.alt,
+      ...(item.image.fallback ? { fallback: item.image.fallback } : {}),
     },
     description: item.description,
   }
