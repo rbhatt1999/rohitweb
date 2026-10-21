@@ -74,6 +74,8 @@ When building new dark-mode-specific visual effects (glows, neon borders, bloom)
 | `.anchor-tag` | Applied to parsed HTML sections; links inside get accent color + underline. Inline `code` uses `var(--mono)`. |
 | `.sectionAnchor` | Wrapper for blog sections |
 | `.blog-html` | Wrapper for raw HTML fragments (tables). Borders use `var(--border)`; cell text uses `var(--fg2)` / `var(--fg1)`. |
+| `.bf-cover` | Featured blog-index image. Fills the aside; background is `var(--paper-2)`. |
+| `.pc-media` | Thumbnail on a blog-index card. 16:9 crop; background is `var(--paper-2)`. |
 
 ## Adding New Component Styles
 

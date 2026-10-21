@@ -16,6 +16,7 @@ All blog posts live in `src/app/api/blogs/blog.js` as a plain JS array. Categori
   tags: [`javascript`, `react`],
   image: {
     src: `https://website-images-rohitcodes.s3.ap-south-1.amazonaws.com/image.webp`,
+    fallback: `/assets/blogs/image.jpg`, // optional JPEG when src is a WebP in public/
     alt: `Image description`,
   },
   summary: `Paragraph shown as "30-sec summary" at top of post. HTML allowed.`,
@@ -78,6 +79,7 @@ Each element of `sections[]` can have any combination of these keys (all optiona
 - Code blocks require `{ html: { type: 'code', language, value } }` — use `CodeBlockViewer` in the renderer.
 - Raw HTML fragments (tables) use `{ html: { type: 'html', value } }`. The post page parses `value` with `html-react-parser` inside `.blog-html`.
 - Blog images should be uploaded to S3 bucket `website-images-rohitcodes` in the `ap-south-1` region as `.webp`.
+- A cover can also live in `public/assets/blogs/` as WebP (`image.src`) plus a JPEG fallback (`image.fallback`). List cards, the post hero, Open Graph, Twitter, and BlogPosting JSON-LD use `src`. The JPEG is the `<img>` fallback inside `<picture>`. Relative `src` values are turned into absolute URLs for metadata and JSON-LD.
 
 ## API Query Params
 
