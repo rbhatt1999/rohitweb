@@ -242,6 +242,12 @@ export default async function page({ params }) {
                   )
                 }
               </section>
+              <div className="flex flex-col gap-2 rounded-lg blog-panel p-4">
+                <h2 className="text-lg md:text-xl font-bold text-left blog-title">About the author</h2>
+                <p className="text-base md:text-lg font-light text-left blog-body anchor-tag">
+                  <Link href="/about">Rohit Bhatt</Link> is a software developer in India and a Forward Deployed Engineer at ekincare. He builds full-stack products and production generative AI with Ruby on Rails, React, LangChain, and Gemini. <Link href="/work">Selected projects</Link>.
+                </p>
+              </div>
               <div className="flex flex-col justify-center flex-1 gap-2 border-y-2 py-5" style={{ borderColor: 'var(--border)' }}>
                 <h2 className="text-lg md:text-xl font-bold text-center" style={{ color: 'var(--fg2)' }}>To share this blog on social media click on the icons below :</h2>
                 <div className="flex flex-row justify-center gap-2">

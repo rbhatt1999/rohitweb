@@ -5,7 +5,7 @@ import NavigationBar from '@/components/Navigation/NavigationBar'
 import Footer from '@/components/Footer'
 import SiteChrome from '@/components/SiteChrome'
 import JsonLd from '@/components/JsonLd'
-import { SITE_URL, SITE_TITLE, SITE_DESCRIPTION, SITE_NAME, TWITTER_HANDLE, SAME_AS } from '@/lib/site'
+import { SITE_URL, SITE_TITLE, SITE_DESCRIPTION, SITE_NAME, TWITTER_HANDLE, SAME_AS, JOB_TITLES, KNOWS_ABOUT, ALUMNI_OF, OG_IMAGE } from '@/lib/site'
 
 export const metadata = {
   metadataBase: new URL(SITE_URL),
@@ -17,11 +17,11 @@ export const metadata = {
   applicationName: SITE_NAME,
   authors: [{ name: SITE_NAME, url: SITE_URL }],
   creator: SITE_NAME,
-  keywords: ['Rohit Bhatt', 'Forward Deployed Engineer', 'Full Stack Web Developer', 'Ruby on Rails', 'React', 'JavaScript', 'AI', 'LangChain', 'Gemini'],
+  keywords: ['Rohit Bhatt', 'software developer', 'Gen AI developer', 'AI developer', 'full stack developer', 'generative AI', 'Forward Deployed Engineer', 'Ruby on Rails', 'React', 'LangChain', 'Gemini', 'India'],
   openGraph: {
     title: SITE_TITLE,
     description: SITE_DESCRIPTION,
-    images: [{ url: '/assets/rohit-bhatt.jpg', width: 1086, height: 1448, alt: 'Rohit Bhatt' }],
+    images: [OG_IMAGE],
     url: SITE_URL,
     siteName: SITE_NAME,
     type: 'website',
@@ -31,7 +31,7 @@ export const metadata = {
     card: 'summary_large_image',
     title: SITE_TITLE,
     description: SITE_DESCRIPTION,
-    images: ['/assets/rohit-bhatt.jpg'],
+    images: [OG_IMAGE.url],
     creator: TWITTER_HANDLE,
   },
   robots: {
@@ -48,7 +48,10 @@ const jsonLd = {
       '@id': `${SITE_URL}/#person`,
       name: 'Rohit Bhatt',
       url: SITE_URL,
-      jobTitle: 'Forward Deployed Engineer',
+      jobTitle: JOB_TITLES,
+      description: SITE_DESCRIPTION,
+      knowsAbout: KNOWS_ABOUT,
+      alumniOf: ALUMNI_OF,
       image: `${SITE_URL}/assets/rohit-bhatt.jpg`,
       worksFor: { '@type': 'Organization', name: 'ekincare' },
       address: {

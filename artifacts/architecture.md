@@ -9,8 +9,12 @@ src/
 ├── app/
 │   ├── layout.js                   # Root layout: fonts, nav, footer, theme flash-prevention script
 │   ├── page.jsx                    # Home — composes all home section components
+│   ├── about/page.jsx              # About: experience, education, software and generative AI work
+│   ├── work/page.jsx               # Project index
+│   ├── work/[slug]/page.jsx        # Sadhak AI and Stay a While
+│   ├── og/route.jsx                # 1200×630 Open Graph image (next/og ImageResponse)
 │   ├── globals.css                 # ALL styles live here (CSS vars, component classes, utility classes)
-│   ├── sitemap.js                  # Dynamic sitemap: fetches blog + category slugs
+│   ├── sitemap.js                  # Sitemap from static blog data plus /about and /work
 │   ├── (blogs)/                    # Route group (no URL segment)
 │   │   ├── blogs/[slug]/page.jsx   # Blog post detail page
 │   │   ├── blogs/page.jsx          # Blog list with pagination
@@ -53,6 +57,8 @@ src/
 │   └── LocatorLoader.jsx           # Dev-only @locator/runtime loader
 ├── lib/
 │   ├── fonts.js                    # next/font/local definitions (all fonts self-hosted in public/fonts/)
+│   ├── site.js                     # Canonical origin, titles, Person JSON-LD fields
+│   ├── projects.js                 # Featured projects (Sadhak AI, Stay a While) and smaller repos
 │   └── locator-runtime-stub.js     # No-op stub used in production build
 └── utils/
     ├── url.js                      # Re-exports NEXT_PUBLIC_URL env var

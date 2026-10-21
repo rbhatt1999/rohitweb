@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import Reveal from '@/components/Reveal'
 
 const ArrowUR = () => (
@@ -33,18 +34,19 @@ export default function About() {
               engineering disappears and the experience is all that&apos;s left.
             </p>
             <p>
-              I&apos;m a Forward Deployed Engineer at ekincare, working remotely
-              on full-stack applications and production AI integrations, with a focus on
-              LLM-backed tools built on LangChain and Gemini.
+              I&apos;m a software developer and Forward Deployed Engineer at ekincare, working
+              remotely from India on full-stack applications and production generative AI,
+              with a focus on LLM-backed tools built on LangChain and Gemini.
             </p>
             <p>
               Five years in, I still care most about the small things: a transition that feels
               right, an API that&apos;s a pleasure to use, a page that loads before you notice.
               Off-screen, you&apos;ll find me on a hiking trail or inside an Erin Morgenstern novel.
             </p>
-            <a className="ext" href="/assets/resume.pdf" target="_blank" rel="noreferrer" style={{ fontSize: '13px' }}>
-              download résumé <ArrowUR />
-            </a>
+            <span className="about-links">
+              <Link className="ext" href="/about">background <ArrowUR /></Link>
+              <a className="ext" href="/assets/resume.pdf" target="_blank" rel="noreferrer">download résumé <ArrowUR /></a>
+            </span>
           </Reveal>
 
           <Reveal delay={0.1}>

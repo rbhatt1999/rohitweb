@@ -19,7 +19,7 @@ No test suite — verify changes by running the dev server and checking in brows
 ```
 NEXT_PUBLIC_URL = 'http://localhost:3001'
 ```
-`NEXT_PUBLIC_URL` is used across all internal `fetch` calls. In production it is `https://www.rohitweb.me`.
+`NEXT_PUBLIC_URL` is the local origin (`http://localhost:3001`). The public site is `https://www.rohitcodes.com`. Canonicals, the sitemap, robots, and Open Graph use that host from `src/lib/site.js` (`https://rohitcodes.com` 308-redirects to the www host). `https://www.rohitweb.me` is not the live site.
 
 ## Architecture & Structure
 
