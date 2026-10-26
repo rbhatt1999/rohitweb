@@ -50,7 +50,7 @@ export default async function page({ params, searchParams }) {
           <h1 className="text-3xl md:text-5xl font-bold text-center md:text-left blog-title">{converblogtomonth(slug)}</h1>
           {
             search && (
-              <p className='text-base md:text-lg text-center md:text-left blog-body'>Search Results for "{search}"</p>
+              <p className='text-base md:text-lg text-center md:text-left blog-body'>Search Results for &quot;{search}&quot;</p>
             )
           }
         </div>
