@@ -4124,8 +4124,633 @@ def test_guardrails(run, check):
       title: `The Agentic Shift: A Comprehensive Analysis of the Artificial Intelligence Landscape in 2026`,
       slug: `the-agentic-shift-artificial-intelligence-landscape-2026`,
     },
+  },
+  {
+    title: `What Changed in Claude This Week: Migrating to API Version 2026-10-21 and Building MCP Tasks`,
+    slug: `claude-api-2026-10-21-migration-mcp-tasks`,
+    id: 15,
+    category_id: 5,
+    description: `Claude API version 2026-10-21 removes temperature, top_p and top_k and the new SDKs send your key as a Bearer token. Claude Code also added MCP Tasks. Here is how to update your code.`,
+    image: {
+      src: `/assets/blogs/claude-api-2026-10-21-migration-mcp-tasks.webp`,
+      fallback: `/assets/blogs/claude-api-2026-10-21-migration-mcp-tasks.jpg`,
+      alt: `What changed in Claude this week: API version 2026-10-21 and MCP Tasks`,
+    },
+    owner: `Rohit Bhatt`,
+    tags: [
+      `Claude API 2026-10-21`,
+      `anthropic-version header`,
+      `Claude API migration`,
+      `temperature removed Claude API`,
+      `Anthropic Python SDK 2.0`,
+      `Authorization Bearer Claude API key`,
+      `MCP Tasks tutorial`,
+      `MCP elicitation example`,
+      `Claude Code MCP tasks`,
+      `AI developer`,
+    ],
+    date: `2026-10-27`,
+    summary: `Claude API version 2026-10-21 removes temperature, top_p and top_k and the new SDKs send your key as a Bearer token. Claude Code also added MCP Tasks. Here is how to update your code.`,
+    sections: [
+      {
+        p: `Two Claude changes from last week matter if you write code against Claude. On October 21, 2026 Anthropic released API version <code>2026-10-21</code>, the first new API version since <code>2023-06-01</code>, along with new major versions of every official SDK. Two days later, on October 23, Claude Code added support for MCP Tasks and Elicitations, which let an MCP tool run a long job in the background and stop to ask the user a question partway through.`,
+      },
+      {
+        p: `The first can break working code the next time you upgrade a dependency. The second makes a new kind of MCP tool practical. This post covers what to change for the new API version, then how to build a task-based MCP tool. Every sample was run locally. Where a sample talks to "the API", it talks to a local server that echoes headers back, so you see what the SDK sends, not an invented Claude reply.`,
+      },
+      {
+        h1: `Part 1: API version 2026-10-21`,
+      },
+      {
+        h2: `What actually changed`,
+        p: `Every Claude API request carries an <code>anthropic-version</code> header. Until last week every SDK sent <code>2023-06-01</code>. The <a href="https://platform.claude.com/docs/en/api/versioning" target="_blank" rel="noopener noreferrer">versions page</a> now lists <code>2026-10-21</code> as the latest, and the <a href="https://platform.claude.com/docs/en/release-notes/overview" target="_blank" rel="noopener noreferrer">release notes</a> for October 21 list the SDK versions that send it by default:`,
+        html: {
+          type: `html`,
+          value: `<table><thead><tr><th>SDK</th><th>First version on 2026-10-21</th></tr></thead><tbody><tr><td>Python (<code>anthropic</code>)</td><td>2.0.0</td></tr><tr><td>TypeScript (<code>@anthropic-ai/sdk</code>)</td><td>1.0.0</td></tr><tr><td>Go</td><td>2.0.0 (<code>github.com/anthropics/anthropic-sdk-go/v2</code>)</td></tr><tr><td>Java</td><td>3.0.0</td></tr><tr><td>C#</td><td>13.0.0</td></tr><tr><td>PHP</td><td>1.0.0</td></tr><tr><td>Ruby</td><td>2.0.0</td></tr><tr><td><code>ant</code> CLI</td><td>2.0.0</td></tr></tbody></table>`,
+        },
+      },
+      {
+        p: `The old version isn't going away. The Claude Devs account <a href="https://x.com/ClaudeDevs/status/2113013247209021918" target="_blank" rel="noopener noreferrer">said</a> that <code>2023-06-01</code> is not deprecated and that they plan to release versions more often from now on. You can move when you're ready, but an unpinned <code>pip install -U anthropic</code> or <code>npm update</code> will move you whether you're ready or not.`,
+      },
+      {
+        p: `The breaking changes in the Messages API (which also apply to token counting and to each request in a Message Batch) are:`,
+        list: [
+          {
+            p: `<code>temperature</code>, <code>top_p</code> and <code>top_k</code> are removed. Sending any of them returns a 400 on every model, even at the default value.`,
+          },
+          {
+            p: `A <code>document</code> block placed directly in an <code>assistant</code> message returns a 400. Documents nested inside other blocks, such as web fetch results, are fine.`,
+          },
+          {
+            p: `A <code>text</code> block with a non-empty <code>citations</code> array in a <code>user</code> message, directly or inside a <code>search_result</code> block, returns a 400. Citations on assistant blocks you send back still work, and so does <code>"citations": {"enabled": true}</code> on documents.`,
+          },
+        ],
+      },
+      {
+        p: `If you use the Admin API, some response fields were renamed: <code>roles</code> to <code>role_ids</code>, <code>group_id</code> to <code>rbac_group_id</code>, <code>name</code> to <code>display_name</code>, <code>group_type</code> to <code>group.type</code>, and API keys lose <code>workspace_id</code> in favour of <code>scope.workspace_id</code>. The Enterprise Analytics API renames <code>actor.email</code> to <code>actor.email_address</code> and <code>summaries</code> to <code>data</code>.`,
+      },
+      {
+        p: `Separately from the API version, the new SDKs change how your key goes over the wire. That one doesn't produce a 400 at all, which is why it's easy to miss. More on it below.`,
+      },
+      {
+        h2: `Step 1: pin the version on purpose`,
+        p: `With an SDK, the API version comes from the SDK's major version. So pinning the version means pinning the package:`,
+        html: {
+          type: `code`,
+          language: `text`,
+          value: `# requirements.txt: stay on 2023-06-01 for now
+anthropic>=1.17,<2
+
+# or move to 2026-10-21
+anthropic>=2,<3`,
+        },
+      },
+      {
+        p: `Do the same in <code>package.json</code> (<code>"@anthropic-ai/sdk": "^1.0.0"</code> for the new version, <code>&#60;1</code> to stay), and in Go change the import path to <code>/v2</code>, which also needs Go 1.25 or later.`,
+      },
+      {
+        p: `If you call the API over plain HTTP, set the header yourself:`,
+        html: {
+          type: `code`,
+          language: `bash`,
+          value: `curl https://api.anthropic.com/v1/messages \\
+  -H "x-api-key: $ANTHROPIC_API_KEY" \\
+  -H "anthropic-version: 2026-10-21" \\
+  -H "content-type: application/json" \\
+  -d '{"model": "claude-opus-5-5", "max_tokens": 1024,
+       "messages": [{"role": "user", "content": "Hello, Claude"}]}'`,
+        },
+      },
+      {
+        p: `I checked what each Python SDK release actually sends by pointing it at a local server that echoes the request headers back:`,
+        html: {
+          type: `code`,
+          language: `python`,
+          value: `import json, anthropic
+
+client = anthropic.Anthropic(api_key="sk-ant-test", base_url="http://127.0.0.1:8765")
+msg = client.messages.create(model="claude-opus-5-5", max_tokens=256,
+                             messages=[{"role": "user", "content": "Hello"}])
+print(anthropic.__version__, json.loads(msg.content[0].text)["headers"])`,
+        },
+      },
+      {
+        html: {
+          type: `code`,
+          language: `text`,
+          value: `1.17.0 {'anthropic-version': '2023-06-01', 'x-api-key': 'sk-ant-test', 'authorization': None}
+2.0.0 {'anthropic-version': '2026-10-21', 'x-api-key': None, 'authorization': 'Bearer sk-ant-test'}`,
+        },
+      },
+      {
+        p: `That one line shows both changes: the new version header, and the key moving from <code>x-api-key</code> to <code>Authorization: Bearer</code>.`,
+      },
+      {
+        p: `On Amazon Bedrock, <code>2026-10-21</code> works only with Claude 4.7 and later models, so stay on your current SDK for older Bedrock models.`,
+      },
+      {
+        h2: `Step 2: remove temperature, top_p and top_k`,
+        p: `This one surprised me a little in testing. The typed Python <code>messages.create()</code> signature had already dropped <code>temperature</code>. Passing it raised <code>TypeError: Messages.create() got an unexpected keyword argument 'temperature'</code> in 1.0.0, 1.17.0 and 2.0.0, while 0.125.0 still accepted it. So if you're on a recent Python SDK and use keyword arguments, you've already dealt with this.`,
+      },
+      {
+        p: `The places the 400 will actually show up are the untyped paths:`,
+        list: [
+          {
+            p: `raw HTTP calls and thin wrappers around <code>httpx</code> or <code>fetch</code>`,
+          },
+          {
+            p: `<code>extra_body={"temperature": ...}</code>, which 2.0.0 forwarded unchecked in my test`,
+          },
+          {
+            p: `request bodies loaded from config and passed through with <code>**params</code>`,
+          },
+          {
+            p: `older SDKs in other services, and hand-written batch files`,
+          },
+        ],
+      },
+      {
+        p: `For these, strip the keys in one place before the request goes out:`,
+        html: {
+          type: `code`,
+          language: `python`,
+          value: `import logging
+
+log = logging.getLogger("claude-migration")
+SAMPLING_KEYS = ("temperature", "top_p", "top_k")
+
+
+def strip_sampling(params: dict, *, strict: bool = False) -> dict:
+    """Return a copy of a Messages request body without temperature, top_p or top_k.
+
+    strict=True raises instead, which is useful in tests to find every caller."""
+    found = [k for k in SAMPLING_KEYS if k in params]
+    if found and strict:
+        raise ValueError(f"2026-10-21 rejects {found}; remove them from this request")
+    for k in found:
+        log.warning("dropping %s=%r (not accepted by API version 2026-10-21)", k, params[k])
+    return {k: v for k, v in params.items() if k not in SAMPLING_KEYS}
+
+
+def api_key_from_headers(headers) -> str | None:
+    """For a gateway or test stub: accept the key from either header."""
+    auth = headers.get("authorization", "")
+    if auth.lower().startswith("bearer "):
+        return auth[7:].strip()
+    return headers.get("x-api-key")`,
+        },
+      },
+      {
+        p: `Run your tests with <code>strict=True</code> first so every caller fails loudly, then keep the non-strict version as a safety net. Given a config dict with <code>temperature=0.2</code> and <code>top_p=0.9</code>, <code>sorted(strip_sampling(config))</code> and then the strict call print:`,
+        html: {
+          type: `code`,
+          language: `text`,
+          value: `WARNING claude-migration: dropping temperature=0.2 (not accepted by API version 2026-10-21)
+WARNING claude-migration: dropping top_p=0.9 (not accepted by API version 2026-10-21)
+['max_tokens', 'messages', 'model']
+ValueError: 2026-10-21 rejects ['temperature', 'top_p']; remove them from this request`,
+        },
+      },
+      {
+        p: `The more important question is what you lose. Without these parameters, every request samples at the defaults, which means <code>temperature</code> 1.0. According to the <a href="https://platform.claude.com/docs/en/api/migration-2026-10-21" target="_blank" rel="noopener noreferrer">migration guide</a>, Claude 4.7 and later models already accept only the defaults, so nothing changes for them. On a model like Claude Sonnet 4.6, a request that set a low temperature for more consistent output loses that effect, and no other setting replaces it. If a pipeline depends on that, you have two options: stop sending the parameter and check that the output is still good enough, or keep that one service on <code>2023-06-01</code> (the old SDK major, or the old header) while the rest of your code moves. For consistency, lean on things that never depended on sampling anyway: structured output, tool schemas and evals that check the result.`,
+      },
+      {
+        h2: `Step 3: fix anything that reads X-Api-Key`,
+        p: `The new SDKs and the CLI send your key as <code>Authorization: Bearer &#60;key&#62;</code> instead of <code>X-Api-Key</code>. The Claude API accepts either header, so direct calls keep working. What breaks is anything in between that looks for <code>X-Api-Key</code>:`,
+        list: [
+          {
+            p: `a gateway or proxy that validates or swaps the key`,
+          },
+          {
+            p: `middleware that attributes usage by key`,
+          },
+          {
+            p: `log filters that redact <code>X-Api-Key</code> (and would now miss the key in <code>Authorization</code>)`,
+          },
+          {
+            p: `test stubs that assert on the header`,
+          },
+        ],
+      },
+      {
+        p: `The clean fix is to make those readers accept both headers during the transition, like <code>api_key_from_headers</code> in the helper above.`,
+      },
+      {
+        p: `If you can't change the gateway yet, the migration guide shows how to move the key back on the client. In Python, an <code>auth</code> function on the HTTP client runs on every request, retries included. Note that SDK 2.0 is built on <code>httpx2</code>, not <code>httpx</code>:`,
+        html: {
+          type: `code`,
+          language: `python`,
+          value: `import httpx2
+from anthropic import Anthropic, DefaultHttpxClient
+
+def send_x_api_key(request: httpx2.Request) -> httpx2.Request:
+    if request.headers.get("Authorization") == f"Bearer {api_key}":
+        del request.headers["Authorization"]
+        request.headers["X-Api-Key"] = api_key
+    return request
+
+client = Anthropic(api_key=api_key, http_client=DefaultHttpxClient(auth=send_x_api_key))`,
+        },
+      },
+      {
+        p: `Against my echo server, that client sent <code>x-api-key</code> and no <code>Authorization</code> header. In TypeScript the equivalent is <code>defaultHeaders: { "X-Api-Key": apiKey, Authorization: null }</code>.`,
+      },
+      {
+        p: `Watch for these too:`,
+        list: [
+          {
+            p: `<code>extra_headers={"X-Api-Key": omit}</code> no longer keeps the key off a request. Use <code>{"Authorization": omit}</code>.`,
+          },
+          {
+            p: `<code>extra_headers={"X-Api-Key": other_key}</code> no longer replaces the key. Both keys go out. Send <code>{"Authorization": f"Bearer {other_key}"}</code> instead.`,
+          },
+          {
+            p: `A client now holds exactly one credential. <code>Anthropic(api_key=..., auth_token=...)</code> raised <code>ValueError: Pass at most one of api_key=, auth_token=, ...</code> when I tried it.`,
+          },
+          {
+            p: `Microsoft Foundry clients still send <code>x-api-key</code>.`,
+          },
+        ],
+      },
+      {
+        h2: `Step 4: the other SDK changes`,
+        p: `These come with the same upgrade:`,
+        list: [
+          {
+            p: `<code>MessageParam</code> is now a union of <code>UserMessageParam</code>, <code>AssistantMessageParam</code> and <code>SystemMessageParam</code>. Dict literals need no change, but calling <code>MessageParam(role=..., content=...)</code> in Python now fails (I got <code>TypeError: Cannot instantiate typing.Union</code>). Use a dict or the role-specific type.`,
+          },
+          {
+            p: `<code>client.models.list(betas=...)</code> is gone from the non-beta client. Use <code>client.beta.models</code>.`,
+          },
+          {
+            p: `Text Completions is removed from the TypeScript, Go, Java and Ruby SDKs and the CLI.`,
+          },
+          {
+            p: `The CLI drops <code>--api-key</code> and <code>--auth-token</code>. Use <code>--api-key-stdin</code> or environment variables.`,
+          },
+          {
+            p: `The SDKs move from the MIT license to Apache 2.0.`,
+          },
+        ],
+      },
+      {
+        p: `If you use Claude Code, version 2.1.307 added <code>/claude-api api-version</code>, which moves Claude API code in your project to <code>2026-10-21</code> (<a href="https://code.claude.com/docs/en/changelog" target="_blank" rel="noopener noreferrer">changelog</a>). Review its diff against the list above like you would any other change.`,
+      },
+      {
+        h1: `Part 2: MCP Tasks and Elicitations in Claude Code`,
+        p: `On October 23, Claude Devs <a href="https://x.com/ClaudeDevs/status/2113698001889927608" target="_blank" rel="noopener noreferrer">announced</a> support for MCP Tasks and Elicitations: "Tasks let Claude give plugins long-running jobs such as deep research and report back when they're done." <a href="https://x.com/ClaudeDevs/status/2113698005161533504" target="_blank" rel="noopener noreferrer">Elicitations</a> "let plugins ask users for input mid-task, such as confirming a refund or filling in a missing detail." They're <a href="https://x.com/ClaudeDevs/status/2113698007892070527" target="_blank" rel="noopener noreferrer">available today in the Claude Code CLI</a>, with more Claude products to follow.`,
+      },
+      {
+        p: `Before this, a tool call held the conversation until it returned, so long jobs hit timeouts. With tasks, a deploy or a report export runs on the server while Claude keeps working.`,
+      },
+      {
+        h2: `How the tasks extension works`,
+        p: `Tasks are an MCP extension called <code>io.modelcontextprotocol/tasks</code>, defined in the <a href="https://tasks.extensions.modelcontextprotocol.io/specification/2026-07-28/tasks" target="_blank" rel="noopener noreferrer">2026-07-28 specification</a>. If you find older tutorials that use a blocking <code>tasks/result</code> call, they describe an earlier design. The current one uses three methods: <code>tasks/get</code>, <code>tasks/update</code> and <code>tasks/cancel</code>.`,
+      },
+      {
+        p: `The flow:`,
+        list: [
+          {
+            p: `<strong>The client opts in on each request.</strong> Claude Code puts its capabilities in <code>params._meta["io.modelcontextprotocol/clientCapabilities"]</code>, with <code>"io.modelcontextprotocol/tasks": {}</code> under <code>extensions</code>. Never return a task to a request that didn't declare it. Claude Code reports that as <code>Unsupported result type 'task' for tools/call</code>.`,
+          },
+          {
+            p: `<strong>The server stores the task, then answers right away</strong> with <code>"resultType": "task"</code>, a <code>taskId</code>, <code>status</code>, <code>createdAt</code>, <code>lastUpdatedAt</code> and <code>ttlMs</code>. The spec says the task must be durably stored before this reply goes out.`,
+          },
+          {
+            p: `<strong>The client polls <code>tasks/get</code>.</strong> The task is <code>working</code>, <code>input_required</code>, <code>completed</code>, <code>failed</code> or <code>cancelled</code> (the last three are final). A completed task carries the normal tool result in <code>result</code>.`,
+          },
+          {
+            p: `<strong>Questions go through <code>inputRequests</code>.</strong> When the job needs a human, the task moves to <code>input_required</code> and <code>tasks/get</code> includes a map of keys to <code>elicitation/create</code> requests. The client answers with <code>tasks/update</code> and an <code>inputResponses</code> map. Keys must be unique for the life of the task, and the server should ignore answers to keys it never issued.`,
+          },
+          {
+            p: `<strong>Cancel is a request.</strong> <code>tasks/cancel</code> asks the server to stop. A job that was about to finish may still end as <code>completed</code>.`,
+          },
+        ],
+      },
+      {
+        h2: `Build it: a deploy tool that pauses for approval`,
+        p: `The code below is a small task layer you can plug into an MCP server by routing the four methods to these handlers. It keeps task state in SQLite so <code>tasks/get</code> never depends on the worker being alive. Before you hand-roll this in production, check whether your MCP SDK already supports the 2026-07-28 tasks extension.`,
+        html: {
+          type: `code`,
+          language: `python`,
+          value: `"""A small MCP Tasks layer (io.modelcontextprotocol/tasks, revision 2026-07-28).
+Route tools/call, tasks/get, tasks/update and tasks/cancel to these handlers."""
+import asyncio, json, secrets, sqlite3
+from datetime import datetime, timezone
+
+TASKS_EXT = "io.modelcontextprotocol/tasks"
+TERMINAL = ("completed", "failed", "cancelled")
+
+
+class JsonRpcError(Exception):
+    def __init__(self, code, message, data=None):
+        super().__init__(message)
+        self.code, self.data = code, data
+
+
+def now():
+    return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+
+
+class TaskStore:
+    """Durable state. tasks/get only reads from here, so it survives worker crashes."""
+    def __init__(self, path="tasks.db"):
+        self.db = sqlite3.connect(path, check_same_thread=False)
+        self.db.execute("CREATE TABLE IF NOT EXISTS tasks (id TEXT PRIMARY KEY, data TEXT)")
+
+    def create(self, ttl_ms=3_600_000):
+        ts = now()
+        t = {"taskId": "task-" + secrets.token_urlsafe(24), "status": "working",
+             "statusMessage": "Queued", "createdAt": ts, "lastUpdatedAt": ts, "ttlMs": ttl_ms,
+             "pollIntervalMs": 2000, "_requests": {}, "_answers": {}, "_cancel": False}
+        self.db.execute("INSERT INTO tasks VALUES (?, ?)", (t["taskId"], json.dumps(t)))
+        self.db.commit()
+        return t
+
+    def get(self, task_id):
+        row = self.db.execute("SELECT data FROM tasks WHERE id=?", (task_id,)).fetchone()
+        if row is None:
+            raise JsonRpcError(-32602, "Unknown taskId")  # Claude Code retries this for 5 min
+        return json.loads(row[0])
+
+    def update(self, task_id, **fields):
+        t = {**self.get(task_id), **fields, "lastUpdatedAt": now()}
+        self.db.execute("UPDATE tasks SET data=? WHERE id=?", (json.dumps(t), task_id))
+        self.db.commit()
+
+
+def wire(t):
+    """Public fields only, plus whatever this status needs."""
+    view = {k: v for k, v in t.items() if not k.startswith("_") and k not in ("result", "error")}
+    if t["status"] == "input_required":
+        view["inputRequests"] = {k: v for k, v in t["_requests"].items() if k not in t["_answers"]}
+    if t["status"] in ("completed", "failed"):
+        key = "result" if t["status"] == "completed" else "error"
+        view[key] = t[key]
+    return view
+
+
+class TaskContext:
+    """Handed to a long-running tool: report progress, check for cancel, ask the user."""
+    def __init__(self, store, task_id):
+        self.store, self.task_id, self._n = store, task_id, 0
+
+    def progress(self, message):
+        self.store.update(self.task_id, statusMessage=message)
+
+    def cancelled(self):
+        return self.store.get(self.task_id)["_cancel"]
+
+    async def ask(self, message, schema):
+        self._n += 1
+        key = f"ask-{self._n}"  # a key is never reused within one task
+        t = self.store.get(self.task_id)
+        t["_requests"][key] = {"method": "elicitation/create",
+                               "params": {"mode": "form", "message": message, "requestedSchema": schema}}
+        self.store.update(self.task_id, status="input_required", statusMessage=message,
+                          _requests=t["_requests"])
+        while True:
+            t = self.store.get(self.task_id)
+            if key in t["_answers"]:
+                self.store.update(self.task_id, status="working", statusMessage="Resuming")
+                return t["_answers"][key]
+            if t["_cancel"]:
+                raise asyncio.CancelledError
+            await asyncio.sleep(0.5)
+
+
+async def _run(store, task_id, tool_fn, args):
+    try:
+        result = await tool_fn(TaskContext(store, task_id), **args)
+        store.update(task_id, status="completed", statusMessage="Done", result=result)
+    except asyncio.CancelledError:
+        store.update(task_id, status="cancelled", statusMessage="Cancelled")
+    except Exception as exc:
+        store.update(task_id, status="failed", statusMessage=str(exc),
+                     error={"code": -32603, "message": str(exc)})
+
+
+async def handle_tools_call(store, tools, params):
+    caps = params.get("_meta", {}).get("io.modelcontextprotocol/clientCapabilities", {})
+    if TASKS_EXT not in caps.get("extensions", {}):
+        raise JsonRpcError(-32021, "Missing required client capability",
+                           {"requiredCapabilities": {"extensions": {TASKS_EXT: {}}}})
+    t = store.create()                                            # 1. durable first
+    asyncio.create_task(_run(store, t["taskId"], tools[params["name"]],
+                             params.get("arguments", {})))        # 2. start the work
+    return {"resultType": "task", **wire(t)}                      # 3. answer right away
+
+
+def handle_tasks_get(store, params):
+    return {"resultType": "complete", **wire(store.get(params["taskId"]))}
+
+
+def handle_tasks_update(store, params):
+    t = store.get(params["taskId"])
+    for key, value in params.get("inputResponses", {}).items():
+        if key in t["_requests"] and key not in t["_answers"]:  # ignore unknown or repeat keys
+            t["_answers"][key] = value
+    store.update(t["taskId"], _answers=t["_answers"])
+    return {"resultType": "complete"}
+
+
+def handle_tasks_cancel(store, params):
+    store.update(store.get(params["taskId"])["taskId"], _cancel=True)  # the worker checks this
+    return {"resultType": "complete"}`,
+        },
+      },
+      {
+        p: `Details that come from the spec and the Claude Code docs:`,
+        list: [
+          {
+            p: `<strong>Durable first.</strong> The row exists before the handle goes out.`,
+          },
+          {
+            p: `<strong>Unguessable IDs.</strong> The spec allows task IDs to act as bearer tokens, so they need real entropy.`,
+          },
+          {
+            p: `<strong><code>-32602</code> for unknown IDs.</strong> Claude Code reads that as an unknown task and retries for up to five minutes.`,
+          },
+          {
+            p: `<strong><code>-32021</code> without the extension.</strong> This tool can't run as a plain call, and the spec says to return "Missing required client capability".`,
+          },
+        ],
+      },
+      {
+        p: `The tool is ordinary async code:`,
+        html: {
+          type: `code`,
+          language: `python`,
+          value: `import asyncio
+from tasks_ext import TaskContext
+
+
+async def deploy_preview(ctx: TaskContext, branch: str) -> dict:
+    """Build a branch, run tests, then ask before promoting it."""
+    steps = ["Installing dependencies", "Running 212 tests", "Building image"]
+    for i, step in enumerate(steps, 1):
+        if ctx.cancelled():
+            raise asyncio.CancelledError
+        ctx.progress(f"{step} ({i}/{len(steps)})")
+        await asyncio.sleep(1)  # stand-in for real work
+
+    answer = await ctx.ask(
+        f"Tests passed on {branch}. Promote this build to staging?",
+        {
+            "type": "object",
+            "properties": {"approved": {"type": "boolean"}},
+            "required": ["approved"],
+        },
+    )
+    approved = answer.get("action") == "accept" and answer.get("content", {}).get("approved")
+    if not approved:
+        return {"content": [{"type": "text", "text": f"Build of {branch} is ready but was not promoted."}]}
+
+    ctx.progress("Promoting to staging")
+    await asyncio.sleep(1)
+    return {"content": [{"type": "text", "text": f"{branch} is live on staging."}]}
+
+
+TOOLS = {"deploy_preview": deploy_preview}`,
+        },
+      },
+      {
+        p: `This script plays the client: call, poll, answer once, keep polling:`,
+        html: {
+          type: `code`,
+          language: `python`,
+          value: `"""Acts like a tasks-aware client: call, poll, answer once, poll until done."""
+import asyncio, os
+from tasks_ext import TaskStore, TASKS_EXT, TERMINAL, handle_tools_call, handle_tasks_get, handle_tasks_update
+from tools import TOOLS
+
+
+async def main():
+    if os.path.exists("demo.db"):
+        os.remove("demo.db")
+    store = TaskStore("demo.db")
+    meta = {"io.modelcontextprotocol/clientCapabilities": {"extensions": {TASKS_EXT: {}}}}
+    handle = await handle_tools_call(store, TOOLS, {
+        "name": "deploy_preview", "arguments": {"branch": "feat/search"}, "_meta": meta})
+    print("tools/call ->", handle["resultType"], handle["taskId"][:14] + "...", handle["status"])
+
+    seen, last = set(), None
+    while True:
+        await asyncio.sleep(0.5)
+        t = handle_tasks_get(store, {"taskId": handle["taskId"]})
+        if (t["status"], t["statusMessage"]) != last:  # print changes only
+            last = (t["status"], t["statusMessage"])
+            print("tasks/get  ->", f"{last[0]} | {last[1]}")
+        for key, req in t.get("inputRequests", {}).items():
+            if key not in seen:  # clients should dedupe keys across polls
+                seen.add(key)
+                handle_tasks_update(store, {"taskId": t["taskId"], "inputResponses": {
+                    key: {"action": "accept", "content": {"approved": True}}}})
+                print("tasks/update -> answered", key)
+        if t["status"] in TERMINAL:
+            print("result     ->", t.get("result") or t.get("error"))
+            break
+
+asyncio.run(main())`,
+        },
+      },
+      {
+        p: `Output from a run:`,
+        html: {
+          type: `code`,
+          language: `text`,
+          value: `tools/call -> task task-jAcw6073E... working
+tasks/get  -> working | Installing dependencies (1/3)
+tasks/get  -> working | Running 212 tests (2/3)
+tasks/get  -> working | Building image (3/3)
+tasks/get  -> input_required | Tests passed on feat/search. Promote this build to staging?
+tasks/update -> answered ask-1
+tasks/get  -> working | Promoting to staging
+tasks/get  -> completed | Done
+result     -> {'content': [{'type': 'text', 'text': 'feat/search is live on staging.'}]}`,
+        },
+      },
+      {
+        p: `I also tested the other paths: <code>tasks/cancel</code> mid-build ended as <code>cancelled</code>, a <code>decline</code> answer ended as <code>completed</code> with "Build of b is ready but was not promoted.", a call without the extension raised <code>-32021</code>, and an unknown task ID raised <code>-32602</code>.`,
+      },
+      {
+        h2: `What to expect when Claude Code is the client`,
+        p: `From the <a href="https://code.claude.com/docs/en/mcp" target="_blank" rel="noopener noreferrer">Claude Code MCP docs</a>:`,
+        list: [
+          {
+            p: `<strong>Requirements.</strong> Tasks are in public beta and need Claude Code v2.1.304 or later, on a connection that negotiated protocol revision 2026-07-28. They work in terminal CLI sessions, Agent SDK sessions and GitHub Actions runs, not in the VS Code extension or the desktop app. They're not available on third-party providers such as Bedrock, or with feature-flag fetching turned off. The call has to come from the main conversation, not a subagent, and a one-shot <code>claude -p "&#60;prompt&#62;"</code> run doesn't get tasks.`,
+          },
+          {
+            p: `<strong>While it runs.</strong> The footer shows a count such as <code>1 MCP task</code>, and <code>/tasks</code> shows your latest <code>statusMessage</code>. Claude Code polls every 2 seconds by default and clamps your <code>pollIntervalMs</code> to between 250 and 30,000 ms.`,
+          },
+          {
+            p: `<strong>Questions.</strong> In non-interactive sessions, Claude Code asks the server to cancel a task that requests input, so unattended jobs should never need to ask. Declining a question is still an answer, and your tool decides what happens next. Claude Code answers at most 16 <code>inputRequests</code> keys per task.`,
+          },
+          {
+            p: `<strong>Stopping.</strong> Select the task in <code>/tasks</code> and press <code>x</code>. Pressing <code>Esc</code> doesn't stop it.`,
+          },
+          {
+            p: `<strong>What it doesn't use.</strong> <code>tasks/result</code>, <code>tasks/list</code> and <code>notifications/tasks</code>. Put everything in <code>tasks/get</code>.`,
+          },
+          {
+            p: `<strong>After exit.</strong> A task on a remote server keeps running when you exit. Resume the same session and Claude Code follows it again, so keep task IDs answerable across connections.`,
+          },
+        ],
+      },
+      {
+        h2: `Before production`,
+        p: `<code>asyncio.create_task</code> dies with the process, so in a real server hand the job to a queue (Celery or RQ, or Sidekiq in Rails) and have the worker write progress to the store <code>tasks/get</code> reads. Over Streamable HTTP, clients set the <code>Mcp-Name</code> header to the task ID, so a load balancer can route by it. Expire old tasks with <code>ttlMs</code>, make side effects idempotent, and never run the risky step without the approval answer.`,
+      },
+      {
+        h1: `Also in the release notes`,
+        p: `The same week, Claude Models on Google Cloud (Anthropic managed) launched on October 22, and user profiles gained <code>enforcement_status</code> and <code>enforcement_actions</code> fields on October 21. Both are in the <a href="https://platform.claude.com/docs/en/release-notes/overview" target="_blank" rel="noopener noreferrer">platform release notes</a>.`,
+      },
+      {
+        h1: `Wrapping up`,
+        p: `For the API change: pin your SDK major version, search untyped request paths for <code>temperature</code>, <code>top_p</code> and <code>top_k</code>, and check everything that reads <code>X-Api-Key</code>. For MCP Tasks, the server needs a durable store, a worker and four handlers, and should only return a task when the client asked for one.`,
+      },
+      {
+        p: `If you're testing agents that call tools like this, <a href="/blogs/agent-evals-101-test-agent-trajectory">Agent Evals 101</a> shows how to check the tool calls and not only the final answer. If you work in Ruby, <a href="/blogs/building-the-future-a-developers-guide-to-agentic-ai-workflows-in-ruby">Agentic AI Workflows in Ruby</a> covers MCP and background jobs from the Rails side. You can see what I'm building at <a href="/work">/work</a> and more <a href="/about">about me</a>.`,
+      },
+      {
+        h1: `Sources`,
+        list: [
+          {
+            p: `Claude Platform: <a href="https://platform.claude.com/docs/en/api/migration-2026-10-21" target="_blank" rel="noopener noreferrer">Migrating to API version 2026-10-21</a>`,
+          },
+          {
+            p: `Claude Platform: <a href="https://platform.claude.com/docs/en/api/versioning" target="_blank" rel="noopener noreferrer">API versions</a>`,
+          },
+          {
+            p: `Claude Platform: <a href="https://platform.claude.com/docs/en/release-notes/overview" target="_blank" rel="noopener noreferrer">Release notes</a>, October 15–22, 2026`,
+          },
+          {
+            p: `Claude Devs on X: <a href="https://x.com/ClaudeDevs/status/2113013247209021918" target="_blank" rel="noopener noreferrer">API version 2026-10-21 announcement</a>, <a href="https://x.com/ClaudeDevs/status/2113013248714744208" target="_blank" rel="noopener noreferrer">list of changes</a>, <a href="https://x.com/ClaudeDevs/status/2113013250136662488" target="_blank" rel="noopener noreferrer">SDKs and migration</a>`,
+          },
+          {
+            p: `Claude Devs on X: <a href="https://x.com/ClaudeDevs/status/2113698001889927608" target="_blank" rel="noopener noreferrer">MCP Tasks and Elicitations</a>, <a href="https://x.com/ClaudeDevs/status/2113698005161533504" target="_blank" rel="noopener noreferrer">Elicitations</a>, <a href="https://x.com/ClaudeDevs/status/2113698007892070527" target="_blank" rel="noopener noreferrer">availability</a>, October 23, 2026`,
+          },
+          {
+            p: `<a href="https://code.claude.com/docs/en/mcp" target="_blank" rel="noopener noreferrer">Claude Code docs: MCP</a>, sections on MCP tasks`,
+          },
+          {
+            p: `<a href="https://code.claude.com/docs/en/changelog" target="_blank" rel="noopener noreferrer">Claude Code changelog</a>, versions 2.1.307 and 2.1.310`,
+          },
+          {
+            p: `<a href="https://tasks.extensions.modelcontextprotocol.io/specification/2026-07-28/tasks" target="_blank" rel="noopener noreferrer">MCP Tasks extension specification, revision 2026-07-28</a>`,
+          },
+        ],
+      },
+    ],
+    advertisements: {
+      show: false,
+    },
+    referBlog: {
+      show: true,
+      title: `Agent Evals 101: Test Your Agent's Trajectory, Not Just Its Answer`,
+      slug: `agent-evals-101-test-agent-trajectory`,
+    },
   }
 ];
 
 export default blogdata;
-
