@@ -51,9 +51,9 @@ Each element of `sections[]` can have any combination of these keys (all optiona
     caption: `Optional caption shown below image`,  // optional
   },
   html: {
-    type: 'code',             // 'code' for a highlighted block, 'html' for a raw fragment (for example a table)
-    language: 'javascript',   // react-syntax-highlighter language; omit for type 'html'
-    value: `const x = 1;`,    // source for 'code', or an HTML string for 'html'
+    type: 'code',             // 'code' for a highlighted block, 'html' for a raw fragment, 'mermaid' for a diagram
+    language: 'javascript',   // react-syntax-highlighter language; omit for type 'html' and 'mermaid'
+    value: `const x = 1;`,    // source for 'code', an HTML string for 'html', or mermaid source for 'mermaid'
   },
   subSections: [ /* same shape as section, nested one level */ ],
 }
@@ -77,7 +77,8 @@ Each element of `sections[]` can have any combination of these keys (all optiona
 - `date` controls display order — posts are sorted descending by date.
 - HTML in `p` fields is parsed via `html-react-parser`. Use HTML entities for `<` / `>` in content: `&#60;` / `&#62;`.
 - Code blocks require `{ html: { type: 'code', language, value } }` — use `CodeBlockViewer` in the renderer.
-- Raw HTML fragments (tables) use `{ html: { type: 'html', value } }`. The post page parses `value` with `html-react-parser` inside `.blog-html`.
+- Raw HTML fragments (tables, callouts) use `{ html: { type: 'html', value } }`. The post page parses `value` with `html-react-parser` inside `.blog-html`.
+- Mermaid diagrams use `{ html: { type: 'mermaid', value } }` with the diagram source in `value`. `npm run render-mermaid` (also run by `npm run build`) writes an inline SVG to `src/generated/mermaid/` with Chrome. The post page inlines that SVG. Posts that do not use mermaid do not load any diagram code.
 - Blog images should be uploaded to S3 bucket `website-images-rohitcodes` in the `ap-south-1` region as `.webp`.
 - A cover can also live in `public/assets/blogs/` as WebP (`image.src`) plus a JPEG fallback (`image.fallback`). List cards, the post hero, Open Graph, Twitter, and BlogPosting JSON-LD use `src`. The JPEG is the `<img>` fallback inside `<picture>`. Relative `src` values are turned into absolute URLs for metadata and JSON-LD.
 

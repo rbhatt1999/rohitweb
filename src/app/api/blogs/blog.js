@@ -4750,6 +4750,532 @@ result     -> {'content': [{'type': 'text', 'text': 'feat/search is live on stag
       title: `Agent Evals 101: Test Your Agent's Trajectory, Not Just Its Answer`,
       slug: `agent-evals-101-test-agent-trajectory`,
     },
+  },
+  {
+    title: `Gemini Computer Use Is GA: Build an AI QA Agent That Clicks Through Your Next.js App`,
+    slug: `gemini-computer-use-ai-qa-agent-tutorial`,
+    id: 16,
+    category_id: 5,
+    description: `Gemini Computer Use went GA on Oct 30, 2026. Build an AI QA agent in Python with Playwright that tests your Next.js app like a real user, with host allowlists, safety confirmations and a pytest gate.`,
+    image: {
+      src: `/assets/blogs/gemini-computer-use-ai-qa-agent-tutorial.webp`,
+      fallback: `/assets/blogs/gemini-computer-use-ai-qa-agent-tutorial.jpg`,
+      alt: `Gemini Computer Use: build an AI QA agent that clicks through a browser and reports tests passed`,
+    },
+    owner: `Rohit Bhatt`,
+    tags: [
+      `AI developer`,
+      `Gen AI developer`,
+      `Gemini Computer Use tutorial`,
+      `Gemini Computer Use GA`,
+      `AI QA agent`,
+      `AI end-to-end testing Playwright`,
+      `computer use agent Python`,
+      `Gemini Interactions API example`,
+      `browser automation agent safety`,
+    ],
+    date: `2026-11-05`,
+    summary: `Gemini Computer Use went GA on Oct 30, 2026. Build an AI QA agent in Python with Playwright that tests your Next.js app like a real user, with host allowlists, safety confirmations and a pytest gate.`,
+    sections: [
+      {
+        p: `Coding agents now write a big chunk of the code that lands in our repos. GitHub's Octoverse 2026 report says more than 40% of pull requests in September 2026 started with an agent's first draft, about 110 million in a single month, up from 17% in March (<a href="https://github.blog/news-insights/octoverse/octoverse-commits-pushes-reach-new-highs-in-2026-as-developers-build-with-agents/" target="_blank" rel="noopener noreferrer">GitHub blog</a>).`,
+      },
+      {
+        p: `Writing code got cheap. Checking it did not. That is the conversation all over X this week: agents produce more PRs, but someone still has to confirm the feature actually works when a person clicks through it.`,
+      },
+      {
+        p: `On October 30, Google made the Gemini API's Computer Use tool generally available across both the Interactions and GenerateContent APIs (<a href="https://ai.google.dev/gemini-api/docs/changelog" target="_blank" rel="noopener noreferrer">Gemini API release notes</a>). Computer Use lets a model look at a screenshot, decide the next UI action (click, type, scroll), and hand that action back to your code to run.`,
+      },
+      {
+        p: `So in this tutorial we'll point it at the verification problem. We'll build a small <strong>AI QA agent</strong> that opens your Next.js app in a real browser, follows a test written in plain English, and returns PASS or FAIL so you can run it from pytest or CI.`,
+      },
+      {
+        h1: `What Computer Use actually is (and isn't)`,
+        p: `The important thing to understand: <strong>the model never touches your machine</strong>. It only proposes actions. Your code runs them.`,
+      },
+      {
+        p: `The loop looks like this (<a href="https://ai.google.dev/gemini-api/docs/computer-use" target="_blank" rel="noopener noreferrer">Computer Use docs</a>):`,
+        list: [
+          { p: `You send the goal plus a screenshot, with the <code>computer_use</code> tool enabled.` },
+          { p: `The model returns a <code>function_call</code> such as <code>click</code> with <code>x</code>, <code>y</code> and an <code>intent</code> field explaining why.` },
+          { p: `Your code executes it (here with Playwright).` },
+          { p: `You send back a <code>function_result</code> with the new screenshot and URL.` },
+          { p: `Repeat until the model stops calling functions.` },
+        ],
+      },
+      {
+        p: `A few details from the docs that matter for real code:`,
+        list: [
+          { p: `Coordinates come back on a <strong>0 to 999 grid</strong>, not pixels. You scale them to your viewport yourself.` },
+          { p: `There are three environments: <code>browser</code>, <code>mobile</code> (Android) and <code>desktop</code>. Each has its own action list.` },
+          { p: `A response can include a <code>safety_decision</code>. If it says <code>require_confirmation</code>, a human is supposed to approve the action before you run it.` },
+          { p: `Prompt injection detection (scanning screenshots for hidden "ignore your instructions" text) is <strong>opt-in</strong> via <code>enable_prompt_injection_detection</code>.` },
+          { p: `Supported models are <code>gemini-4-argon</code>, <code>gemini-3.8-flash</code> (the one Google recommends for computer use), <code>gemini-3.5-flash-lite</code> and <code>gemini-3-flash-preview</code>.` },
+        ],
+        html: {
+          type: `mermaid`,
+          value: `sequenceDiagram
+    participant T as Test (pytest)
+    participant A as Agent loop (Python)
+    participant G as Gemini API
+    participant B as Browser (Playwright)
+    T->>A: goal + start URL
+    A->>B: screenshot
+    A->>G: goal + screenshot
+    loop until report_result
+        G-->>A: function_call (click / type / scroll) + intent
+        A->>A: allowlist + safety checks
+        A->>B: execute action
+        A->>B: new screenshot
+        A->>G: function_result (screenshot + URL)
+    end
+    G-->>A: report_result(PASS/FAIL, reason)
+    A-->>T: verdict + log`,
+        },
+      },
+      {
+        h1: `Why use it for QA instead of plain Playwright scripts?`,
+        p: `Classic end-to-end tests are great when the UI is stable. They break when someone renames a button or moves a field, even though the feature still works for a person.`,
+      },
+      {
+        p: `A Computer Use test is written as intent: "sign up with a new email and confirm you land on the dashboard". The model finds the button by looking at the screen, the way a tester would. That makes it a good fit for:`,
+        list: [
+          { p: `Smoke-testing a preview deploy that an agent just opened a PR for.` },
+          { p: `Flows that change often (onboarding, checkout forms, settings pages).` },
+          { p: `Apps with no test IDs or API you can hook into.` },
+        ],
+      },
+      {
+        p: `It's slower and costs tokens, so it does not replace your fast unit and Playwright suites. Think of it as a few high-value journeys run on every preview deploy.`,
+      },
+      {
+        h1: `Setup`,
+        html: {
+          type: `code`,
+          language: `bash`,
+          value: `pip install "google-genai>=2.7.0" playwright pytest
+playwright install chromium
+export GEMINI_API_KEY="your-key"`,
+        },
+      },
+      {
+        p: `The docs call out <code>google-genai</code> version 2.7.0 or higher for the Interactions API Computer Use examples.`,
+      },
+      {
+        p: `We'll test a local Next.js app on <code>http://localhost:3000</code>, but any URL you own works.`,
+      },
+      {
+        h1: `Step 1: Guardrails before the model gets a mouse`,
+        p: `Before writing the loop, decide what the agent is allowed to do. Google's own safety guidance recommends a sandboxed environment, allowlists, logging every action, and a human in the loop for anything consequential.`,
+      },
+      {
+        p: `For a QA agent, the rules are simple:`,
+        list: [
+          { p: `It may only visit hosts we own (<code>localhost</code>, our preview domain).` },
+          { p: `It gets a hard step limit so a confused run can't burn tokens forever.` },
+          { p: `Any <code>require_confirmation</code> safety decision <strong>fails the test</strong> in CI, because nobody is there to approve it.` },
+          { p: `Every action and its <code>intent</code> is logged, with a screenshot per step.` },
+        ],
+        html: {
+          type: `code`,
+          language: `python`,
+          value: `# qa_agent/guardrails.py
+from urllib.parse import urlparse
+
+ALLOWED_HOSTS = {"localhost", "127.0.0.1"}  # add your preview domain here
+MAX_STEPS = 25
+
+
+def host_allowed(url: str) -> bool:
+    host = urlparse(url).hostname or ""
+    return host in ALLOWED_HOSTS
+
+
+def block_other_hosts(page) -> None:
+    """Abort any page navigation to a host outside the allowlist, however it starts."""
+    def guard(route):
+        req = route.request
+        if req.is_navigation_request() and not host_allowed(req.url):
+            route.abort()
+        else:
+            route.continue_()
+    page.route("**/*", guard)`,
+        },
+      },
+      {
+        p: `The URL check in the executor catches a bad <code>navigate</code> call, but a click on a link can also take the browser somewhere else. Routing every navigation request through <code>block_other_hosts</code> stops that at the network level, so the page never loads at all.`,
+      },
+      {
+        h1: `Step 2: A custom <code>report_result</code> function`,
+        p: `The model needs a clean way to tell us "test passed" or "test failed". Computer Use can be combined with your own function declarations (the docs show this with a <code>yield_to_user</code> example), so we add one:`,
+        html: {
+          type: `code`,
+          language: `python`,
+          value: `# qa_agent/tools.py
+COMPUTER_USE_TOOL = {
+    "type": "computer_use",
+    "environment": "browser",
+    "enable_prompt_injection_detection": True,
+}
+
+REPORT_RESULT_TOOL = {
+    "type": "function",
+    "name": "report_result",
+    "description": (
+        "Call this exactly once when the test is finished. "
+        "status is PASS if every expected outcome was observed on screen, otherwise FAIL."
+    ),
+    "parameters": {
+        "type": "object",
+        "properties": {
+            "status": {"type": "string", "enum": ["PASS", "FAIL"]},
+            "reason": {"type": "string", "description": "What you saw that led to this verdict."},
+        },
+        "required": ["status", "reason"],
+    },
+}
+
+SYSTEM_INSTRUCTION = """
+You are a QA tester for a web application.
+Follow the test steps exactly. Do not visit any other website.
+Never accept terms of service, cookie banners or payment screens on your own; if you hit one, call report_result with FAIL and explain.
+When you have checked every expected outcome, call report_result.
+Only report PASS if you actually saw the expected result on screen.
+"""`,
+        },
+      },
+      {
+        h1: `Step 3: Executing actions in Playwright`,
+        p: `This maps each action from the browser action table in the docs to Playwright. Two small changes compared to the docs sample: we use <code>ControlOrMeta+A</code> so clearing a field works on Linux CI runners and on Mac (the sample uses <code>Meta+A</code>, which only selects all on a Mac), and we handle the rest of the browser actions too, like <code>scroll</code>, <code>drag_and_drop</code> and <code>hotkey</code>.`,
+        html: {
+          type: `code`,
+          language: `python`,
+          value: `# qa_agent/executor.py
+from playwright.sync_api import Page
+
+from .guardrails import host_allowed
+
+
+# Playwright wants "Control", "Shift", "Enter"; the model may send "control" or "ctrl".
+KEY_NAMES = {"ctrl": "Control", "control": "Control", "cmd": "Meta", "command": "Meta",
+             "meta": "Meta", "alt": "Alt", "shift": "Shift", "enter": "Enter",
+             "return": "Enter", "esc": "Escape", "escape": "Escape", "tab": "Tab",
+             "backspace": "Backspace", "delete": "Delete", "space": "Space"}
+
+
+def key_name(key: str) -> str:
+    return KEY_NAMES.get(key.lower(), key)
+
+
+def to_px(value: int, size: int) -> int:
+    """Gemini returns coordinates on a 0-999 grid. Scale to real pixels."""
+    return int(value / 1000 * size)
+
+
+def run_action(page: Page, name: str, args: dict, width: int, height: int) -> dict:
+    """Execute one Computer Use action. Returns extra info for the function_result."""
+    if name == "navigate":
+        if not host_allowed(args["url"]):
+            return {"error": f"Blocked navigation to {args['url']}: host not allowed"}
+        page.goto(args["url"])
+    elif name in ("click", "double_click", "triple_click", "right_click", "middle_click",
+                  "move", "mouse_down", "mouse_up"):
+        x, y = to_px(args["x"], width), to_px(args["y"], height)
+        if name == "click":
+            page.mouse.click(x, y)
+        elif name == "double_click":
+            page.mouse.dblclick(x, y)
+        elif name == "triple_click":
+            page.mouse.click(x, y, click_count=3)
+        elif name == "mouse_down":
+            page.mouse.move(x, y)
+            page.mouse.down()
+        elif name == "mouse_up":
+            page.mouse.move(x, y)
+            page.mouse.up()
+        elif name == "right_click":
+            page.mouse.click(x, y, button="right")
+        elif name == "middle_click":
+            page.mouse.click(x, y, button="middle")
+        else:
+            page.mouse.move(x, y)
+    elif name == "type":
+        if "x" in args and "y" in args:
+            page.mouse.click(to_px(args["x"], width), to_px(args["y"], height))
+        page.keyboard.press("ControlOrMeta+A")
+        page.keyboard.press("Backspace")
+        page.keyboard.type(args["text"])
+        if args.get("press_enter"):
+            page.keyboard.press("Enter")
+    elif name == "scroll":
+        page.mouse.move(to_px(args["x"], width), to_px(args["y"], height))
+        dist = args.get("magnitude_in_pixels", 300)
+        dx, dy = {"up": (0, -dist), "down": (0, dist),
+                  "left": (-dist, 0), "right": (dist, 0)}[args["direction"]]
+        page.mouse.wheel(dx, dy)
+    elif name == "drag_and_drop":
+        page.mouse.move(to_px(args["start_x"], width), to_px(args["start_y"], height))
+        page.mouse.down()
+        page.mouse.move(to_px(args["end_x"], width), to_px(args["end_y"], height), steps=10)
+        page.mouse.up()
+    elif name == "press_key":
+        page.keyboard.press(key_name(args["key"]))
+    elif name == "key_down":
+        page.keyboard.down(key_name(args["key"]))
+    elif name == "key_up":
+        page.keyboard.up(key_name(args["key"]))
+    elif name == "hotkey":
+        page.keyboard.press("+".join(key_name(k) for k in args["keys"]))
+    elif name == "go_back":
+        page.go_back()
+    elif name == "go_forward":
+        page.go_forward()
+    elif name == "wait":
+        page.wait_for_timeout(args.get("seconds", 1) * 1000)
+    elif name == "take_screenshot":
+        pass  # we send a fresh screenshot after every action anyway
+    else:
+        return {"error": f"Unsupported action: {name}"}
+
+    try:
+        page.wait_for_load_state(timeout=5000)
+    except Exception:
+        pass
+    # page.wait_for_timeout, not time.sleep: the sync API only sees new page events while it waits.
+    page.wait_for_timeout(1000)
+
+    # Second line of defence behind block_other_hosts: check where we ended up.
+    if not host_allowed(page.url):
+        bad_url = page.url
+        page.go_back()
+        return {"error": f"Left allowed hosts ({bad_url}); navigated back"}
+    return {}`,
+        },
+      },
+      {
+        h1: `Step 4: The agent loop`,
+        p: `Now the core loop. It uses the Interactions API, where each turn points at the last one with <code>previous_interaction_id</code>, so the server keeps the conversation state.`,
+        html: {
+          type: `code`,
+          language: `python`,
+          value: `# qa_agent/agent.py
+import base64
+import json
+from dataclasses import dataclass, field
+from pathlib import Path
+
+from google import genai
+from playwright.sync_api import sync_playwright
+
+from .executor import run_action
+from .guardrails import MAX_STEPS, block_other_hosts
+from .tools import COMPUTER_USE_TOOL, REPORT_RESULT_TOOL, SYSTEM_INSTRUCTION
+
+MODEL = "gemini-3.8-flash"
+WIDTH, HEIGHT = 1440, 900
+
+
+@dataclass
+class Verdict:
+    status: str
+    reason: str
+    steps: list = field(default_factory=list)
+
+
+def b64_png(page) -> str:
+    return base64.b64encode(page.screenshot(type="png")).decode("utf-8")
+
+
+def run_qa_test(start_url: str, test_steps: str, log_dir: str = "qa_logs") -> Verdict:
+    client = genai.Client()
+    logs = Path(log_dir)
+    logs.mkdir(exist_ok=True)
+    tools = [COMPUTER_USE_TOOL, REPORT_RESULT_TOOL]
+    history = []
+
+    with sync_playwright() as p:
+        browser = p.chromium.launch(headless=True)
+        page = browser.new_context(viewport={"width": WIDTH, "height": HEIGHT}).new_page()
+        block_other_hosts(page)
+        page.goto(start_url)
+
+        interaction = client.interactions.create(
+            model=MODEL,
+            system_instruction=SYSTEM_INSTRUCTION,
+            input=[
+                {"type": "text", "text": f"Start URL: {start_url}\\n\\nTest:\\n{test_steps}"},
+                {"type": "image", "data": b64_png(page), "mime_type": "image/png"},
+            ],
+            tools=tools,
+        )
+
+        for step in range(1, MAX_STEPS + 1):
+            calls = [s for s in interaction.steps if s.type == "function_call"]
+            if not calls:
+                browser.close()
+                return Verdict("FAIL", "Agent stopped without calling report_result", history)
+
+            results = []
+            for call in calls:
+                args = dict(call.arguments or {})
+
+                if call.name == "report_result":
+                    browser.close()
+                    return Verdict(args["status"], args["reason"], history)
+
+                # Nobody is watching in CI, so a confirmation request is a failure.
+                decision = args.get("safety_decision") or {}
+                if decision.get("decision") == "require_confirmation":
+                    browser.close()
+                    return Verdict(
+                        "FAIL",
+                        f"Safety confirmation required: {decision.get('explanation', '')}",
+                        history,
+                    )
+
+                print(f"[{step}] {call.name}: {args.get('intent', '')}")
+                extra = run_action(page, call.name, args, WIDTH, HEIGHT)
+                shot = page.screenshot(type="png")
+                (logs / f"step_{step:02d}_{call.name}.png").write_bytes(shot)
+                history.append({"step": step, "action": call.name, "args": args, **extra})
+
+                results.append({
+                    "type": "function_result",
+                    "name": call.name,
+                    "call_id": call.id,
+                    "result": [
+                        {"type": "text", "text": json.dumps({"url": page.url, **extra})},
+                        {"type": "image",
+                         "data": base64.b64encode(shot).decode("utf-8"),
+                         "mime_type": "image/png"},
+                    ],
+                })
+
+            interaction = client.interactions.create(
+                model=MODEL,
+                previous_interaction_id=interaction.id,
+                input=results,
+                tools=tools,
+            )
+
+        browser.close()
+        return Verdict("FAIL", f"Hit the {MAX_STEPS}-step limit", history)`,
+        },
+      },
+      {
+        p: `A few design choices worth calling out:`,
+        list: [
+          { p: `<strong>The verdict comes from a function call, not free text.</strong> Parsing "looks good to me!" out of prose is fragile. A typed <code>report_result</code> call is easy to assert on.` },
+          { p: `<strong>No function call means FAIL.</strong> If the model just stops and chats, we don't treat silence as success.` },
+          { p: `<strong>Every step is logged with its <code>intent</code>.</strong> When a test fails, you read the intents and screenshots and immediately see where the agent got confused. This is the same idea as testing an agent's trajectory, which I covered in <a href="/blogs/agent-evals-101-test-agent-trajectory">Agent Evals 101</a>.` },
+        ],
+      },
+      {
+        h1: `Step 5: Run it from pytest`,
+        p: `Write your journeys as plain English and gate them in pytest:`,
+        html: {
+          type: `code`,
+          language: `python`,
+          value: `# tests/test_journeys.py
+import os
+import pytest
+
+from qa_agent.agent import run_qa_test
+
+BASE_URL = os.environ.get("QA_BASE_URL", "http://localhost:3000")
+
+
+@pytest.mark.slow
+def test_signup_lands_on_dashboard():
+    verdict = run_qa_test(
+        start_url=f"{BASE_URL}/signup",
+        test_steps="""
+        1. Fill the sign-up form with name "QA Bot", email "qa+{run}@example.com" and password "Test-Password-123".
+        2. Submit the form.
+        Expected: you land on a page with the heading "Dashboard" and the text "QA Bot" is visible.
+        """.replace("{run}", os.environ.get("GITHUB_RUN_ID", "local")),
+    )
+    assert verdict.status == "PASS", verdict.reason
+
+
+@pytest.mark.slow
+def test_empty_cart_shows_message():
+    verdict = run_qa_test(
+        start_url=f"{BASE_URL}/cart",
+        test_steps="Expected: the page says the cart is empty and shows a link back to products.",
+    )
+    assert verdict.status == "PASS", verdict.reason`,
+        },
+      },
+      {
+        p: `Register the marker once in <code>pytest.ini</code> (<code>markers = slow: AI journeys</code>) so pytest doesn't warn about it, then run <code>pytest -m slow -s</code> and watch the intents stream by. In CI, point <code>QA_BASE_URL</code> at the preview deploy and upload the <code>qa_logs/</code> folder as an artifact so failures come with screenshots.`,
+      },
+      {
+        html: {
+          type: `html`,
+          value: `<blockquote class="blog-callout"><p>Tip: always write the <strong>Expected</strong> line. Without it, the model decides for itself what "working" means, and that's exactly the vibe check we're trying to get away from.</p></blockquote>`,
+        },
+      },
+      {
+        h1: `Choosing a model and keeping cost sane`,
+        p: `Computer Use has no separate fee; you pay the normal token price of the model you use, and every step sends a screenshot. A few practical notes:`,
+        list: [
+          { p: `Start with <code>gemini-3.8-flash</code>, which the docs recommend for computer use. Move a journey to <code>gemini-4-argon</code> only if it needs harder reasoning.` },
+          { p: `Check current pricing before you put this in CI. On the <a href="https://ai.google.dev/gemini-api/docs/pricing" target="_blank" rel="noopener noreferrer">Gemini API pricing page</a>, Gemini 3.8 Flash paid-tier input is listed at $0.75 per million tokens through December 31, 2026 and $1.50 starting January 1, 2027, with output going from $3.75 to $7.50.` },
+          { p: `Keep <code>MAX_STEPS</code> tight per journey. A sign-up flow should not need 25 steps.` },
+          { p: `Run AI journeys on preview deploys and nightly, not on every commit.` },
+        ],
+      },
+      {
+        h1: `Security: treat the screen as untrusted input`,
+        p: `A computer use agent reads whatever is on the screen, and that includes text an attacker controls (user-generated content, a third-party widget, an ad). That's why this tutorial:`,
+        list: [
+          { p: `turns on <code>enable_prompt_injection_detection</code>,` },
+          { p: `restricts the agent to an allowlist of hosts and checks the URL after every action,` },
+          { p: `fails on any <code>require_confirmation</code> instead of auto-approving it,` },
+          { p: `runs headless in a throwaway browser context with test accounts only.` },
+        ],
+      },
+      {
+        p: `Don't run this against production with real user data, and don't give it a browser profile that is signed in to anything important. Google's docs say the same: supervise closely and avoid tasks with sensitive data or actions that can't be undone.`,
+      },
+      {
+        h1: `When not to use it`,
+        list: [
+          { p: `Stable flows that already have solid Playwright tests with test IDs. Deterministic tests are faster, cheaper and never hallucinate a pass.` },
+          { p: `Anything that needs pixel-exact visual checks. Use visual regression tools for that.` },
+          { p: `Load or performance testing. One agent clicking slowly tells you nothing about scale.` },
+        ],
+      },
+      {
+        h1: `Wrap-up`,
+        p: `Agents are now writing a large share of our pull requests. The bottleneck has moved to proving those changes work. Gemini Computer Use going GA gives you a practical new tool for that: describe a user journey in English, let the model click through it, and get back a typed PASS or FAIL with a screenshot trail.`,
+      },
+      {
+        p: `The pattern is the part to keep, whatever model you use: the model proposes, your code executes, guardrails sit in between, and every step is logged.`,
+      },
+      {
+        p: `If you want to see what I build, check out <a href="/work">my work</a>, or read more <a href="/about">about me</a>. If you're setting up agents for coding too, my <a href="/blogs/the-definitive-claude-code-playbook-2026">Claude Code playbook</a> covers the other side of this loop.`,
+      },
+      {
+        p: `<strong>Sources</strong>`,
+        list: [
+          { p: `Gemini API release notes, Computer Use GA (Oct 30, 2026): <a href="https://ai.google.dev/gemini-api/docs/changelog" target="_blank" rel="noopener noreferrer">https://ai.google.dev/gemini-api/docs/changelog</a>` },
+          { p: `Gemini Computer Use documentation (actions, safety policies, models): <a href="https://ai.google.dev/gemini-api/docs/computer-use" target="_blank" rel="noopener noreferrer">https://ai.google.dev/gemini-api/docs/computer-use</a>` },
+          { p: `Gemini API pricing: <a href="https://ai.google.dev/gemini-api/docs/pricing" target="_blank" rel="noopener noreferrer">https://ai.google.dev/gemini-api/docs/pricing</a>` },
+          { p: `GitHub Octoverse 2026: <a href="https://github.blog/news-insights/octoverse/octoverse-commits-pushes-reach-new-highs-in-2026-as-developers-build-with-agents/" target="_blank" rel="noopener noreferrer">https://github.blog/news-insights/octoverse/octoverse-commits-pushes-reach-new-highs-in-2026-as-developers-build-with-agents/</a>` },
+          { p: `Google Cloud Agent Platform release notes (Computer Use GA with HITL policies): <a href="https://docs.cloud.google.com/gemini-enterprise-agent-platform/release-notes" target="_blank" rel="noopener noreferrer">https://docs.cloud.google.com/gemini-enterprise-agent-platform/release-notes</a>` },
+        ],
+      },
+    ],
+    advertisements: {
+      show: false,
+    },
+    referBlog: {
+      show: true,
+      title: `Agent Evals 101: Test Your Agent's Trajectory, Not Just Its Answer`,
+      slug: `agent-evals-101-test-agent-trajectory`,
+    },
   }
 ];
 
