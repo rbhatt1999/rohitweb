@@ -74,6 +74,8 @@ When building new dark-mode-specific visual effects (glows, neon borders, bloom)
 | `.anchor-tag` | Applied to parsed HTML sections; links inside get accent color + underline. Inline `code` uses `var(--mono)`. |
 | `.sectionAnchor` | Wrapper for blog sections |
 | `.blog-html` | Wrapper for raw HTML fragments (tables). Borders use `var(--border)`; cell text uses `var(--fg2)` / `var(--fg1)`. |
+| `.blog-callout` | Blockquote inside a post. Left border is `var(--accent)`; background is `var(--surface)`. |
+| `.mermaid-diagram` | Inline mermaid SVG. Fills, strokes, and text use `var(--paper-2)`, `var(--paper-3)`, `var(--accent)`, `var(--fg1)`, `var(--fg2)`, and `var(--border2)`, so the diagram follows light and dark. |
 | `.bf-cover` | Featured blog-index image. Fills the aside; background is `var(--paper-2)`. |
 | `.pc-media` | Thumbnail on a blog-index card. 16:9 crop; background is `var(--paper-2)`. |
 

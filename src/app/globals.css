@@ -1198,6 +1198,64 @@ html.js [data-reveal].in { opacity: 1; transform: none; }
   color: var(--fg2);
 }
 .blog-html th { color: var(--fg1); font-weight: 600; }
+.blog-callout {
+  margin: 0;
+  padding: 0.9rem 1rem;
+  border-left: 3px solid var(--accent);
+  background: var(--surface);
+  border-radius: 0 12px 12px 0;
+}
+.blog-callout p { margin: 0; color: var(--fg2); }
+.mermaid-diagram {
+  width: 100%;
+  margin: 0.35rem 0 0;
+  overflow-x: auto;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 12px 8px 4px;
+}
+.mermaid-diagram svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  font-family: var(--sans);
+}
+.mermaid-diagram text,
+.mermaid-diagram .messageText,
+.mermaid-diagram .labelText,
+.mermaid-diagram .loopText,
+.mermaid-diagram text.actor tspan {
+  fill: var(--fg1);
+  stroke: none;
+  font-family: var(--sans) !important;
+}
+.mermaid-diagram rect.actor {
+  fill: var(--paper-3);
+  stroke: var(--accent);
+  stroke-width: 1.5px;
+}
+.mermaid-diagram .actor-line { stroke: var(--border2); }
+.mermaid-diagram .messageLine0,
+.mermaid-diagram .messageLine1 {
+  stroke: var(--fg2);
+  fill: none;
+}
+.mermaid-diagram .labelBox {
+  fill: var(--paper-2);
+  stroke: var(--accent);
+}
+.mermaid-diagram .loopLine {
+  stroke: var(--accent);
+  fill: none;
+}
+.mermaid-diagram marker path {
+  fill: var(--fg2);
+  stroke: none;
+}
+@media (max-width: 720px) {
+  .mermaid-diagram svg { min-width: 680px; }
+}
 .active_underline { text-decoration: underline; text-underline-offset: 4px; }
 
 /* Loading spinner */

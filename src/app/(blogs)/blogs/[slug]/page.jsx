@@ -12,6 +12,7 @@ import { BiLogoWhatsapp } from 'react-icons/bi'
 import CodeBlockViewer from '@/components/blogs/CodeBlockViewer'
 import BlogCover from '@/components/blogs/BlogCover'
 import { getPost, sortedBlogs } from '@/lib/blog-queries'
+import { mermaidMarkup } from '@/lib/mermaid-svg'
 import { SITE_URL, TWITTER_HANDLE, metaDescription, withBrand } from '@/lib/site'
 
 export function generateStaticParams() {
@@ -65,6 +66,28 @@ function coverSrc(src) {
 
 function BlogImage({ src, fallback, alt, priority = false, className = 'w-full rounded-lg h-auto' }) {
   return <BlogCover src={src} fallback={fallback} alt={alt} priority={priority} className={className} />
+}
+
+function SectionHtml({ html }) {
+  if (!html) return null
+  if (html.type === 'code') {
+    return (
+      <div className="flex flex-col justify-center self-center gap-1 w-full">
+        <CodeBlockViewer code={html.value} language={html.language} />
+      </div>
+    )
+  }
+  if (html.type === 'mermaid') {
+    return (
+      <figure className="mermaid-diagram" aria-label="Diagram">
+        <div dangerouslySetInnerHTML={{ __html: mermaidMarkup(html.value) }} />
+      </figure>
+    )
+  }
+  if (html.type === 'html') {
+    return <div className="blog-html anchor-tag blog-body w-full">{parse(html.value)}</div>
+  }
+  return null
 }
 
 const longdateConvert = (date) => {
@@ -167,19 +190,7 @@ export default async function page({ params }) {
                           }
                         </div>
                       }
-                      {
-                        section.html &&
-                        <>
-                          {
-                            section.html.type === 'code' && <div className="flex flex-col justify-center self-center gap-1 w-full">
-                              <CodeBlockViewer code={section.html.value} language={section.html.language} />
-                            </div>
-                          }
-                          {
-                            section.html.type === 'html' && <div className="blog-html anchor-tag blog-body w-full">{parse(section.html.value)}</div>
-                          }
-                        </>
-                      }
+                      <SectionHtml html={section.html} />
                       {
                         section.subSections && (
                           <section className="flex flex-col justify-center flex-1 gap-5 rounded-lg pt-5">
@@ -222,19 +233,7 @@ export default async function page({ params }) {
                                       }
                                     </div>
                                   }
-                                  {
-                                    subSection.html &&
-                                    <>
-                                      {
-                                        subSection.html.type === 'code' && <div className="flex flex-col justify-center self-center gap-1 w-full">
-                                          <CodeBlockViewer code={subSection.html.value} language={subSection.html.language} />
-                                        </div>
-                                      }
-                                      {
-                                        subSection.html.type === 'html' && <div className="blog-html anchor-tag blog-body w-full">{parse(subSection.html.value)}</div>
-                                      }
-                                    </>
-                                  }
+                                  <SectionHtml html={subSection.html} />
                                 </div>
                               ))
                             }

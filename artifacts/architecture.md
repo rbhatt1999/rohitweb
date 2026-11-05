@@ -59,6 +59,7 @@ src/
 │   ├── fonts.js                    # next/font/local definitions (all fonts self-hosted in public/fonts/)
 │   ├── site.js                     # Canonical origin, titles, Person JSON-LD fields
 │   ├── projects.js                 # Featured projects (Sadhak AI, Stay a While) and smaller repos
+│   ├── mermaid-svg.js              # Inlines a pre-rendered mermaid SVG for a blog section
 │   └── locator-runtime-stub.js     # No-op stub used in production build
 └── utils/
     ├── url.js                      # Re-exports NEXT_PUBLIC_URL env var
@@ -90,4 +91,5 @@ Pages read the static arrays in-process. They do not HTTP-fetch the site's own A
 - **Section IDs for scroll nav**: `id="home"`, `id="work"`, `id="skills"`, `id="writing"`, `id="about"` — nav links use `href="/#work"` etc.
 - **Framer Motion**: all home sections animate in on scroll via `useInView` + `motion` components.
 - **Blog images**: usually hosted on S3 (`https://website-images-rohitcodes.s3.ap-south-1.amazonaws.com/`). A cover can also live in `public/assets/blogs/` as WebP plus a JPEG fallback.
+- **Mermaid**: `scripts/render-mermaid.mjs` turns `html.type === 'mermaid'` sections into SVGs under `src/generated/mermaid/` at build time. The post page inlines the SVG. There is no mermaid code in the client bundle.
 - **No test suite** — validate by running dev server.
