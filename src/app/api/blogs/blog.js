@@ -5276,6 +5276,352 @@ def test_empty_cart_shows_message():
       title: `Agent Evals 101: Test Your Agent's Trajectory, Not Just Its Answer`,
       slug: `agent-evals-101-test-agent-trajectory`,
     },
+  },
+  {
+    title: `Gemini Decisions API Tutorial: Stop Parsing LLM Text When Your Code Needs a Decision`,
+    slug: `gemini-decisions-api-calibrated-routing-tutorial`,
+    id: 17,
+    category_id: 5,
+    description: `Google's new Gemini Decisions API returns calibrated probabilities instead of text. Learn how it works and build a confidence-gated ticket router and a LangChain model router in Python.`,
+    image: {
+      src: `/assets/blogs/gemini-decisions-api-calibrated-routing-tutorial.webp`,
+      fallback: `/assets/blogs/gemini-decisions-api-calibrated-routing-tutorial.jpg`,
+      alt: `Gemini Decisions API: calibrated probabilities route billing at 0.91 to auto and lower scores to human review`,
+    },
+    owner: `Rohit Bhatt`,
+    tags: [
+      `AI developer`,
+      `Gen AI developer`,
+      `Gemini Decisions API tutorial`,
+      `gemini-decision-1`,
+      `LLM classification with calibrated probabilities`,
+      `LLM routing in Python`,
+      `LangChain model router middleware`,
+      `confidence threshold human in the loop`,
+    ],
+    date: `2026-11-16`,
+    summary: `Google's new Gemini Decisions API returns calibrated probabilities instead of text. Learn how it works and build a confidence-gated ticket router and a LangChain model router in Python.`,
+    sections: [
+      {
+        p: `A lot of the LLM calls in a real AI app aren't asking for prose. They're asking for a decision. Is this ticket about billing? Is this tool call safe to run? Does this request need the big model or the cheap one? Should a human look at this?`,
+      },
+      {
+        p: `Most of us handle that by asking a chat model to "respond with one word" or by forcing JSON output, then parsing it and hoping. You pay for output tokens, you wait for decoding, and you get an answer with no honest sense of how sure the model was.`,
+      },
+      {
+        p: `On November 11, 2026 Google released the Gemini Decisions API and a new model, Gemini Decision 1 (<code>gemini-decision-1</code>), built for exactly this. It doesn't generate text at all. It scores the options you give it and returns calibrated probabilities plus a confidence number your code can branch on.`,
+      },
+      {
+        p: `In this post I'll explain how it works, when to use it instead of structured output, and then build two things in Python:`,
+        list: [
+          { p: `A support ticket router that only acts automatically when the model is confident, and sends everything else to a human.` },
+          { p: `A LangChain agent that uses the Decisions API to pick between Gemini 4 Hydrogen and Gemini 4 Carbon per request.` },
+        ],
+      },
+      {
+        h1: `What the Decisions API actually is`,
+        p: `You send one shared input (text, JSON as text, images, audio, video or PDFs) and a map of questions. You get back one typed answer per question. According to Google's docs:`,
+        list: [
+          { p: `It evaluates up to 1,000 questions per request against the same input, in a single forward pass.` },
+          { p: `Every question is scored independently. Questions can't see each other, so adding one doesn't change the others.` },
+          { p: `Output tokens are always 0. Pricing is $0.10 per 1M input tokens. The shared input is billed once per request no matter how many questions you ask; each question adds only its own instruction and criteria tokens.` },
+          { p: `Google quotes 150 to 250 ms end-to-end latency on contexts up to 16K tokens, staying nearly flat from 1 to 100 questions.` },
+          { p: `The context window is 262,144 tokens across the input and all questions.` },
+        ],
+      },
+      {
+        p: `There are three question types:`,
+        html: {
+          type: `html`,
+          value: `<table><thead><tr><th>Type</th><th>Use it for</th><th>You get back</th></tr></thead><tbody><tr><td><code>noul</code> (yes/no)</td><td>"Is this true?"</td><td><code>noul</code> (probability of yes, 0.01 to 0.99) and <code>confidence</code></td></tr><tr><td><code>choice</code></td><td>Pick one of 2 to 255 options</td><td><code>choice</code>, <code>probabilities</code> for every option, <code>confidence</code></td></tr><tr><td><code>score</code></td><td>Rate on an ordered rubric</td><td><code>score</code> (probability-weighted level), <code>probabilities</code>, <code>legend</code>, <code>confidence</code></td></tr></tbody></table>`,
+        },
+      },
+      {
+        p: `<code>confidence</code> is the probability that the top answer is right. For yes/no it's max(noul, 1 - noul). For choice and score it's the probability of the top option or level. That's the real shift: "billing at 0.99" and "billing at 0.41" are different answers, and your code can treat them differently.`,
+      },
+      {
+        h1: `Decisions API or structured output?`,
+        p: `Google's guidance is to use the Decisions API when you need a yes/no probability, one option from a fixed set, or a rating on a fixed scale; when you want calibrated probabilities you can threshold; when you're running many independent checks over the same input; and when you care about low latency and zero output cost. Use a generative call (the Interactions API or structured output) for generated text, extracted values in your own JSON schema, tool calls with arguments, and multi-step reasoning.`,
+      },
+      {
+        p: `A simple rule: if the answer is a branch in your code, it's a decision. If it's content, it's generation.`,
+      },
+      {
+        h1: `Setup`,
+        html: {
+          type: `code`,
+          language: `bash`,
+          value: `pip install -U google-genai   # needs 3.2+
+export GEMINI_API_KEY=your-key-here`,
+        },
+      },
+      {
+        html: {
+          type: `code`,
+          language: `python`,
+          value: `from google import genai
+
+client = genai.Client(http_options={"api_version": "v1beta"})
+
+result = client.decisions.create(
+    model="gemini-decision-1",
+    input="The blue mug I ordered on Monday arrived cracked on Wednesday.",
+    questions={"is_damaged": {"type": "noul", "instructions": "Did the item arrive damaged?"}},
+)
+
+answer = result.answers["is_damaged"]
+print(f"P(yes)={answer.noul:.2f} confidence={answer.confidence:.2f}")`,
+        },
+      },
+      {
+        p: `The model never sees your question keys, so the full question goes in <code>instructions</code>. <code>usage.total_output_tokens</code> is always 0.`,
+      },
+      {
+        h1: `Build 1: a confidence-gated support ticket router`,
+        html: {
+          type: `code`,
+          language: `python`,
+          value: `# router.py
+import json
+from dataclasses import dataclass
+from google import genai
+
+client = genai.Client(http_options={"api_version": "v1beta"})
+
+QUESTIONS = {
+    "in_scope": {
+        "type": "noul",
+        "instructions": "Is \`message\` a request about an existing order or account?",
+    },
+    "department": {
+        "type": "choice",
+        "instructions": "Which team should handle \`message\`?",
+        "criteria": {
+            "billing": "Payments, invoices, double charges and refunds.",
+            "shipping": "Delivery, tracking and items damaged in transit.",
+            "technical": "Problems using the product or app.",
+            "other": "Anything outside these categories.",
+        },
+    },
+    "urgency": {
+        "type": "score",
+        "instructions": "How urgent is \`message\` for the customer?",
+        "criteria": [
+            "No time pressure.",
+            "Wants a fix soon but nothing is blocked.",
+            "Blocked right now or threatening to cancel.",
+        ],
+    },
+}
+
+SCOPE_MIN = 0.80  # starting points; tune on your own labeled tickets
+DEPT_MIN = 0.70
+
+
+@dataclass
+class Route:
+    queue: str
+    urgent: bool
+    reason: str
+
+
+def route_ticket(ticket: dict) -> Route:
+    payload = {"customer_tier": ticket["tier"], "message": ticket["message"]}
+    result = client.decisions.create(
+        model="gemini-decision-1",
+        input=json.dumps(payload),
+        questions=QUESTIONS,
+    )
+    a = result.answers
+    urgent = a["urgency"].score >= 1.5
+
+    if a["in_scope"].noul < SCOPE_MIN:
+        return Route("human_review", urgent, f"scope p={a['in_scope'].noul:.2f}")
+
+    dept = a["department"]
+    if dept.choice == "other" or dept.confidence < DEPT_MIN:
+        return Route("human_review", urgent, f"{dept.choice} conf={dept.confidence:.2f}")
+
+    return Route(dept.choice, urgent, f"{dept.choice} conf={dept.confidence:.2f}")
+
+
+if __name__ == "__main__":
+    for t in [
+        {"tier": "Gold", "message": "I was charged twice for order 8821. Fix it today or I cancel."},
+        {"tier": "Free", "message": "The export button does nothing in Safari."},
+        {"tier": "Free", "message": "Do you have a podcast?"},
+    ]:
+        print(route_ticket(t))`,
+        },
+      },
+      {
+        p: `A few design choices here, all from Google's best-practice notes:`,
+        list: [
+          { p: `<strong>Atomic questions, combined in code.</strong> There's a scope check, a department choice and an urgency score, and the <code>if</code> logic lives in Python where you can test it.` },
+          { p: `<strong>A separate scope check.</strong> A <code>choice</code> question always spreads probability across your options, even when none of them fits.` },
+          { p: `<strong>Use <code>other</code>, not <code>none_of_the_above</code>.</strong> The API sorts option keys alphabetically.` },
+          { p: `<strong>Keep rubric levels linear.</strong> <code>score</code> is a probability-weighted average of level indices. If you need a hard level, use <code>level = max(p, key=p.get)</code> and then <code>legend[level]</code>.` },
+          { p: `<strong>Treat input as untrusted.</strong> Customers can argue for their own classification, so test adversarial messages and keep a human on anything that moves money.` },
+        ],
+      },
+      {
+        h2: `Picking thresholds with your own data`,
+        html: {
+          type: `code`,
+          language: `python`,
+          value: `# tune_threshold.py
+import csv
+from google import genai
+from router import QUESTIONS
+
+client = genai.Client(http_options={"api_version": "v1beta"})
+rows = list(csv.DictReader(open("labeled_tickets.csv")))  # columns: message,label
+
+scored = []
+for r in rows:
+    d = client.decisions.create(
+        model="gemini-decision-1",
+        input=r["message"],
+        questions={"department": QUESTIONS["department"]},
+    ).answers["department"]
+    scored.append((d.confidence, d.choice == r["label"]))
+
+for t in [0.5, 0.6, 0.7, 0.8, 0.9]:
+    auto = [ok for conf, ok in scored if conf >= t]
+    if auto:
+        print(
+            f"threshold={t:.1f} automated={len(auto)/len(scored):.0%} "
+            f"accuracy_when_automated={sum(auto)/len(auto):.0%}"
+        )`,
+        },
+      },
+      {
+        p: `This shows how much traffic you can automate at a given accuracy. Pick the lowest threshold whose accuracy you're comfortable with, and let the rest go to people.`,
+      },
+      {
+        h1: `Build 2: route each agent request to the right Gemini model with LangChain`,
+        p: `Gemini 4 Hydrogen (Nov 12) is the fast everyday model, and Gemini 4 Carbon (Nov 10) is for long-horizon work. <code>GoogleGenAIClassifier</code> is in beta and needs <code>langchain-google-genai&#62;=4.5.0</code>. The middleware below also needs <code>langchain&#62;=1.5.0</code>.`,
+        html: {
+          type: `code`,
+          language: `python`,
+          value: `from langchain.agents import create_agent
+from langchain.agents.middleware import ModelChoice, ModelRouterMiddleware
+from langchain_google_genai import GoogleGenAIClassifier
+
+router = ModelRouterMiddleware(
+    choices={
+        "fast": ModelChoice(
+            model="google_genai:gemini-4-hydrogen",
+            criteria="Simple, well-scoped tasks.",
+        ),
+        "powerful": ModelChoice(
+            model="google_genai:gemini-4-carbon",
+            criteria="Complex tasks that need deeper reasoning.",
+        ),
+    },
+    instructions="Choose the least costly model that can complete the task.",
+    classifier=GoogleGenAIClassifier(model="gemini-decision-1"),
+)
+
+agent = create_agent("google_genai:gemini-4-hydrogen", middleware=[router])
+
+for prompt in [
+    "What is 2 + 2?",
+    "Plan a migration of a Rails 6 monolith's background jobs from Sidekiq to Solid Queue, with a rollback strategy.",
+]:
+    result = agent.invoke({"messages": [{"role": "user", "content": prompt}]})
+    print(result["model_route"].choice, "-", prompt[:50])`,
+        },
+      },
+      {
+        p: `Google says Gemini Notebook uses the Decisions API as a real-time router across model tiers. LangChain's <code>AutoModeMiddleware</code> uses the same classifier to block risky tool calls, and destructive ones count as risky by default. It's a cheap first gate, but keep real permissions and human approval behind anything destructive.`,
+      },
+      {
+        p: `You can also call the classifier directly, without the agent middleware. Pass <code>Noul</code>, <code>Choice</code>, and <code>Score</code> questions from <code>langchain_core.decisions</code>. Answers come back grouped by type on <code>nouls</code>, <code>choices</code>, and <code>scores</code>:`,
+        html: {
+          type: `code`,
+          language: `python`,
+          value: `from langchain_core.decisions import Choice, Noul, Score
+from langchain_google_genai import GoogleGenAIClassifier
+
+classifier = GoogleGenAIClassifier(model="gemini-decision-1")
+
+response = classifier.invoke(
+    {
+        "state": "The blue mug I ordered arrived cracked. Fix this today!",
+        "questions": {
+            "damaged": Noul(
+                instructions="Did the item arrive damaged?",
+                criteria={"true": "The item is broken, cracked, or dented."},
+            ),
+            "department": Choice(
+                instructions="Which team should handle this request?",
+                criteria={
+                    "billing": "Payment or refund questions.",
+                    "shipping": "Delivery problems or damaged items.",
+                    "other": None,
+                },
+            ),
+            "frustration": Score(
+                instructions="How frustrated does the customer appear?",
+                criteria=["Calm.", "Concerned but civil.", "Very angry."],
+            ),
+        },
+    }
+)
+
+print(response.nouls["damaged"].noul)
+print(response.choices["department"].choice, response.choices["department"].confidence)
+print(response.scores["frustration"].score)`,
+        },
+      },
+      {
+        p: `LangChain's <code>Noul</code> answers don't include a <code>confidence</code> field. The Decisions API still returns one (<code>max(noul, 1 - noul)</code>), but LangChain leaves it off because you can compute it from <code>noul</code>.`,
+      },
+      {
+        h1: `It's multimodal`,
+        p: `The input can mix text, images, audio, video and PDFs. You can check an invoice PDF for a PO number and categorize it in one call, score a call recording's pacing and tone without a separate transcription step, or check a photo for damage with <code>resolution: "low"</code>. Inline bytes go up to 100 MB per request (50 MB for PDFs). External HTTPS URLs are capped at 15 MB. Larger or reusable files should go through the Files API.`,
+      },
+      {
+        h1: `Limits to know`,
+        list: [
+          { p: `It's only on the Gemini Developer API (v1beta). Google Cloud support is still "coming soon".` },
+          { p: `There's no context caching, Batch API or Flex/Priority inference.` },
+          { p: `No YouTube or gs:// URIs, and no history, tool-call or thought blocks as input.` },
+          { p: `Yes/no probabilities are clamped to 0.01 to 0.99.` },
+          { p: `Blocked inputs return HTTP 400 with an <code>error.code</code> such as <code>safety</code>.` },
+          { p: `Do number and date comparisons in code, not in a question.` },
+        ],
+      },
+      {
+        h1: `Where to use this first`,
+        p: `Look for the LLM calls whose output you immediately parse into an <code>if</code>: intent routing, moderation, "should the agent stop or continue", ranking retrieved chunks, tool selection. Swap one of them for a Decisions API call, log the confidence next to outcomes for a week, and pick thresholds from real data.`,
+      },
+      {
+        p: `The bigger idea is to separate the parts of your system that need words from the parts that need decisions, and give the decision parts a number you can trust.`,
+      },
+      {
+        p: `If you want to see the kind of AI products I build, have a look at <a href="/work">my work</a>, or read more <a href="/about">about me</a>.`,
+      },
+      {
+        h1: `Sources`,
+        list: [
+          { p: `<a href="https://blog.google/innovation-and-ai/technology/developers-tools/gemini-decisions-api/" target="_blank" rel="noopener noreferrer">Google: Introducing the Gemini Decisions API</a>` },
+          { p: `<a href="https://aistudio.google.com/docs/decisions-api" target="_blank" rel="noopener noreferrer">Decisions API docs</a>` },
+          { p: `<a href="https://docs.langchain.com/oss/python/integrations/decision_models/google_generative_ai" target="_blank" rel="noopener noreferrer">LangChain: Google Generative AI decision models</a>` },
+          { p: `<a href="https://blog.google/innovation-and-ai/technology/developers-tools/build-with-gemini-4-hydrogen/" target="_blank" rel="noopener noreferrer">Build with Gemini 4 Hydrogen</a>` },
+          { p: `<a href="https://blog.google/innovation-and-ai/technology/developers-tools/gemini-4-carbon-developers/" target="_blank" rel="noopener noreferrer">Gemini 4 Carbon for developers</a>` },
+        ],
+      },
+    ],
+    advertisements: {
+      show: false,
+    },
+    referBlog: {
+      show: true,
+      title: `Gemini Computer Use Is GA: Build an AI QA Agent That Clicks Through Your Next.js App`,
+      slug: `gemini-computer-use-ai-qa-agent-tutorial`,
+    },
   }
 ];
 
